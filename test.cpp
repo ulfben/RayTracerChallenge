@@ -32,6 +32,9 @@ constexpr Tuple normalize(const Tuple &t) noexcept {
   assert(length != 0.0f);
   return t / length;
 }
+constexpr Real dot(const Tuple &a, const Tuple &b) noexcept {
+  return a.x * b.x + a.y * b.y + a.z * b.z;
+}
 constexpr bool is_vector(Tuple t) noexcept { return t.w == 0; }
 constexpr bool is_point(Tuple t) noexcept { return t.w == 1; }
 
@@ -150,18 +153,24 @@ TEST(vector, hasMagnitude) {
   v = vector(0, 0, 1);
   EXPECT_FLOAT_EQ(magnitude(v), 1.0f);
   v = vector(1, 2, 3);
-  EXPECT_FLOAT_EQ(magnitude(v),  math::sqrt(14));
+  EXPECT_FLOAT_EQ(magnitude(v), math::sqrt(14));
   v = vector(-1, -2, -3);
-  EXPECT_FLOAT_EQ(magnitude(v),  math::sqrt(14));
+  EXPECT_FLOAT_EQ(magnitude(v), math::sqrt(14));
   EXPECT_TRUE(is_vector(v));
 }
 
 TEST(vector, canBeNormalized) {
   const auto v = vector(4, 0, 0);
   EXPECT_EQ(normalize(v), vector(1, 0, 0));
-  const auto norm = normalize(vector(1,2,3));
+  const auto norm = normalize(vector(1, 2, 3));
   EXPECT_FLOAT_EQ(magnitude(norm), 1.0f);
-  EXPECT_FLOAT_EQ(norm.x, 1.0f/std::sqrt(14.0f));// roughly 0.26726
-  EXPECT_FLOAT_EQ(norm.y, 2.0f/std::sqrt(14.0f));// roughly 0.53452
-  EXPECT_FLOAT_EQ(norm.z, 3.0f/std::sqrt(14.0f));// roughly 0.80178
+  EXPECT_FLOAT_EQ(norm.x, 1.0f / std::sqrt(14.0f)); // roughly 0.26726
+  EXPECT_FLOAT_EQ(norm.y, 2.0f / std::sqrt(14.0f)); // roughly 0.53452
+  EXPECT_FLOAT_EQ(norm.z, 3.0f / std::sqrt(14.0f)); // roughly 0.80178
+}
+
+TEST(vector, hasDotProduct) {
+  const auto a = vector(1,2,3);
+  const auto b = vector(2,3,4);
+  EXPECT_FLOAT_EQ(dot(a,b), 20.0f);
 }
