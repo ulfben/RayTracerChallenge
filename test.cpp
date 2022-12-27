@@ -64,6 +64,22 @@ TEST(Tuples, canBeAdded) {
   EXPECT_TRUE(res == truth);
 }
 
+TEST(Tuples, pointPlusVectorIsPoint) {
+  const auto t1 = point(3, 2, 1);
+  const auto t2 = vector(5,6,7);
+  const auto res = t1 + t2;
+  EXPECT_TRUE(res == point(8, 8, 8));
+  EXPECT_TRUE(is_point(res));
+}
+
+TEST(Tuples, vectorPlusVectorisVector) {
+  const auto t1 = vector(3, 2, 1);
+  const auto t2 = vector(5,6,7);
+  const auto res = t1 + t2;
+  EXPECT_TRUE(res == vector(8, 8, 8));
+  EXPECT_TRUE(is_vector(res));
+}
+
 TEST(Tuples, pointMinusPointIsVector) {
   const auto t1 = point(3, 2, 1);
   const auto t2 = point(5,6,7);
@@ -87,3 +103,4 @@ TEST(Tuples, vectorMinusVectorIsaVector) {
   EXPECT_TRUE(res == vector(-2, -4, -6));
   EXPECT_TRUE(is_vector(res));
 }
+
