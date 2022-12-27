@@ -13,7 +13,7 @@ struct Tuple {
     return Tuple{x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w};
   }
   constexpr Tuple operator-() const noexcept {
-    return Tuple{-x, -y, -z, -w};
+    return Tuple{-x, -y, -z, w};
   }
   constexpr bool operator==(const Tuple& rhs) const noexcept = default;
 };
@@ -104,3 +104,9 @@ TEST(Tuples, vectorMinusVectorIsaVector) {
   EXPECT_TRUE(is_vector(res));
 }
 
+TEST(Tuples, canBeNegated) {
+  const auto t1 = point(3, 2, 1);
+  const auto t2 = vector(5,6,7);
+  EXPECT_EQ(-t1, point(-3, -2, -1));
+  EXPECT_EQ(-t2, vector(-5, -6, -7));
+}
