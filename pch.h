@@ -1,18 +1,16 @@
-//
-// pch.h
-//
-
 #pragma once
-#include "gtest/gtest.h"
 #include <cassert>
 #include <limits>
+#include <algorithm>
+#include <vector>
+#include "gtest/gtest.h"
 
 namespace Detail {
 float constexpr sqrtNewtonRaphson(float x, float curr, float prev) {
   return curr == prev ? curr
                       : sqrtNewtonRaphson(x, 0.5f * (curr + x / curr), curr);
 }
-} // namespace Detail
+}
 
 /*
  * Constexpr version of the square root
@@ -27,4 +25,4 @@ float constexpr sqrt(float x) noexcept {
              ? Detail::sqrtNewtonRaphson(x, x, 0.0f)
              : std::numeric_limits<float>::quiet_NaN();
 }
-} // namespace math
+}
