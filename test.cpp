@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Tuple.h"
-#include "Buffer.h"
+#include "Canvas.h"
 
 TEST(Tuple, W1isPoint) {
   const Tuple t{4.3f, -4.2f, 3.1f, 1.0f};
@@ -160,4 +160,21 @@ TEST(color, canBeMultiplied) {
   EXPECT_FLOAT_EQ(result.g, 0.2f);
   EXPECT_FLOAT_EQ(result.b, 0.04f);
   EXPECT_FLOAT_EQ(result.a, 1.0f);
+}
+
+TEST(Canvas, hasWidthHeightAndColor) {
+  const auto canvas = Canvas(10, 20);
+  EXPECT_EQ(canvas.width(), (uint32_t) 10);
+  EXPECT_EQ(canvas.height(), (uint32_t) 20);
+  for (const auto &pixel : canvas) {
+    EXPECT_EQ(pixel, color(.0f, .0f, .0f, 1.0f));
+  }
+}
+
+TEST(Canvas, canSetAndGetPixel) {
+  auto canvas = Canvas(10, 20);
+  const auto red = color(1, 0, 0);
+  canvas.set(2, 3, red);
+  EXPECT_EQ(canvas.get(2,3), red);
+
 }

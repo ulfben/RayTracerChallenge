@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.h"
-struct Tuple; 
+struct Tuple;
 using Real = float;
 using Vector = Tuple;
 using Point = Tuple;
@@ -17,8 +17,8 @@ struct Tuple {
       Real r, g, b, a;
     };
   };
-  
-  constexpr Tuple operator*(const Tuple& color) const noexcept {
+
+  constexpr Tuple operator*(const Tuple &color) const noexcept {
     return hadamard_product(*this, color);
   }
 
@@ -35,7 +35,7 @@ struct Tuple {
     return Tuple{x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w};
   }
   constexpr Tuple operator-() const noexcept { return Tuple{-x, -y, -z, w}; }
-  constexpr bool operator==(const Tuple& rhs) const noexcept {
+  constexpr bool operator==(const Tuple &rhs) const noexcept {
     return rhs.x == x && rhs.y == y && rhs.z == z && rhs.w == w;
   };
 };
@@ -51,7 +51,6 @@ constexpr Tuple color(Real r, Real g, Real b, Real a = 1.0f) noexcept {
 }
 constexpr bool is_vector(Tuple t) noexcept { return t.w == 0; }
 constexpr bool is_point(Tuple t) noexcept { return t.w == 1; }
-
 
 constexpr Real magnitudeSq(const Tuple &t) noexcept {
   return ((t.x * t.x) + (t.y * t.y) + (t.z * t.z));
@@ -78,8 +77,5 @@ constexpr Tuple cross(const Tuple &a, const Tuple &b) noexcept {
 }
 
 constexpr Tuple hadamard_product(const Color &a, const Color &b) noexcept {
-  return Color{a.r * b.r, 
-               a.g * b.g, 
-               a.b * b.b,
-               a.a * b.a};
+  return Color{a.r * b.r, a.g * b.g, a.b * b.b, a.a * b.a};
 }
