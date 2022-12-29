@@ -38,6 +38,7 @@
   <ItemGroup>
     <ClInclude Include="Canvas.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="StringHelpers.h" />
     <ClInclude Include="Tuple.h" />
   </ItemGroup>
   <ItemGroup>

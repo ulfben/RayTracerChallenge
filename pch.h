@@ -3,7 +3,9 @@
 #include <limits>
 #include <algorithm>
 #include <vector>
+#include <format>
 #include "gtest/gtest.h"
+
 
 namespace Detail {
 float constexpr sqrtNewtonRaphson(float x, float curr, float prev) {

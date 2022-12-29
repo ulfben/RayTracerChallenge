@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Tuple.h"
 #include "Canvas.h"
+#include "StringHelpers.h"
 
 TEST(Tuple, W1isPoint) {
   const Tuple t{4.3f, -4.2f, 3.1f, 1.0f};
@@ -176,5 +177,13 @@ TEST(Canvas, canSetAndGetPixel) {
   const auto red = color(1, 0, 0);
   canvas.set(2, 3, red);
   EXPECT_EQ(canvas.get(2,3), red);
+}
 
+TEST(Canvas, canOutputPPMHeader) {
+  const auto canvas = Canvas(5, 3);
+  const auto output = canvas.to_ppm();
+  const auto lines = split(output, "\n");
+  EXPECT_EQ(lines[0], "P3"sv);
+  EXPECT_EQ(lines[1], "5 3"sv);
+  EXPECT_EQ(lines[2], "255"sv);
 }

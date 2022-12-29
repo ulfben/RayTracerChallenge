@@ -40,6 +40,10 @@ struct Tuple {
   };
 };
 
+
+
+constexpr std::string to_string(Color c) { return ""; }
+
 constexpr Tuple vector(Real x, Real y, Real z) noexcept {
   return Tuple{x, y, z, 0.0f};
 }

@@ -43,4 +43,7 @@ public:
   }
   constexpr auto begin() const noexcept { return bitmap.begin(); }
   constexpr auto end() const noexcept { return bitmap.end(); }
+  std::string to_ppm() const noexcept {
+    return std::format("{}\n{} {}\n255\n", "P3", _width, _height);
+  }
 };
