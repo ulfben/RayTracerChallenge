@@ -260,3 +260,9 @@ TEST(Canvas, PPMLineWrapDoesntBreakPixels2) {
   EXPECT_EQ(lines[5], LESS_THAN_70_CHARS);  
   EXPECT_EQ(lines[6], WRAPPED);
 }
+
+TEST(Canvas, PPMIsTerminatedByNewline) {
+  auto canvas = Canvas(5, 3);  
+  const auto output = canvas.to_ppm();
+  EXPECT_EQ('\n', output.back());  
+}
