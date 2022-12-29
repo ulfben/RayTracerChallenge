@@ -199,3 +199,64 @@ TEST(Canvas, canOutputPPMPixelData) {
   EXPECT_EQ(lines[4], "0 0 0 0 0 0 0 128 0 0 0 0 0 0 0"sv);
   EXPECT_EQ(lines[5], "0 0 0 0 0 0 0 0 0 0 0 0 0 0 255"sv);
 }
+
+TEST(Canvas, PPMIsMax70CharsPerLine) {
+  auto canvas = Canvas(10, 2);
+  canvas.clear(color(1.0f, 0.8f, 0.6f));  
+  const auto output = canvas.to_ppm();
+  const auto lines = split(output, "\n");
+  const auto LESS_THAN_70_CHARS =
+      "255 204 153 255 204 153 255 204 153 255 204 153 255 204 153"sv;
+  const auto WRAPPED = "255 204 153 255 204 153 255 204 153 255 204 153 255 204 153"sv;
+
+  EXPECT_EQ(lines[3].size(), LESS_THAN_70_CHARS.size());
+  EXPECT_EQ(lines[4].size(), WRAPPED.size());
+  EXPECT_EQ(lines[5].size(), LESS_THAN_70_CHARS.size());
+  EXPECT_EQ(lines[6].size(), WRAPPED.size());
+  
+  EXPECT_EQ(lines[3], LESS_THAN_70_CHARS);  
+  EXPECT_EQ(lines[4], WRAPPED);  
+  EXPECT_EQ(lines[5], LESS_THAN_70_CHARS);  
+  EXPECT_EQ(lines[6], WRAPPED);
+}
+
+TEST(Canvas, PPMLineWrapDoesntBreakPixels) {
+  auto canvas = Canvas(10, 2);
+  canvas.clear(color(0.0f, 0.8f, 0.6f));  
+  const auto output = canvas.to_ppm();
+  const auto lines = split(output, "\n");
+  const auto LESS_THAN_70_CHARS =
+      "0 204 153 0 204 153 0 204 153 0 204 153 0 204 153 0 204 153"sv;
+  const auto WRAPPED = "0 204 153 0 204 153 0 204 153 0 204 153"sv;
+
+  EXPECT_EQ(lines[3].size(), LESS_THAN_70_CHARS.size());
+  EXPECT_EQ(lines[4].size(), WRAPPED.size());
+  EXPECT_EQ(lines[5].size(), LESS_THAN_70_CHARS.size());
+  EXPECT_EQ(lines[6].size(), WRAPPED.size());
+  
+  EXPECT_EQ(lines[3], LESS_THAN_70_CHARS);  
+  EXPECT_EQ(lines[4], WRAPPED);  
+  EXPECT_EQ(lines[5], LESS_THAN_70_CHARS);  
+  EXPECT_EQ(lines[6], WRAPPED);
+}
+
+TEST(Canvas, PPMLineWrapDoesntBreakPixels2) {
+  auto canvas = Canvas(10, 2);
+  canvas.clear(color(0.0f, 0.2f, 0.6f));  
+  const auto output = canvas.to_ppm();
+  const auto lines = split(output, "\n");
+  
+  const auto LESS_THAN_70_CHARS =
+      "0 51 153 0 51 153 0 51 153 0 51 153 0 51 153 0 51 153 0 51 153"sv;
+  const auto WRAPPED = "0 51 153 0 51 153 0 51 153"sv;
+
+  EXPECT_EQ(lines[3].size(), LESS_THAN_70_CHARS.size());
+  EXPECT_EQ(lines[4].size(), WRAPPED.size());
+  EXPECT_EQ(lines[5].size(), LESS_THAN_70_CHARS.size());
+  EXPECT_EQ(lines[6].size(), WRAPPED.size());
+  
+  EXPECT_EQ(lines[3], LESS_THAN_70_CHARS);  
+  EXPECT_EQ(lines[4], WRAPPED);  
+  EXPECT_EQ(lines[5], LESS_THAN_70_CHARS);  
+  EXPECT_EQ(lines[6], WRAPPED);
+}

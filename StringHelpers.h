@@ -11,6 +11,7 @@ using namespace std::string_literals;
 using std::string_view;
 using StringViews = std::vector<string_view>;
 static constexpr string_view WHITE_SPACE = " \f\n\r\t\v"sv;
+static constexpr string_view NEWLINE = "\n"sv;
 
 string_view trimLeft(string_view in, string_view delims = WHITE_SPACE) noexcept {
   const auto countFromTheLeft = in.find_first_not_of(delims);

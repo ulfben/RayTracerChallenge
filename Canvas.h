@@ -47,19 +47,28 @@ public:
   constexpr auto end() const noexcept { return bitmap.end(); }
   std::string to_ppm() const noexcept {
     using namespace std::string_literals;
-    const auto CHANNELS = 4; // RGBA
+    const auto CHANNELS = 3; // RGB
     const auto CHARS = 4;    //"255 "
-    std::string result = ppm_header();
-    result.reserve(result.size() + (_width * _height * (CHANNELS * CHARS)));
+    const auto PIXEL_CHAR_COUNT = CHANNELS * CHARS;
+    const auto LINE_WRAP = 70-PIXEL_CHAR_COUNT;
+    std::string ppm = ppm_header();    
+    ppm.reserve(ppm.size() + (bitmap.size() * PIXEL_CHAR_COUNT));
     for (size_t y = 0; y < _height; ++y) {
+      auto linestart = ppm.size();
       for (size_t x = 0; x < _width; ++x) {
-        std::format_to(std::back_inserter(result), "{} ",
+        std::format_to(std::back_inserter(ppm), "{} ",
                        to_rgb_bytes(bitmap[y * _width + x]));
+        if(ppm.size()-linestart >= LINE_WRAP){          
+          ppm.pop_back(); //remove trailing whitespace
+          ppm.append(NEWLINE);
+          linestart = ppm.size();
+        }
       }
-      result.pop_back(); //remove trailing whitespace
-      result.append("\n"s);
+      ppm.pop_back(); //remove trailing whitespace
+      ppm.append(NEWLINE);
     }
-    return result;
+    ppm.shrink_to_fit();
+    return ppm;
   }
 
 private:
