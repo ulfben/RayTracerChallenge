@@ -10,8 +10,6 @@ using namespace std::string_view_literals;
 using namespace std::string_literals;
 using std::string_view;
 using StringViews = std::vector<string_view>;
-using Number = int;
-using Numbers = std::vector<Number>;
 static constexpr string_view WHITE_SPACE = " \f\n\r\t\v"sv;
 
 string_view trimLeft(string_view in, string_view delims = WHITE_SPACE) noexcept {
@@ -31,9 +29,9 @@ string_view trim(string_view in, string_view delims = WHITE_SPACE) noexcept {
 }
 
 [[nodiscard]] StringViews split(string_view source, string_view delim) {
-  StringViews values;
-  std::ranges::split_view outer_view{source, delim};
-  for (const auto &split : outer_view) {
+  StringViews values;  
+  for (std::ranges::split_view outer_view{source, delim}; 
+        const auto &split : outer_view) {
     if (split.empty()) {
       continue;
     }

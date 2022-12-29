@@ -27,4 +27,20 @@ float constexpr sqrt(float x) noexcept {
              ? Detail::sqrtNewtonRaphson(x, x, 0.0f)
              : std::numeric_limits<float>::quiet_NaN();
 }
+
+template<class T>
+requires std::floating_point<T>
+bool almost_equal(T x, T y, int ulp){
+    // the machine epsilon has to be scaled to the magnitude of the values used
+    // and multiplied by the desired precision in ULPs (units in the last place)
+    return std::fabs(x-y) <= std::numeric_limits<T>::epsilon() * std::fabs(x+y) * ulp
+        // unless the result is subnormal
+        || std::fabs(x-y) < std::numeric_limits<T>::min();
+}
+
+template<class T>
+requires std::floating_point<T>
+constexpr bool almost_equal(T x, T y) noexcept {
+    return std::fabs(x-y) <= std::numeric_limits<T>::epsilon();
+}
 }

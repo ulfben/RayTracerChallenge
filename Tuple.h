@@ -35,12 +35,12 @@ struct Tuple {
     return Tuple{x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w};
   }
   constexpr Tuple operator-() const noexcept { return Tuple{-x, -y, -z, w}; }
-  constexpr bool operator==(const Tuple &rhs) const noexcept {
-    return rhs.x == x && rhs.y == y && rhs.z == z && rhs.w == w;
+  constexpr bool operator==(const Tuple &rhs) const noexcept {    
+      using math::almost_equal;
+    return almost_equal(rhs.x, x) && almost_equal(rhs.y, y) &&
+        almost_equal(rhs.z, z) && almost_equal(rhs.w, w);
   };
 };
-
-
 
 constexpr std::string to_string(Color c) { return ""; }
 
