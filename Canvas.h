@@ -1,8 +1,10 @@
 // application.hpp
 // lippuu: https://gist.github.com/lippuu/cbf4fa62fe8eed408159a558ff5c96ee
 #pragma once
-#include "Tuple.h"
 #include "pch.h"
+#include "Tuple.h"
+#include "StringHelpers.h"
+
 using Bitmap = std::vector<Color>;
 class Canvas {
   Bitmap bitmap;
@@ -44,6 +46,24 @@ public:
   constexpr auto begin() const noexcept { return bitmap.begin(); }
   constexpr auto end() const noexcept { return bitmap.end(); }
   std::string to_ppm() const noexcept {
-    return std::format("{}\n{} {}\n255\n", "P3", _width, _height);
+    using namespace std::string_literals;
+    const auto CHANNELS = 4; // RGBA
+    const auto CHARS = 4;    //"255 "
+    std::string result = ppm_header();
+    result.reserve(result.size() + (_width * _height * (CHANNELS * CHARS)));
+    for (size_t y = 0; y < _height; ++y) {
+      for (size_t x = 0; x < _width; ++x) {
+        std::format_to(std::back_inserter(result), "{} ",
+                       to_rgb_bytes(bitmap[y * _width + x]));
+      }
+      result.pop_back(); //remove trailing whitespace
+      result.append("\n"s);
+    }
+    return result;
+  }
+
+private:
+  std::string ppm_header() const noexcept {
+    return std::format("{}\n{} {}\n{}\n", PPM_VERSION, _width, _height, PPM_MAX);
   }
 };

@@ -5,7 +5,10 @@
 #include <vector>
 #include <format>
 #include "gtest/gtest.h"
+using namespace std::string_view_literals;
 
+static constexpr auto PPM_VERSION = "P3"sv;
+static constexpr auto PPM_MAX = 255; //max value of color components in PPM file. 
 
 namespace Detail {
 float constexpr sqrtNewtonRaphson(float x, float curr, float prev) {

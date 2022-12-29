@@ -35,14 +35,12 @@ struct Tuple {
     return Tuple{x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w};
   }
   constexpr Tuple operator-() const noexcept { return Tuple{-x, -y, -z, w}; }
-  constexpr bool operator==(const Tuple &rhs) const noexcept {    
-      using math::almost_equal;
+  constexpr bool operator==(const Tuple &rhs) const noexcept {
+    using math::almost_equal;
     return almost_equal(rhs.x, x) && almost_equal(rhs.y, y) &&
-        almost_equal(rhs.z, z) && almost_equal(rhs.w, w);
+           almost_equal(rhs.z, z) && almost_equal(rhs.w, w);
   };
 };
-
-constexpr std::string to_string(Color c) { return ""; }
 
 constexpr Tuple vector(Real x, Real y, Real z) noexcept {
   return Tuple{x, y, z, 0.0f};
@@ -53,6 +51,24 @@ constexpr Tuple point(Real x, Real y, Real z) noexcept {
 constexpr Tuple color(Real r, Real g, Real b, Real a = 1.0f) noexcept {
   return Tuple{r, g, b, a};
 }
+
+constexpr Color to_byte_values(Color c) noexcept {
+  // TODO: implement expects(), requires() etc.
+  // assert(c.r >= 0 && c.r < 1.0f && "to_rgb(): red channel is out of range");
+  // assert(c.g >= 0 && c.g < 1.0f && "to_rgb(): green channel is out of
+  // range"); assert(c.b >= 0 && c.b < 1.0f && "to_rgb(): blue channel is out of
+  // range");
+  const float MAX = PPM_MAX;
+  return color(std::clamp(std::round(c.r * PPM_MAX), 0.0f, MAX),
+               std::clamp(std::round(c.g * PPM_MAX), 0.0f, MAX),
+               std::clamp(std::round(c.b * PPM_MAX), 0.0f, MAX));
+}
+
+std::string to_rgb_bytes(Color c) {
+  const auto out = to_byte_values(c);
+  return std::format("{} {} {}", out.r, out.g, out.b);
+}
+
 constexpr bool is_vector(Tuple t) noexcept { return t.w == 0; }
 constexpr bool is_point(Tuple t) noexcept { return t.w == 1; }
 

@@ -187,3 +187,15 @@ TEST(Canvas, canOutputPPMHeader) {
   EXPECT_EQ(lines[1], "5 3"sv);
   EXPECT_EQ(lines[2], "255"sv);
 }
+
+TEST(Canvas, canOutputPPMPixelData) {
+  auto canvas = Canvas(5, 3);
+  canvas.set(0, 0, color(1.5f, 0, 0));
+  canvas.set(2, 1, color(0, 0.5f, 0));
+  canvas.set(4, 2, color(-0.5, 0, 1.0f));
+  const auto output = canvas.to_ppm();
+  const auto lines = split(output, "\n");
+  EXPECT_EQ(lines[3], "255 0 0 0 0 0 0 0 0 0 0 0 0 0 0"sv);
+  EXPECT_EQ(lines[4], "0 0 0 0 0 0 0 128 0 0 0 0 0 0 0"sv);
+  EXPECT_EQ(lines[5], "0 0 0 0 0 0 0 0 0 0 0 0 0 0 255"sv);
+}
