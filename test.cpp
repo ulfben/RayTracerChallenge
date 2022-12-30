@@ -1,7 +1,8 @@
 #include "pch.h"
-#include "Tuple.h"
 #include "Canvas.h"
 #include "StringHelpers.h"
+#include "Tuple.h"
+#include "Projectile.h"
 
 TEST(Tuple, W1isPoint) {
   const Tuple t{4.3f, -4.2f, 3.1f, 1.0f};
@@ -165,8 +166,8 @@ TEST(color, canBeMultiplied) {
 
 TEST(Canvas, hasWidthHeightAndColor) {
   const auto canvas = Canvas(10, 20);
-  EXPECT_EQ(canvas.width(), (uint32_t) 10);
-  EXPECT_EQ(canvas.height(), (uint32_t) 20);
+  EXPECT_EQ(canvas.width(), (uint32_t)10);
+  EXPECT_EQ(canvas.height(), (uint32_t)20);
   for (const auto &pixel : canvas) {
     EXPECT_EQ(pixel, color(.0f, .0f, .0f, 1.0f));
   }
@@ -176,7 +177,7 @@ TEST(Canvas, canSetAndGetPixel) {
   auto canvas = Canvas(10, 20);
   const auto red = color(1, 0, 0);
   canvas.set(2, 3, red);
-  EXPECT_EQ(canvas.get(2,3), red);
+  EXPECT_EQ(canvas.get(2, 3), red);
 }
 
 TEST(Canvas, canOutputPPMHeader) {
@@ -202,27 +203,28 @@ TEST(Canvas, canOutputPPMPixelData) {
 
 TEST(Canvas, PPMIsMax70CharsPerLine) {
   auto canvas = Canvas(10, 2);
-  canvas.clear(color(1.0f, 0.8f, 0.6f));  
+  canvas.clear(color(1.0f, 0.8f, 0.6f));
   const auto output = canvas.to_ppm();
   const auto lines = split(output, "\n");
   const auto LESS_THAN_70_CHARS =
       "255 204 153 255 204 153 255 204 153 255 204 153 255 204 153"sv;
-  const auto WRAPPED = "255 204 153 255 204 153 255 204 153 255 204 153 255 204 153"sv;
+  const auto WRAPPED =
+      "255 204 153 255 204 153 255 204 153 255 204 153 255 204 153"sv;
 
   EXPECT_EQ(lines[3].size(), LESS_THAN_70_CHARS.size());
   EXPECT_EQ(lines[4].size(), WRAPPED.size());
   EXPECT_EQ(lines[5].size(), LESS_THAN_70_CHARS.size());
   EXPECT_EQ(lines[6].size(), WRAPPED.size());
-  
-  EXPECT_EQ(lines[3], LESS_THAN_70_CHARS);  
-  EXPECT_EQ(lines[4], WRAPPED);  
-  EXPECT_EQ(lines[5], LESS_THAN_70_CHARS);  
+
+  EXPECT_EQ(lines[3], LESS_THAN_70_CHARS);
+  EXPECT_EQ(lines[4], WRAPPED);
+  EXPECT_EQ(lines[5], LESS_THAN_70_CHARS);
   EXPECT_EQ(lines[6], WRAPPED);
 }
 
 TEST(Canvas, PPMLineWrapDoesntBreakPixels) {
   auto canvas = Canvas(10, 2);
-  canvas.clear(color(0.0f, 0.8f, 0.6f));  
+  canvas.clear(color(0.0f, 0.8f, 0.6f));
   const auto output = canvas.to_ppm();
   const auto lines = split(output, "\n");
   const auto LESS_THAN_70_CHARS =
@@ -233,19 +235,19 @@ TEST(Canvas, PPMLineWrapDoesntBreakPixels) {
   EXPECT_EQ(lines[4].size(), WRAPPED.size());
   EXPECT_EQ(lines[5].size(), LESS_THAN_70_CHARS.size());
   EXPECT_EQ(lines[6].size(), WRAPPED.size());
-  
-  EXPECT_EQ(lines[3], LESS_THAN_70_CHARS);  
-  EXPECT_EQ(lines[4], WRAPPED);  
-  EXPECT_EQ(lines[5], LESS_THAN_70_CHARS);  
+
+  EXPECT_EQ(lines[3], LESS_THAN_70_CHARS);
+  EXPECT_EQ(lines[4], WRAPPED);
+  EXPECT_EQ(lines[5], LESS_THAN_70_CHARS);
   EXPECT_EQ(lines[6], WRAPPED);
 }
 
 TEST(Canvas, PPMLineWrapDoesntBreakPixels2) {
   auto canvas = Canvas(10, 2);
-  canvas.clear(color(0.0f, 0.2f, 0.6f));  
+  canvas.clear(color(0.0f, 0.2f, 0.6f));
   const auto output = canvas.to_ppm();
   const auto lines = split(output, "\n");
-  
+
   const auto LESS_THAN_70_CHARS =
       "0 51 153 0 51 153 0 51 153 0 51 153 0 51 153 0 51 153 0 51 153"sv;
   const auto WRAPPED = "0 51 153 0 51 153 0 51 153"sv;
@@ -254,15 +256,27 @@ TEST(Canvas, PPMLineWrapDoesntBreakPixels2) {
   EXPECT_EQ(lines[4].size(), WRAPPED.size());
   EXPECT_EQ(lines[5].size(), LESS_THAN_70_CHARS.size());
   EXPECT_EQ(lines[6].size(), WRAPPED.size());
-  
-  EXPECT_EQ(lines[3], LESS_THAN_70_CHARS);  
-  EXPECT_EQ(lines[4], WRAPPED);  
-  EXPECT_EQ(lines[5], LESS_THAN_70_CHARS);  
+
+  EXPECT_EQ(lines[3], LESS_THAN_70_CHARS);
+  EXPECT_EQ(lines[4], WRAPPED);
+  EXPECT_EQ(lines[5], LESS_THAN_70_CHARS);
   EXPECT_EQ(lines[6], WRAPPED);
 }
 
 TEST(Canvas, PPMIsTerminatedByNewline) {
-  auto canvas = Canvas(5, 3);  
+  auto canvas = Canvas(5, 3);
   const auto output = canvas.to_ppm();
-  EXPECT_EQ('\n', output.back());  
+  EXPECT_EQ('\n', output.back());
+}
+
+TEST(Canvas, PuttingItAllTogether) {
+  auto c = Canvas(900, 550);
+  auto vel = normalize(vector(1, -1.8f, 0)) * 11.25f;
+  auto p = Projectile(point(0, c.height(), 0), vel);
+  for (int i = 0; i < 100; i++) {
+    p.update();
+    p.render(c);
+  }
+    // c.to_ppm();
+  EXPECT_TRUE(false);
 }

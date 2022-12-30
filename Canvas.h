@@ -32,6 +32,9 @@ public:
     assert(y <= _height && "Buffer::set called with invalid y position");
     bitmap[y * _width + x] = c;
   }
+  constexpr void set(const Point& p, const Color &c) noexcept {
+    set(static_cast<uint32_t>(p.x), static_cast<uint32_t>(p.y), c);
+  }
   constexpr Color get(uint32_t x, uint32_t y) const noexcept {
     assert(x <= _width && "Buffer::get called with invalid x position");
     assert(y <= _height && "Buffer::get called with invalid y position");

@@ -25,12 +25,24 @@ struct Tuple {
   constexpr Tuple operator*(Real scalar) const noexcept {
     return Tuple{x * scalar, y * scalar, z * scalar, w * scalar};
   }
+  constexpr void operator*=(Real scalar) noexcept {
+    x *= scalar;
+    y *= scalar;
+    z *= scalar;
+    w *= scalar;
+  }
   constexpr Tuple operator/(Real scalar) const noexcept {
     return Tuple{x / scalar, y / scalar, z / scalar, w / scalar};
   }
   constexpr Tuple operator+(Tuple rhs) const noexcept {
     return Tuple{x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w};
   }
+  constexpr void operator+=(Tuple rhs) noexcept {
+    x += rhs.x;
+    y += rhs.y;
+    z += rhs.z;
+    w += rhs.w;
+  };
   constexpr Tuple operator-(Tuple rhs) const noexcept {
     return Tuple{x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w};
   }
