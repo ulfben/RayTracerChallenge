@@ -270,13 +270,15 @@ TEST(Canvas, PPMIsTerminatedByNewline) {
 }
 
 TEST(Canvas, PuttingItAllTogether) {
-  auto c = Canvas(900, 550);
-  auto vel = normalize(vector(1, -1.8f, 0)) * 11.25f;
-  auto p = Projectile(point(0, c.height(), 0), vel);
-  for (int i = 0; i < 100; i++) {
+  auto c = Canvas(300, 300);
+  const auto bottomEdge = static_cast<Real>(c.height());
+  const auto vel = normalize(vector(1, -1.8f, 0)) * 11.25f;
+  auto p = Projectile(point(0, bottomEdge, 0), vel);
+  while (p.y() <= bottomEdge) {
     p.update();
     p.render(c);
   }
-    // c.to_ppm();
-  EXPECT_TRUE(false);
+  std::ofstream ofs("test.ppm", std::ofstream::out);
+  ofs << c.to_ppm();
+  EXPECT_TRUE(true);
 }

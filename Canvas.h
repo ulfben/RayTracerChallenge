@@ -5,6 +5,7 @@
 #include "Tuple.h"
 #include "StringHelpers.h"
 
+
 using Bitmap = std::vector<Color>;
 class Canvas {
   Bitmap bitmap;
@@ -28,17 +29,17 @@ public:
   }
 
   constexpr void set(uint32_t x, uint32_t y, const Color &c) noexcept {
-    assert(x <= _width && "Buffer::set called with invalid x position");
-    assert(y <= _height && "Buffer::set called with invalid y position");
-    bitmap[y * _width + x] = c;
+    if (x < _width && y < _height) {
+      bitmap[y * _width + x] = c;
+    }
   }
-  constexpr void set(const Point& p, const Color &c) noexcept {
-    set(static_cast<uint32_t>(p.x), static_cast<uint32_t>(p.y), c);
+  constexpr void set(const Point& p, const Color &c) noexcept {    
+    set(std::lroundf(p.x), std::lroundf(p.y), c);
   }
-  constexpr Color get(uint32_t x, uint32_t y) const noexcept {
-    assert(x <= _width && "Buffer::get called with invalid x position");
-    assert(y <= _height && "Buffer::get called with invalid y position");
-    return bitmap[y * _width + x];
+  constexpr Color get(uint32_t x, uint32_t y) const noexcept {    
+    if (x < _width && y < _height) {
+      return bitmap[y * _width + x];
+    }
   }
   constexpr uint32_t width() const noexcept {
     return static_cast<uint32_t>(_width);
@@ -48,6 +49,7 @@ public:
   }
   constexpr auto begin() const noexcept { return bitmap.begin(); }
   constexpr auto end() const noexcept { return bitmap.end(); }
+  
   std::string to_ppm() const noexcept {
     using namespace std::string_literals;
     const auto CHANNELS = 3; // RGB

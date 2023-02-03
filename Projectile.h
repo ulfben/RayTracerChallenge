@@ -14,9 +14,11 @@ public:
 
   void update() noexcept {
     position += velocity;
+    velocity += wind;
+    velocity += gravity;
     velocity *= friction;
   }
-  void render(Canvas &c) const noexcept {
-    c.set(position, myColor);
-  }
+  void render(Canvas &c) const noexcept { c.set(position, myColor); }
+
+  auto y() const noexcept { return position.y; };
 };
