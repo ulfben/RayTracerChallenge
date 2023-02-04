@@ -13,13 +13,17 @@
     <ClInclude Include="tests\TupleTests.h">
       <Filter>tests</Filter>
     </ClInclude>
-    <ClInclude Include="tests\CanvasTest.h">
+    <ClInclude Include="tests\CanvasTests.h">
       <Filter>tests</Filter>
     </ClInclude>
-    <ClInclude Include="tests\VectorTest.h">
+    <ClInclude Include="tests\VectorTests.h">
       <Filter>tests</Filter>
     </ClInclude>
     <ClInclude Include="tests\ColorTests.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix.h" />
+    <ClInclude Include="tests\MatrixTests.h">
       <Filter>tests</Filter>
     </ClInclude>
   </ItemGroup>

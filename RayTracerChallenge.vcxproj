@@ -37,12 +37,14 @@
   </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="Canvas.h" />
+    <ClInclude Include="Matrix.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="StringHelpers.h" />
-    <ClInclude Include="tests\CanvasTest.h" />
+    <ClInclude Include="tests\CanvasTests.h" />
     <ClInclude Include="tests\ColorTests.h" />
-    <ClInclude Include="tests\VectorTest.h" />
+    <ClInclude Include="tests\MatrixTests.h" />
+    <ClInclude Include="tests\VectorTests.h" />
     <ClInclude Include="Tuple.h" />
   </ItemGroup>
   <ItemGroup>
