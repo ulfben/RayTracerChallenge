@@ -11,8 +11,9 @@ constexpr Color hadamard_product(const Color &a, const Color &b) noexcept;
 #pragma warning( disable : 4201 )
 //warning C4201: nonstandard extension used: nameless struct/union
 struct Tuple {
+    static const auto SIZE = 4;
   union {
-    Real data[4]{};
+      Real data[SIZE]{};
     struct {
       Real x, y, z, w;
     };
