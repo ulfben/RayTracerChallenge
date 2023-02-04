@@ -7,16 +7,20 @@ using Point = Tuple;
 using Color = Tuple;
 constexpr Color hadamard_product(const Color &a, const Color &b) noexcept;
 
+#pragma warning(push)
+#pragma warning( disable : 4201 )
+//warning C4201: nonstandard extension used: nameless struct/union
 struct Tuple {
   union {
-    Real data[4];
+    Real data[4]{};
     struct {
       Real x, y, z, w;
     };
-    struct {
+    struct{
       Real r, g, b, a;
     };
   };
+#pragma warning(pop)
 
   constexpr Tuple operator*(const Tuple &color) const noexcept {
     return hadamard_product(*this, color);

@@ -6,7 +6,13 @@
 #include <format>
 #include <fstream>
 #include "cmath"
-#include "gtest/gtest.h"
+
+#pragma warning(push)
+#pragma warning( disable : 26495 )
+    //disable all warnings for gtest
+    #include "gtest/gtest.h"
+#pragma warning(pop)
+
 using namespace std::string_view_literals;
 
 static constexpr auto PPM_VERSION = "P3"sv;

@@ -37,9 +37,9 @@ public:
     set(std::lroundf(p.x), std::lroundf(p.y), c);
   }
   constexpr Color get(uint32_t x, uint32_t y) const noexcept {    
-    if (x < _width && y < _height) {
-      return bitmap[y * _width + x];
-    }
+      assert(x <= _width && "Buffer::get called with invalid x position");
+      assert(y <= _height && "Buffer::get called with invalid y position");  
+      return bitmap[y * _width + x];    
   }
   constexpr uint32_t width() const noexcept {
     return static_cast<uint32_t>(_width);
