@@ -99,6 +99,17 @@ Tuple operator*(const Matrix4& lhs, const Tuple rhs) noexcept {
    return Tuple{x, y, z, w};
 }
 
+template <uint8_t ROWS, uint8_t COLUMNS>
+Matrix<ROWS, COLUMNS> transpose(const Matrix<ROWS, COLUMNS>& a) noexcept {
+    Matrix<ROWS, COLUMNS> result;
+   for (uint8_t row = 0; row < ROWS; ++row) {
+        for (uint8_t col = 0; col < COLUMNS; ++col) {
+            result(col,row) = a(row,col);
+        }
+    }
+    return result;
+}
+
 TEST(Matrix, isRowMajorOrder) {
     const Matrix4 m = { 1.0f, 2.0f,  3.0f,  4.0f,  5.0f,  6.0f,  7.0f,  8.0f,
                        9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f };
@@ -149,10 +160,12 @@ TEST(Matrix, canBeMultiplied) {
 }
 
 TEST(Matrix, canBeMultipliedWithTuple) {
-    Matrix4 a{ 1, 2, 3, 4,
-               2, 4, 4, 2,
-                8,6,4,1,
-                0,0,0,1 };
+    Matrix4 a{ 
+        1, 2, 3, 4,
+        2, 4, 4, 2,
+        8, 6, 4, 1,
+        0, 0, 0, 1 
+    };
     auto b = Tuple{ 1, 2, 3, 1 };
     auto product = a * b; 
     const auto truth = Tuple{ 18,24,33,1 };
@@ -160,11 +173,34 @@ TEST(Matrix, canBeMultipliedWithTuple) {
 }
 
 TEST(Matrix, hasIdentity) {
-    Matrix4 a{ 0,1,2,4,
-                1,2,4,8,
-                2,4,8,16,
-                4,8,16,32 };
+    Matrix4 a{ 
+        0,1,2,4,
+        1,2,4,8,
+        2,4,8,16,
+        4,8,16,32 
+    };
     const Matrix4 id = Matrix4::identity();
     auto product = a * id;
     EXPECT_TRUE(product == a);
+}
+
+TEST(Matrix, canBeTransposed) {
+    const Matrix4 a{ 
+        0,9,3,0,
+        9,8,0,8,
+        1,8,5,3,
+        0,0,5,8 
+    };
+    const Matrix4 truth{
+        0,9,1,0,
+        9,8,8,0,
+        3,0,5,5,
+        0,8,3,8
+    };
+    const Matrix4 b = transpose(a);    
+    EXPECT_TRUE(b == truth);
+    const Matrix4 c = transpose(b);
+    EXPECT_TRUE(a == c); //2x transpose = back to original
+    const Matrix4 identity = Matrix4::identity();
+    EXPECT_TRUE(identity == transpose(identity));
 }
