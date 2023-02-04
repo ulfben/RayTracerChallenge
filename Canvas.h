@@ -1,11 +1,11 @@
-// application.hpp
-// lippuu: https://gist.github.com/lippuu/cbf4fa62fe8eed408159a558ff5c96ee
 #pragma once
 #include "pch.h"
 #include "Tuple.h"
 #include "StringHelpers.h"
 
 
+// application.hpp
+// lippuu: https://gist.github.com/lippuu/cbf4fa62fe8eed408159a558ff5c96ee
 using Bitmap = std::vector<Color>;
 class Canvas {
   Bitmap bitmap;
