@@ -1,6 +1,6 @@
 #pragma once
-#include "Canvas.h";
-#include "Tuple.h";
+#include "Canvas.h"
+#include "Tuple.h"
 static const Vector gravity = vector(0, 0.1f, 0);
 static const Vector wind = vector(-0.01f, 0, 0);
 static const Color myColor = color(1.0f, 0, 0);
