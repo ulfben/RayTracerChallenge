@@ -35,7 +35,7 @@ struct Matrix {
   
   value_type _data[COLUMNS * ROWS]{};
 
-  constexpr const_reference operator()(size_type row, size_type col) noexcept {
+  constexpr reference operator()(size_type row, size_type col) noexcept {
     return _data[COLUMNS * row + col];
   }
   constexpr value_type operator()(size_type row, size_type col) const noexcept {
@@ -55,16 +55,32 @@ struct Matrix {
 };
 
 template <uint8_t ROWS, uint8_t COLUMNS>
-constexpr bool operator==(Matrix<ROWS, COLUMNS> &lhs,
-                          Matrix<ROWS, COLUMNS> &rhs) noexcept {
+constexpr bool operator==(const Matrix<ROWS, COLUMNS> &lhs,
+                          const Matrix<ROWS, COLUMNS> &rhs) noexcept {
   using std::ranges::equal;
   return equal(lhs, rhs, [](auto a, auto b) { return math::almost_equal(a, b); });
 }
+
+template <uint8_t ROWS, uint8_t COLUMNS>
+Matrix<ROWS, COLUMNS> operator*(const Matrix<ROWS, COLUMNS>& lhs, const Matrix<ROWS, COLUMNS>& rhs) noexcept {		
+  Matrix<ROWS, COLUMNS> result;
+	for (uint8_t row = 0; row < ROWS; ++row) {		
+		for (uint8_t col = 0; col < COLUMNS; ++col) {
+      for (uint8_t i = 0; i < COLUMNS; ++i) {
+          result(row, col) += lhs(row, i) * rhs(i, col);                        
+      }
+		}
+	}
+	return result;
+}
+
+
+
 using Matrix4 = Matrix<4, 4>;
 using Matrix3 = Matrix<3, 3>;
 using Matrix2 = Matrix<2, 2>;
 
-TEST(Matrix, isRowColumnOrder) {
+TEST(Matrix, isRowMajorOrder) {
   const Matrix4 m = {1.0f, 2.0f,  3.0f,  4.0f,  5.0f,  6.0f,  7.0f,  8.0f,
                      9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f};
   EXPECT_EQ(m(0, 0), 1.0f);
@@ -97,11 +113,24 @@ TEST(Matrix, isEqualityComparable) {
   Matrix3 b = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f};
   EXPECT_TRUE(a == b);
   EXPECT_FALSE(a != b);
+
+  Matrix2 c = {1.0f, 2.0f, 3.0f, 4.0f};
+  Matrix2 d = {1.1f, 2.1f, 3.0f, 4.0f};
+  EXPECT_FALSE(c == d);
+  EXPECT_TRUE(c != d);
 }
 
-TEST(Matrix, isEqualityComparable2) {
-  Matrix2 a = {1.0f, 2.0f, 3.0f, 4.0f};
-  Matrix2 b = {1.1f, 2.1f, 3.0f, 4.0f};
-  EXPECT_FALSE(a == b);
-  EXPECT_TRUE(a != b);
+TEST(Matrix, canBeMultiplied) { 
+    Matrix4 a{1,2,3,4,
+              5,6,7,8,
+              9,8,7,6,
+              5,4,3,2};
+    Matrix4 b{-2,1,2,3,
+               3,2,1,-1,
+               4,3,6,5,
+               1,2,7,8};
+    auto product = a * b;
+    const Matrix4 truth{20, 22, 50,  48,  44, 54, 114, 108,
+                        40, 58, 110, 102, 16, 26, 46,  42};
+    EXPECT_TRUE(product == truth);
 }
