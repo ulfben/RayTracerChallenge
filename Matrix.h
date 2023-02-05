@@ -17,11 +17,40 @@ template <uint8_t ROWS, uint8_t COLUMNS> struct Matrix {
 
     constexpr reference operator()(size_type row, size_type col) noexcept {
         assert(row < rows() && col < columns() && "Matrix access is out of bounds");
-        return _data[COLUMNS * row + col];
+        return _data[columns() * row + col];
     }
     constexpr value_type operator()(size_type row, size_type col) const noexcept {
         assert(row < rows() && col < columns() && "Matrix access is out of bounds");
-        return _data[COLUMNS * row + col];
+        return _data[columns() * row + col];
+    }
+    constexpr value_type operator[](size_type i) const noexcept {
+        assert(i < size());
+        return _data[i];
+    }
+    constexpr reference operator[](size_type i) noexcept {
+        assert(i < size());
+        return _data[i];
+    }
+
+    constexpr value_type index_to_column(size_t index) const noexcept {
+        assert(index < size());
+        return static_cast<value_type>(index % columns());
+    }
+    constexpr value_type index_to_row(size_t index) const noexcept {
+        assert(index < size());
+        return static_cast<value_type>(index / columns());
+    }
+        
+    constexpr auto submatrix(size_type remove_row, size_type remove_column) const noexcept {
+        assert(remove_row < rows() && remove_column < columns() && "submatrix: row and column to remove must be inside the original matrix.");
+        Matrix<ROWS - 1, COLUMNS - 1> r;  
+        uint8_t ri = 0;
+        for (size_t i = 0; i < size(); i++) {
+            if (index_to_column(i) != remove_column && index_to_row(i) != remove_row) {
+                r[ri++] = _data[i];
+            }
+        }     
+        return r;
     }
 
     constexpr size_type columns() const noexcept { return COLUMNS; }
@@ -35,7 +64,7 @@ template <uint8_t ROWS, uint8_t COLUMNS> struct Matrix {
     constexpr const_iterator begin() const noexcept { return data(); }
     constexpr const_iterator end() const noexcept { return begin() + size(); }
 
-    static constexpr Matrix<ROWS, COLUMNS> identity() noexcept {
+    static constexpr auto identity() noexcept {
         static_assert(ROWS == COLUMNS, "Matrix::identity only supports square matrixes");
         Matrix<ROWS, COLUMNS> result;
         for (size_type i = 0; i < COLUMNS; ++i) {
@@ -59,11 +88,12 @@ constexpr bool operator==(const Matrix<ROWS, COLUMNS>& lhs,
 }
 
 template <uint8_t ROWS, uint8_t COLUMNS>
-Matrix<ROWS, COLUMNS> operator*(const Matrix<ROWS, COLUMNS>& lhs, const Matrix<ROWS, COLUMNS>& rhs) noexcept {
+constexpr auto operator*(const Matrix<ROWS, COLUMNS>& lhs, const Matrix<ROWS, COLUMNS>& rhs) noexcept {
+    using size_type = Matrix<ROWS, COLUMNS>::size_type;
     Matrix<ROWS, COLUMNS> result;
-    for (uint8_t row = 0; row < ROWS; ++row) {
-        for (uint8_t col = 0; col < COLUMNS; ++col) {
-            for (uint8_t i = 0; i < COLUMNS; ++i) {
+    for (size_type row = 0; row < ROWS; ++row) {
+        for (size_type col = 0; col < COLUMNS; ++col) {
+            for (size_type i = 0; i < ROWS; ++i) {
                 result(row, col) += lhs(row, i) * rhs(i, col);
             }
         }
@@ -72,19 +102,19 @@ Matrix<ROWS, COLUMNS> operator*(const Matrix<ROWS, COLUMNS>& lhs, const Matrix<R
 }
 
 Tuple operator*(const Matrix4& lhs, const Tuple rhs) noexcept {
-   const auto x = rhs.x*lhs(0,0) + rhs.y*lhs(0,1) + rhs.z*lhs(0,2) + rhs.w*lhs(0,3);
-   const auto y = rhs.x*lhs(1,0) + rhs.y*lhs(1,1) + rhs.z*lhs(1,2) + rhs.w*lhs(1,3);
-   const auto z = rhs.x*lhs(2,0) + rhs.y*lhs(2,1) + rhs.z*lhs(2,2) + rhs.w*lhs(2,3);
-   const auto w = rhs.x*lhs(3,0) + rhs.y*lhs(3,1) + rhs.z*lhs(3,2) + rhs.w*lhs(3,3);   
-   return Tuple{x, y, z, w};
+    const auto x = rhs.x * lhs(0, 0) + rhs.y * lhs(0, 1) + rhs.z * lhs(0, 2) + rhs.w * lhs(0, 3);
+    const auto y = rhs.x * lhs(1, 0) + rhs.y * lhs(1, 1) + rhs.z * lhs(1, 2) + rhs.w * lhs(1, 3);
+    const auto z = rhs.x * lhs(2, 0) + rhs.y * lhs(2, 1) + rhs.z * lhs(2, 2) + rhs.w * lhs(2, 3);
+    const auto w = rhs.x * lhs(3, 0) + rhs.y * lhs(3, 1) + rhs.z * lhs(3, 2) + rhs.w * lhs(3, 3);
+    return Tuple{ x, y, z, w };
 }
 
 template <uint8_t ROWS, uint8_t COLUMNS>
 Matrix<ROWS, COLUMNS> transpose(const Matrix<ROWS, COLUMNS>& a) noexcept {
     Matrix<ROWS, COLUMNS> result;
-   for (uint8_t row = 0; row < ROWS; ++row) {
+    for (uint8_t row = 0; row < ROWS; ++row) {
         for (uint8_t col = 0; col < COLUMNS; ++col) {
-            result(col,row) = a(row,col);
+            result(col, row) = a(row, col);
         }
     }
     return result;

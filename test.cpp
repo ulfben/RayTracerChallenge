@@ -56,6 +56,31 @@ TEST(Matrix, canCalcDeterminant) {
     };
     ASSERT_EQ(determinant(a), 17);
 }
+TEST(Matrix, getRowFromIndex) {
+    const Matrix3 a{
+        1,5,0,
+        -3,2,7,
+        0,6,-3
+    };    
+    EXPECT_EQ(0, a.index_to_row(0)); 
+    EXPECT_EQ(0, a.index_to_row(2)); 
+    EXPECT_EQ(2, a.index_to_row(6)); 
+    EXPECT_EQ(2, a.index_to_row(8));     
+}
+
+TEST(Matrix, getColumnFromIndex) {
+    const Matrix3 a{
+        1,5,0,
+        -3,2,7,
+        0,6,-3
+    };    
+    EXPECT_EQ(0, a.index_to_column(0)); 
+    EXPECT_EQ(1, a.index_to_column(1)); 
+    EXPECT_EQ(2, a.index_to_column(2)); 
+    EXPECT_EQ(0, a.index_to_column(6)); 
+    EXPECT_EQ(1, a.index_to_column(7)); 
+    EXPECT_EQ(2, a.index_to_column(8)); 
+}
 
 TEST(Matrix, submatrixOf3x3is2x2) {
     const Matrix3 a{
@@ -68,5 +93,8 @@ TEST(Matrix, submatrixOf3x3is2x2) {
         0, 6
     };
     const auto b = submatrix(a, 0, 2);
+    const auto c = a.submatrix(0, 2);
     EXPECT_TRUE(b == truth);
+    EXPECT_TRUE(c == truth);
 }
+

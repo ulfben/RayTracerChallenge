@@ -2,6 +2,7 @@
 #include <cassert>
 #include <limits>
 #include <algorithm>
+#include <array>
 #include <vector>
 #include <format>
 #include <fstream>
