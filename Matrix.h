@@ -12,6 +12,8 @@ template <uint8_t ROWS, uint8_t COLUMNS> struct Matrix {
     using size_type = uint8_t;
     using reference = value_type&;
     using const_reference = const value_type&;
+    static constexpr size_type HEIGHT = ROWS;
+    static constexpr size_type WIDTH = COLUMNS;
 
     value_type _data[COLUMNS * ROWS]{};
 
@@ -46,6 +48,7 @@ template <uint8_t ROWS, uint8_t COLUMNS> struct Matrix {
         Matrix<ROWS - 1, COLUMNS - 1> r;          
         uint8_t ri = 0;
         for (size_type i = 0; i < size(); i++) {
+            //if(index_to_row(i) == remove_row) { i += columns(); } //skip the entire row
             if(index_to_row(i) != remove_row && index_to_column(i) != remove_column) {
                 r[ri++] = _data[i];
             }
@@ -79,21 +82,20 @@ using Matrix3 = Matrix<3, 3>;
 using Matrix2 = Matrix<2, 2>;
 static constexpr auto Matrix4Identity = Matrix4::identity();
 
-template <uint8_t ROWS, uint8_t COLUMNS>
-constexpr bool operator==(const Matrix<ROWS, COLUMNS>& lhs,
-    const Matrix<ROWS, COLUMNS>& rhs) noexcept {
+template <class Matrix>
+constexpr bool operator==(const Matrix& lhs, const Matrix& rhs) noexcept {
     using std::ranges::equal;
     return equal(lhs, rhs,
         [](auto a, auto b) { return math::almost_equal(a, b); });
 }
 
-template <uint8_t ROWS, uint8_t COLUMNS>
-constexpr auto operator*(const Matrix<ROWS, COLUMNS>& lhs, const Matrix<ROWS, COLUMNS>& rhs) noexcept {
-    using size_type = Matrix<ROWS, COLUMNS>::size_type;
-    Matrix<ROWS, COLUMNS> result;
-    for (size_type row = 0; row < ROWS; ++row) {
-        for (size_type col = 0; col < COLUMNS; ++col) {
-            for (size_type i = 0; i < ROWS; ++i) {
+template <class Matrix>
+constexpr auto operator*(const Matrix& lhs, const Matrix& rhs) noexcept {
+    using size_type = Matrix::size_type;
+    Matrix result;
+    for (size_type row = 0; row < Matrix::HEIGHT; ++row) {
+        for (size_type col = 0; col < Matrix::WIDTH; ++col) {
+            for (size_type i = 0; i < Matrix::HEIGHT; ++i) {
                 result(row, col) += lhs(row, i) * rhs(i, col);
             }
         }
