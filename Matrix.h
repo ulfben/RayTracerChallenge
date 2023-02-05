@@ -16,9 +16,11 @@ template <uint8_t ROWS, uint8_t COLUMNS> struct Matrix {
     value_type _data[COLUMNS * ROWS]{};
 
     constexpr reference operator()(size_type row, size_type col) noexcept {
+        assert(row < rows() && col < columns() && "Matrix access is out of bounds");
         return _data[COLUMNS * row + col];
     }
     constexpr value_type operator()(size_type row, size_type col) const noexcept {
+        assert(row < rows() && col < columns() && "Matrix access is out of bounds");
         return _data[COLUMNS * row + col];
     }
 
@@ -46,7 +48,7 @@ template <uint8_t ROWS, uint8_t COLUMNS> struct Matrix {
 using Matrix4 = Matrix<4, 4>;
 using Matrix3 = Matrix<3, 3>;
 using Matrix2 = Matrix<2, 2>;
-static constexpr auto Matrix4Identity = Matrix<4, 4>::identity();
+static constexpr auto Matrix4Identity = Matrix4::identity();
 
 template <uint8_t ROWS, uint8_t COLUMNS>
 constexpr bool operator==(const Matrix<ROWS, COLUMNS>& lhs,

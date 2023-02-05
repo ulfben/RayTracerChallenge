@@ -20,6 +20,12 @@ TEST(Matrix, twoByTwo) {
     EXPECT_EQ(m(1, 1), 4.0f);
 }
 
+TEST(Matrix, assertOnOutOfBounds) {
+    const Matrix2 m = { 1.0f, 2.0f, 3.0f, 4.0f };
+    EXPECT_DEATH(m(m.rows(), 0), "");
+    EXPECT_DEATH(m(0, m.columns()), "");
+}
+
 TEST(Matrix, threeByThree) {
     const Matrix3 m = { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f };
     EXPECT_EQ(m(0, 0), 1.0f);
