@@ -32,21 +32,21 @@ template <uint8_t ROWS, uint8_t COLUMNS> struct Matrix {
         return _data[i];
     }
 
-    constexpr value_type index_to_column(size_t index) const noexcept {
+    constexpr size_type index_to_column(size_type index) const noexcept {
         assert(index < size());
-        return static_cast<value_type>(index % columns());
+        return index % columns();
     }
-    constexpr value_type index_to_row(size_t index) const noexcept {
+    constexpr size_type index_to_row(size_type index) const noexcept {
         assert(index < size());
-        return static_cast<value_type>(index / columns());
+        return index / columns();
     }
         
     constexpr auto submatrix(size_type remove_row, size_type remove_column) const noexcept {
         assert(remove_row < rows() && remove_column < columns() && "submatrix: row and column to remove must be inside the original matrix.");
-        Matrix<ROWS - 1, COLUMNS - 1> r;  
+        Matrix<ROWS - 1, COLUMNS - 1> r;          
         uint8_t ri = 0;
-        for (size_t i = 0; i < size(); i++) {
-            if (index_to_column(i) != remove_column && index_to_row(i) != remove_row) {
+        for (size_type i = 0; i < size(); i++) {
+            if(index_to_row(i) != remove_row && index_to_column(i) != remove_column) {
                 r[ri++] = _data[i];
             }
         }     
