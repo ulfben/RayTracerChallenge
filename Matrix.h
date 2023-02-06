@@ -1,8 +1,8 @@
 #pragma once
 #include "pch.h"
 #include "Tuple.h"
-
-template <uint8_t ROWS, uint8_t COLUMNS> struct Matrix {
+template <uint8_t ROWS, uint8_t COLUMNS> 
+struct Matrix {
     static_assert(ROWS > 0 && COLUMNS > 0 && "Matrix dimensions must be non-zero.");
     static_assert((uint16_t(ROWS) * COLUMNS) < std::numeric_limits<uint8_t>::max(), "Matrix is limited to 255 elements.");
     using value_type = Real;
@@ -20,19 +20,19 @@ template <uint8_t ROWS, uint8_t COLUMNS> struct Matrix {
     value_type _data[COLUMNS * ROWS]{};
 
     constexpr reference operator()(size_type row, size_type col) noexcept {
-        assert(row < rows() && col < columns() && "Matrix access is out of bounds");
+        assert(row < rows() && col < columns() && "Matrix::operator(row,col) arguments are out of bounds");
         return _data[columns() * row + col];
     }
     constexpr value_type operator()(size_type row, size_type col) const noexcept {
-        assert(row < rows() && col < columns() && "Matrix access is out of bounds");
+        assert(row < rows() && col < columns() && "Matrix::operator(row,col) arguments are out of bounds");
         return _data[columns() * row + col];
     }
     constexpr value_type operator[](size_type i) const noexcept {
-        assert(i < size());
+        assert(i < size()) && "Matrix::operator[i] index is out of bounds");
         return _data[i];
     }
     constexpr reference operator[](size_type i) noexcept {
-        assert(i < size());
+        assert(i < size() && "Matrix::operator[i] index is out of bounds");
         return _data[i];
     }
 
@@ -46,7 +46,7 @@ template <uint8_t ROWS, uint8_t COLUMNS> struct Matrix {
     }
         
     constexpr auto submatrix(size_type remove_row, size_type remove_column) const noexcept {
-        assert(remove_row < rows() && remove_column < columns() && "Matrix::submatrix() arguments are out of range. row and column must be inside the input matrix.");
+        assert(remove_row < rows() && remove_column < columns() && "Matrix::submatrix() arguments are out of range. row and column must be inside the matrix.");
         submatrix_type r;          
         size_type ri = 0;
         for (size_type i = 0; i < size(); i++) {
