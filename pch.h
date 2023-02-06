@@ -33,7 +33,19 @@ float constexpr sqrtNewtonRaphson(float x, float curr, float prev) {
  *   - Otherwise, returns NaN
  */
 namespace math {
-float constexpr sqrt(float x) noexcept {
+    template<class T>
+    requires std::integral<T>
+    constexpr bool is_odd(T v) noexcept {
+        return v & 1;
+    }
+
+    template<class T>
+    requires std::integral<T>
+    constexpr bool is_even(T v) noexcept {
+        return v & 0;
+    }
+
+constexpr float sqrt(float x) noexcept {
   return x >= 0.0f && x < std::numeric_limits<float>::infinity()
              ? Detail::sqrtNewtonRaphson(x, x, 0.0f)
              : std::numeric_limits<float>::quiet_NaN();
@@ -41,7 +53,7 @@ float constexpr sqrt(float x) noexcept {
 
 template<class T>
 requires std::floating_point<T>
-bool almost_equal(T x, T y, int ulp){
+constexpr bool almost_equal(T x, T y, int ulp){
     // the machine epsilon has to be scaled to the magnitude of the values used
     // and multiplied by the desired precision in ULPs (units in the last place)
     return std::fabs(x-y) <= std::numeric_limits<T>::epsilon() * std::fabs(x+y) * ulp

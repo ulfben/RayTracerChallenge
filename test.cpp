@@ -43,6 +43,21 @@ constexpr auto submatrix(const Matrix<ROWS, COLUMNS>& in, uint8_t remove_row, ui
     return out;
 }
 
+//Returns the determinant of a submatrix
+template <uint8_t ROWS, uint8_t COLUMNS>
+constexpr Real minor(const Matrix<ROWS, COLUMNS>& in, uint8_t remove_row, uint8_t remove_column) noexcept {
+    assert(remove_row < ROWS && remove_column < COLUMNS && "invalid submatrix specification. row and column must be inside the input matrix.");   
+    const auto sub = submatrix(in, remove_row, remove_column);
+    return determinant(sub);    
+}
+
+template <uint8_t ROWS, uint8_t COLUMNS>
+constexpr Real cofactor(const Matrix<ROWS, COLUMNS>& in, uint8_t remove_row, uint8_t remove_column) noexcept {
+    assert(remove_row < ROWS && remove_column < COLUMNS && "invalid submatrix specification. row and column must be inside the input matrix.");   
+    const auto min = minor(in, remove_row, remove_column);
+    return math::is_odd(remove_row + remove_column) ? -min : min;    
+}
+
 TEST(Matrix, canCalcDeterminant) {
     const Matrix2 a{
         1,5,
@@ -92,3 +107,25 @@ TEST(Matrix, canExtractSubmatrix) {
     EXPECT_TRUE(c == truth);
 }
 
+TEST(Matrix, canCalculateMinor) {
+    const Matrix3 a{
+        3,5,0,
+        2,-1,-7,
+        6,-1,5
+    };
+    const auto sub = a.submatrix(1, 0);
+    EXPECT_EQ(25, determinant(sub));
+    EXPECT_EQ(25, minor(a, 1, 0));    
+}
+
+TEST(Matrix, canCalculateCofactor) {
+    const Matrix3 a{
+        3,5,0,
+        2,-1,-7,
+        6,-1,5
+    };    
+    EXPECT_EQ(-12, minor(a, 0, 0));
+    EXPECT_EQ(-12, cofactor(a, 0, 0));    
+    EXPECT_EQ(25, minor(a, 1, 0));
+    EXPECT_EQ(-25, cofactor(a, 1, 0));    
+}
