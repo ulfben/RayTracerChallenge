@@ -102,3 +102,103 @@ TEST(Matrix, canBeTransposed) {
     const Matrix4 identity = Matrix4::identity();
     EXPECT_TRUE(identity == transpose(identity));
 }
+
+TEST(Matrix, getRowFromIndex) {
+    const Matrix3 a{
+        1,5,0,
+        -3,2,7,
+        0,6,-3
+    };
+    EXPECT_EQ(0, a.index_to_row(0));
+    EXPECT_EQ(0, a.index_to_row(2));
+    EXPECT_EQ(2, a.index_to_row(6));
+    EXPECT_EQ(2, a.index_to_row(8));
+}
+
+TEST(Matrix, getColumnFromIndex) {
+    const Matrix3 a{
+        1,5,0,
+        -3,2,7,
+        0,6,-3
+    };
+    EXPECT_EQ(0, a.index_to_column(0));
+    EXPECT_EQ(1, a.index_to_column(1));
+    EXPECT_EQ(2, a.index_to_column(2));
+    EXPECT_EQ(0, a.index_to_column(6));
+    EXPECT_EQ(1, a.index_to_column(7));
+    EXPECT_EQ(2, a.index_to_column(8));
+}
+
+TEST(Matrix, canExtractSubmatrix) {
+    const Matrix3 a{
+        1,5,0,
+        -3,2,7,
+        0,6,-3
+    };
+    const Matrix2 truth{
+        -3, 2,
+        0, 6
+    };
+    const auto b = submatrix(a, 0, 2);
+    const auto c = a.submatrix(0, 2);
+    EXPECT_TRUE(b == truth);
+    EXPECT_TRUE(c == truth);
+}
+
+TEST(Matrix, canCalculateMinor) {
+    const Matrix3 a{
+        3,5,0,
+        2,-1,-7,
+        6,-1,5
+    };
+    const auto sub = a.submatrix(1, 0);
+    EXPECT_EQ(25, determinant(sub));
+    EXPECT_EQ(25, minor(a, 1, 0));
+}
+
+TEST(Matrix, canCalculateCofactor) {
+    const Matrix3 a{
+        3,5,0,
+        2,-1,-7,
+        6,-1,5
+    };
+    EXPECT_EQ(-12, minor(a, 0, 0));
+    EXPECT_EQ(-12, cofactor(a, 0, 0));
+    EXPECT_EQ(25, minor(a, 1, 0));
+    EXPECT_EQ(-25, cofactor(a, 1, 0));
+}
+
+TEST(Matrix, canCalcDeterminantOn2x2) {
+    const Matrix2 a{
+        1,5,
+        -3,2
+    };
+    ASSERT_EQ(determinant(a), 17);
+    ASSERT_EQ(determinant2(a), 17);
+}
+TEST(Matrix, canCalcDeterminantOn3x3) {
+    const Matrix3 a{
+        1,2,6,
+        -5,8,-4,
+        2,6,4
+    };
+    ASSERT_EQ(cofactor(a, 0, 0), 56);
+    ASSERT_EQ(cofactor(a, 0, 1), 12);
+    ASSERT_EQ(cofactor(a, 0, 2), -46);
+    ASSERT_EQ(determinant(a), -196);
+    ASSERT_EQ(determinant2(a), -196);
+}
+TEST(Matrix, canCalcDeterminantOn4x4) {
+    const Matrix4 a{
+        -2,-8,3,5,
+        -3,1,7,3,
+        1,2,-9,6,
+        -6,7,7,-9
+    };
+    ASSERT_EQ(cofactor(a, 0, 0), 690);
+    ASSERT_EQ(cofactor(a, 0, 1), 447);
+    ASSERT_EQ(cofactor(a, 0, 2), 210);
+    ASSERT_EQ(cofactor(a, 0, 3), 51);
+    ASSERT_EQ(determinant(a), -4071);
+    ASSERT_EQ(determinant2(a), -4071);
+}

@@ -80,6 +80,7 @@ template <uint8_t ROWS, uint8_t COLUMNS> struct Matrix {
 using Matrix4 = Matrix<4, 4>;
 using Matrix3 = Matrix<3, 3>;
 using Matrix2 = Matrix<2, 2>;
+using Matrix1 = Matrix<1, 1>; //to stop template deductions from breaking
 static constexpr auto Matrix4Identity = Matrix4::identity();
 
 template <class Matrix>
@@ -120,4 +121,80 @@ Matrix<ROWS, COLUMNS> transpose(const Matrix<ROWS, COLUMNS>& a) noexcept {
         }
     }
     return result;
+}
+
+constexpr Real determinant(const Matrix1& m) noexcept {    
+    return m(0, 0); //necessary for the template deduction
+}
+
+constexpr Real determinant(const Matrix2& m) noexcept {
+    return m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0);
+}
+
+constexpr Real determinant(const Matrix3& m) noexcept {
+    return m(0,0) * (m(1,1) * m(2,2) - m(1,2) * m(2,1)) - 
+           m(0,1) * (m(1,0) * m(2,2) - m(1,2) * m(2,0)) + 
+           m(0,2) * (m(1,0) * m(2,1) - m(1,1) * m(2,0));
+}
+
+constexpr Real determinant(const Matrix4& m) noexcept {
+    return 
+        m(0,0) * 
+            (m(1,1) * m(2,2) * m(3,3) + m(1,2) * m(2,3) * m(3,1) + 
+             m(1,3) * m(2,1) * m(3,2) - m(1,3) * m(2,2) * m(3,1) - 
+             m(1,1) * m(2,3) * m(3,2) - m(1,2) * m(2,1) * m(3,3)) - 
+        m(0,1) * 
+            (m(1,0) * m(2,2) * m(3,3) + m(1,2) * m(2,3) * m(3,0) + 
+            m(1,3) * m(2,0) * m(3,2) - m(1,3) * m(2,2) * m(3,0) - 
+            m(1,0) * m(2,3) * m(3,2) - m(1,2) * m(2,0) * m(3,3)) +
+        m(0,2) * 
+            (m(1,0) * m(2,1) * m(3,3) + m(1,1) * m(2,3) * m(3,0) + 
+            m(1,3) * m(2,0) * m(3,1) - m(1,3) * m(2,1) * m(3,0) - 
+            m(1,0) * m(2,3) * m(3,1) - m(1,1) * m(2,0) * m(3,3)) - 
+        m(0,3) * 
+            (m(1,0) * m(2,1) * m(3,2) + m(1,1) * m(2,2) * m(3,0) + 
+             m(1,2) * m(2,0) * m(3,1) - m(1,2) * m(2,1) * m(3,0) - 
+             m(1,0) * m(2,2) * m(3,1) - m(1,1) * m(2,0) * m(3,2));
+}
+
+//calculate determinant on arbitrary Matrix sizes.
+template <uint8_t ROWS, uint8_t COLUMNS>
+constexpr Real determinant2(const Matrix<ROWS, COLUMNS>& m) noexcept {        
+    using size_type = Matrix<ROWS, COLUMNS>::size_type;
+    Real out = 0;
+    for (size_type col = 0; col < COLUMNS; col++) {
+        out += m(0, col) * cofactor(m, 0, col);
+    }
+    return out;
+}
+
+template <uint8_t ROWS, uint8_t COLUMNS>
+constexpr auto submatrix(const Matrix<ROWS, COLUMNS>& in, uint8_t remove_row, uint8_t remove_column) noexcept {
+    assert(remove_row < ROWS&& remove_column < COLUMNS && "invalid submatrix specification. row and column must be inside the input matrix.");
+    using size_type = Matrix<ROWS, COLUMNS>::size_type;
+    Matrix<ROWS - 1, COLUMNS - 1> out;
+    size_type ri = 0;
+    for (size_type i = 0; i < ROWS; i++) {
+        if (i == remove_row) { continue; }
+        for (size_type j = 0; j < COLUMNS; j++) {
+            if (j == remove_column) { continue; }
+            out[ri++] = in[i * COLUMNS + j];
+        }
+    }
+    return out;
+}
+
+//Returns the determinant of a submatrix
+template <uint8_t ROWS, uint8_t COLUMNS>
+constexpr Real minor(const Matrix<ROWS, COLUMNS>& in, uint8_t remove_row, uint8_t remove_column) noexcept {
+    assert(remove_row < ROWS&& remove_column < COLUMNS && "invalid submatrix specification. row and column must be inside the input matrix.");
+    const auto sub = submatrix(in, remove_row, remove_column);
+    return determinant(sub);
+}
+
+template <uint8_t ROWS, uint8_t COLUMNS>
+constexpr Real cofactor(const Matrix<ROWS, COLUMNS>& in, uint8_t remove_row, uint8_t remove_column) noexcept {
+    assert(remove_row < ROWS&& remove_column < COLUMNS && "invalid submatrix specification. row and column must be inside the input matrix.");
+    const auto min = minor(in, remove_row, remove_column);
+    return math::is_odd(remove_row + remove_column) ? -min : min;
 }
