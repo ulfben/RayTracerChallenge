@@ -27,26 +27,20 @@ constexpr Real determinant(const Matrix2& m) noexcept {
     return m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0);
 }
 
-constexpr Matrix2 submatrix(const Matrix3& m, Matrix3::size_type row_, Matrix3::size_type column_) noexcept {
-    assert(row_ < m.rows() && column_ < m.columns() && "invalid submatrix specification. row and column must be inside the input matrix.");
-    using size_type = Matrix3::size_type;
-    Matrix2 r;
-    size_type i = 0;    
-    for (size_type k = 0; k < m.rows(); k++) {
-        if (k == row_) {
-            continue;
+template <uint8_t ROWS, uint8_t COLUMNS>
+constexpr auto submatrix(const Matrix<ROWS, COLUMNS>& in, uint8_t remove_row, uint8_t remove_column) noexcept {
+    assert(remove_row < ROWS && remove_column < COLUMNS && "invalid submatrix specification. row and column must be inside the input matrix.");   
+    using size_type = Matrix<ROWS, COLUMNS>::size_type;  
+    Matrix<ROWS - 1, COLUMNS - 1> out;          
+    size_type ri = 0;
+    for (size_type i = 0; i < ROWS; i++) {
+        if (i == remove_row) { continue; }
+        for (size_type j = 0; j < COLUMNS; j++) {
+            if (j == remove_column) { continue; }
+            out[ri++] = in[i * COLUMNS + j];
         }
-        size_type j = 0;
-        for (size_type l = 0; l < m.columns(); l++) {
-            if (l == column_) {
-                continue;
-            }
-            r(i, j) = m(k, l);
-            j++;
-        }
-        i++;
-    }
-    return r;
+    }     
+    return out;
 }
 
 TEST(Matrix, canCalcDeterminant) {
@@ -82,7 +76,7 @@ TEST(Matrix, getColumnFromIndex) {
     EXPECT_EQ(2, a.index_to_column(8)); 
 }
 
-TEST(Matrix, submatrixOf3x3is2x2) {
+TEST(Matrix, canExtractSubmatrix) {
     const Matrix3 a{
         1,5,0,
         -3,2,7,
