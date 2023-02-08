@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Tuple.h"
+#include "Math.h"
 template <uint8_t ROWS_, uint8_t COLUMNS_> 
 struct Matrix final {
     static_assert(ROWS_ > 0 && COLUMNS_ > 0 && "Matrix dimensions must be non-zero.");

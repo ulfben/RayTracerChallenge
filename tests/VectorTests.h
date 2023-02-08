@@ -1,7 +1,7 @@
 #pragma once
 #include "../pch.h"
 #include "../Tuple.h"
-
+#include "../Math.h"
 TEST(vector, hasMagnitude) {
   auto v = vector(1, 0, 0);
   EXPECT_FLOAT_EQ(magnitude(v), 1.0f);

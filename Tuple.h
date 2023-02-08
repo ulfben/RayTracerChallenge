@@ -1,5 +1,7 @@
 #pragma once
 #include "pch.h"
+#include "Math.h"
+
 struct Tuple;
 using Real = float;
 using Vector = Tuple;

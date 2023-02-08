@@ -26,6 +26,10 @@
     <ClInclude Include="tests\MatrixTests.h">
       <Filter>tests</Filter>
     </ClInclude>
+    <ClInclude Include="tests\FloatCompareTests.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Math.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

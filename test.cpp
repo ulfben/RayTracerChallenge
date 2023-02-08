@@ -4,6 +4,7 @@
 #include "Tuple.h"
 #include "Matrix.h"
 
+#include "tests/FloatCompareTests.h"
 #include "tests/ColorTests.h"
 #include "tests/TupleTests.h"
 #include "tests/VectorTests.h"
