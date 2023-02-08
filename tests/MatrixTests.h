@@ -168,7 +168,7 @@ TEST(Matrix, canCalculateCofactor) {
     EXPECT_EQ(-25, cofactor(a, 1, 0));
 }
 
-TEST(Matrix, canCalcDeterminantOn2x2) {
+TEST(Matrix, canCalculateDeterminantOn2x2) {
     const Matrix2 a{
         1,5,
         -3,2
@@ -176,7 +176,7 @@ TEST(Matrix, canCalcDeterminantOn2x2) {
     ASSERT_EQ(determinant(a), 17);
     ASSERT_EQ(determinant2(a), 17);
 }
-TEST(Matrix, canCalcDeterminantOn3x3) {
+TEST(Matrix, canCalculateDeterminantOn3x3) {
     const Matrix3 a{
         1,2,6,
         -5,8,-4,
@@ -188,7 +188,7 @@ TEST(Matrix, canCalcDeterminantOn3x3) {
     ASSERT_EQ(determinant(a), -196);
     ASSERT_EQ(determinant2(a), -196);
 }
-TEST(Matrix, canCalcDeterminantOn4x4) {
+TEST(Matrix, canCalculateDeterminantOn4x4) {
     const Matrix4 a{
         -2,-8,3,5,
         -3,1,7,3,
@@ -201,4 +201,21 @@ TEST(Matrix, canCalcDeterminantOn4x4) {
     ASSERT_EQ(cofactor(a, 0, 3), 51);
     ASSERT_EQ(determinant(a), -4071);
     ASSERT_EQ(determinant2(a), -4071);
+}
+
+TEST(Matrix, isInvertible) {
+    const Matrix4 a = { 
+        6,4,4,4,
+        5,5,7,6,
+        4,-9,3,-7,
+        9,1,7,-6
+    };
+    const Matrix4 b = { 
+        -4,2,-2,-3,
+        9,6,2,6,
+        0,-5,1,-5,
+        0,0,0,0
+    };
+    EXPECT_TRUE(is_invertible(a));
+    EXPECT_FALSE(is_invertible(b));    
 }

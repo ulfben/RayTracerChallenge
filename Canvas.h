@@ -7,7 +7,7 @@
 // application.hpp
 // lippuu: https://gist.github.com/lippuu/cbf4fa62fe8eed408159a558ff5c96ee
 using Bitmap = std::vector<Color>;
-class Canvas {
+class Canvas final {
   Bitmap bitmap;
   size_t _width = 0;
   size_t _height = 0;

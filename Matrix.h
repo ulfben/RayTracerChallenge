@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "Tuple.h"
 template <uint8_t ROWS, uint8_t COLUMNS> 
-struct Matrix {
+struct Matrix final {
     static_assert(ROWS > 0 && COLUMNS > 0 && "Matrix dimensions must be non-zero.");
     static_assert((uint16_t(ROWS) * COLUMNS) < std::numeric_limits<uint8_t>::max(), "Matrix is limited to 255 elements.");
     using value_type = Real;
@@ -28,7 +28,7 @@ struct Matrix {
         return _data[columns() * row + col];
     }
     constexpr value_type operator[](size_type i) const noexcept {
-        assert(i < size()) && "Matrix::operator[i] index is out of bounds");
+        assert(i < size() && "Matrix::operator[i] index is out of bounds");
         return _data[i];
     }
     constexpr reference operator[](size_type i) noexcept {
@@ -62,7 +62,7 @@ struct Matrix {
     constexpr size_type rows() const noexcept { return ROWS; }
     constexpr pointer data() noexcept { return &_data[0]; }
     constexpr const_pointer data() const noexcept { return &_data[0]; }
-    constexpr size_type size() const noexcept { return COLUMNS * ROWS; }
+    constexpr size_type size() const noexcept { return columns() * rows(); }
 
     constexpr iterator begin() noexcept { return data(); }
     constexpr iterator end() noexcept { return begin() + size(); }
@@ -136,7 +136,7 @@ constexpr Matrix2 operator*(const Matrix2& lhs, const Matrix2& rhs) noexcept {
 //multiplying arbitrarily sized (square) Matrices.
 template <class Matrix>
 constexpr auto operator*(const Matrix& lhs, const Matrix& rhs) noexcept {
-    using size_type = Matrix::size_type;
+    using size_type = typename Matrix::size_type;
     Matrix result;
     for (size_type row = 0; row < Matrix::HEIGHT; ++row) {
         for (size_type col = 0; col < Matrix::WIDTH; ++col) {
@@ -158,7 +158,7 @@ Tuple operator*(const Matrix4& lhs, const Tuple rhs) noexcept {
 
 template <class Matrix>
 Matrix transpose(const Matrix& a) noexcept {
-    using size_type = Matrix::size_type;
+    using size_type = typename Matrix::size_type;
     Matrix result;
     for (size_type row = 0; row < Matrix::HEIGHT; ++row) {
         for (size_type col = 0; col < Matrix::WIDTH; ++col) {
@@ -205,7 +205,7 @@ constexpr Real determinant(const Matrix4& m) noexcept {
 //calculate determinant on arbitrary Matrix sizes.
 template <class Matrix>
 constexpr Real determinant2(const Matrix& m) noexcept {        
-    using size_type = Matrix::size_type;
+    using size_type = typename Matrix::size_type;
     Real out = 0;
     for (size_type col = 0; col < Matrix::WIDTH; col++) {
         out += m(0, col) * cofactor(m, 0, col);
@@ -216,7 +216,7 @@ constexpr Real determinant2(const Matrix& m) noexcept {
 template <class Matrix>
 constexpr auto submatrix(const Matrix& in, uint8_t remove_row, uint8_t remove_column) noexcept {
     assert(remove_row < Matrix::HEIGHT && remove_column < Matrix::WIDTH && "submatrix() arguments are out of range. row and column must be inside the input matrix.");
-    using size_type = Matrix::size_type;
+    using size_type = typename Matrix::size_type;
     using SubMatrix = Matrix::submatrix_type;    
     SubMatrix out;
     size_type ri = 0;
@@ -243,4 +243,9 @@ constexpr Real cofactor(const Matrix& in, uint8_t remove_row, uint8_t remove_col
     assert(remove_row < Matrix::HEIGHT && remove_column < Matrix::WIDTH && "cofactor() arguments are out of range. row and column must be inside the input matrix.");
     const auto min = minor(in, remove_row, remove_column);
     return math::is_odd(remove_row + remove_column) ? -min : min;
+}
+
+template <class Matrix>
+constexpr bool is_invertible(const Matrix& m) noexcept {        
+    return determinant(m) != 0;
 }
