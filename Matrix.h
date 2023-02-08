@@ -1,10 +1,10 @@
 #pragma once
 #include "pch.h"
 #include "Tuple.h"
-template <uint8_t ROWS, uint8_t COLUMNS> 
+template <uint8_t ROWS_, uint8_t COLUMNS_> 
 struct Matrix final {
-    static_assert(ROWS > 0 && COLUMNS > 0 && "Matrix dimensions must be non-zero.");
-    static_assert((uint16_t(ROWS) * COLUMNS) < std::numeric_limits<uint8_t>::max(), "Matrix is limited to 255 elements.");
+    static_assert(ROWS_ > 0 && COLUMNS_ > 0 && "Matrix dimensions must be non-zero.");
+    static_assert((uint16_t(ROWS_) * COLUMNS_) < std::numeric_limits<uint8_t>::max(), "Matrix is limited to 255 elements.");
     using value_type = Real;
     using pointer = value_type*;
     using const_pointer = const value_type*;
@@ -13,11 +13,11 @@ struct Matrix final {
     using size_type = uint8_t;
     using reference = value_type&;
     using const_reference = const value_type&;
-    using submatrix_type = Matrix<ROWS - 1, COLUMNS - 1>;
-    static constexpr size_type HEIGHT = ROWS;
-    static constexpr size_type WIDTH = COLUMNS;
+    using submatrix_type = Matrix<ROWS_ - 1, COLUMNS_ - 1>;
+    static constexpr size_type ROWS = ROWS_;
+    static constexpr size_type COLUMNS = COLUMNS_;
 
-    value_type _data[COLUMNS * ROWS]{};
+    value_type _data[COLUMNS_ * ROWS_]{};
 
     constexpr reference operator()(size_type row, size_type col) noexcept {
         assert(row < rows() && col < columns() && "Matrix::operator(row,col) arguments are out of bounds");
@@ -58,8 +58,8 @@ struct Matrix final {
         return r;
     }
 
-    constexpr size_type columns() const noexcept { return COLUMNS; }
-    constexpr size_type rows() const noexcept { return ROWS; }
+    constexpr size_type columns() const noexcept { return COLUMNS_; }
+    constexpr size_type rows() const noexcept { return ROWS_; }
     constexpr pointer data() noexcept { return &_data[0]; }
     constexpr const_pointer data() const noexcept { return &_data[0]; }
     constexpr size_type size() const noexcept { return columns() * rows(); }
@@ -70,9 +70,9 @@ struct Matrix final {
     constexpr const_iterator end() const noexcept { return begin() + size(); }
 
     static constexpr auto identity() noexcept {
-        static_assert(ROWS == COLUMNS, "Matrix::identity only supports square matrixes");
-        Matrix<ROWS, COLUMNS> result;
-        for (size_type i = 0; i < COLUMNS; ++i) {
+        static_assert(ROWS_ == COLUMNS_, "Matrix::identity only supports square matrixes");
+        Matrix<ROWS_, COLUMNS_> result;
+        for (size_type i = 0; i < COLUMNS_; ++i) {
             result(i, i) = 1;
         }
         return result;
@@ -88,6 +88,7 @@ static constexpr auto Matrix4Identity = Matrix4::identity();
 template <class Matrix>
 constexpr bool operator==(const Matrix& lhs, const Matrix& rhs) noexcept {
     using std::ranges::equal;
+    using value_type = Matrix::value_type;
     return equal(lhs, rhs,
         [](auto a, auto b) { return math::almost_equal(a, b); });
 }
@@ -138,9 +139,9 @@ template <class Matrix>
 constexpr auto operator*(const Matrix& lhs, const Matrix& rhs) noexcept {
     using size_type = typename Matrix::size_type;
     Matrix result;
-    for (size_type row = 0; row < Matrix::HEIGHT; ++row) {
-        for (size_type col = 0; col < Matrix::WIDTH; ++col) {
-            for (size_type i = 0; i < Matrix::WIDTH; ++i) {
+    for (size_type row = 0; row < Matrix::ROWS; ++row) {
+        for (size_type col = 0; col < Matrix::COLUMNS; ++col) {
+            for (size_type i = 0; i < Matrix::COLUMNS; ++i) {
                 result(row, col) += lhs(row, i) * rhs(i, col);
             }
         }
@@ -160,8 +161,8 @@ template <class Matrix>
 Matrix transpose(const Matrix& a) noexcept {
     using size_type = typename Matrix::size_type;
     Matrix result;
-    for (size_type row = 0; row < Matrix::HEIGHT; ++row) {
-        for (size_type col = 0; col < Matrix::WIDTH; ++col) {
+    for (size_type row = 0; row < Matrix::ROWS; ++row) {
+        for (size_type col = 0; col < Matrix::COLUMNS; ++col) {
             result(col, row) = a(row, col);
         }
     }
@@ -207,7 +208,7 @@ template <class Matrix>
 constexpr Real determinant2(const Matrix& m) noexcept {        
     using size_type = typename Matrix::size_type;
     Real out = 0;
-    for (size_type col = 0; col < Matrix::WIDTH; col++) {
+    for (size_type col = 0; col < Matrix::COLUMNS; col++) {
         out += m(0, col) * cofactor(m, 0, col);
     }
     return out;
@@ -215,16 +216,16 @@ constexpr Real determinant2(const Matrix& m) noexcept {
 
 template <class Matrix>
 constexpr auto submatrix(const Matrix& in, uint8_t remove_row, uint8_t remove_column) noexcept {
-    assert(remove_row < Matrix::HEIGHT && remove_column < Matrix::WIDTH && "submatrix() arguments are out of range. row and column must be inside the input matrix.");
+    assert(remove_row < Matrix::ROWS && remove_column < Matrix::COLUMNS && "submatrix() arguments are out of range. row and column must be inside the input matrix.");
     using size_type = typename Matrix::size_type;
     using SubMatrix = Matrix::submatrix_type;    
     SubMatrix out;
     size_type ri = 0;
-    for (size_type i = 0; i < Matrix::HEIGHT; i++) {
+    for (size_type i = 0; i < Matrix::ROWS; i++) {
         if (i == remove_row) { continue; }
-        for (size_type j = 0; j < Matrix::WIDTH; j++) {
+        for (size_type j = 0; j < Matrix::COLUMNS; j++) {
             if (j == remove_column) { continue; }
-            out[ri++] = in[i * Matrix::WIDTH + j];
+            out[ri++] = in[i * Matrix::COLUMNS + j];
         }
     }
     return out;
@@ -233,14 +234,14 @@ constexpr auto submatrix(const Matrix& in, uint8_t remove_row, uint8_t remove_co
 //Returns the determinant of a submatrix
 template <class Matrix>
 constexpr Real minor(const Matrix& in, uint8_t remove_row, uint8_t remove_column) noexcept {
-    assert(remove_row < Matrix::HEIGHT && remove_column < Matrix::WIDTH && "minor() arguments are out of range. row and column must be inside the input matrix.");
+    assert(remove_row < Matrix::ROWS && remove_column < Matrix::COLUMNS && "minor() arguments are out of range. row and column must be inside the input matrix.");
     const auto sub = submatrix(in, remove_row, remove_column);
     return determinant(sub);
 }
 
 template <class Matrix>
 constexpr Real cofactor(const Matrix& in, uint8_t remove_row, uint8_t remove_column) noexcept {
-    assert(remove_row < Matrix::HEIGHT && remove_column < Matrix::WIDTH && "cofactor() arguments are out of range. row and column must be inside the input matrix.");
+    assert(remove_row < Matrix::ROWS && remove_column < Matrix::COLUMNS && "cofactor() arguments are out of range. row and column must be inside the input matrix.");
     const auto min = minor(in, remove_row, remove_column);
     return math::is_odd(remove_row + remove_column) ? -min : min;
 }
@@ -248,4 +249,20 @@ constexpr Real cofactor(const Matrix& in, uint8_t remove_row, uint8_t remove_col
 template <class Matrix>
 constexpr bool is_invertible(const Matrix& m) noexcept {        
     return determinant(m) != 0;
+}
+
+template <class Matrix>
+constexpr Matrix inverse(const Matrix& in) noexcept {        
+    const auto det = determinant(in);
+    assert(det != 0 && "Matrix inverse called with non-invertible Matrix");    
+    const auto invDet = 1.0f / det;
+    using size_type = typename Matrix::size_type;          
+    Matrix result; 
+    for (size_type row = 0; row < Matrix::ROWS; ++row) {
+        for (size_type col = 0; col < Matrix::COLUMNS; ++col) {            
+            result(col, row) = cofactor(in, row, col) * invDet; 
+            //note: "col,row" instead of "row,col", because we want to transpose the result.
+        }
+    }    
+    return result;
 }
