@@ -9,6 +9,7 @@
 #include "tests/TupleTests.h"
 #include "tests/VectorTests.h"
 #include "tests/MatrixTests.h"
+#include "tests/MatrixTransformationTests.h"
 
 //TEST(Chapter2, CanOutputPPM) {
 //    auto c = Canvas(300, 300);

@@ -46,6 +46,7 @@
     <ClInclude Include="tests\ColorTests.h" />
     <ClInclude Include="tests\FloatCompareTests.h" />
     <ClInclude Include="tests\MatrixTests.h" />
+    <ClInclude Include="tests\MatrixTransformationTests.h" />
     <ClInclude Include="tests\VectorTests.h" />
     <ClInclude Include="Tuple.h" />
   </ItemGroup>

@@ -38,16 +38,22 @@ namespace math {
     static constexpr auto MACHINE_EPSILON= 0.000000119209f; //== std::numeric_limits<Real>::epsilon();
 
     template<class T>
-        requires std::same_as<T, Real>
+        requires std::is_arithmetic_v<T>
     constexpr bool almost_equal(T a, T b, T epsilon = TESTED_EPSILON) noexcept {
         return math::abs(a - b) <= epsilon;
     }
 
+    //borrowed from QT
+    //dummy argument added to match the other comparison interfaces (easier to facade during testing).
+    constexpr bool fuzzy_compare(Real a, Real b, [[maybe_unused]] Real) noexcept {
+        return (math::abs(a - b) * 100000.f <= std::min(std::abs(a), math::abs(b)));
+    }
+
     //ported from Java implementation at https://floating-point-gui.de/errors/comparison/
     //  including test cases, see FloatCompareTests.h
-    //  currently failing all ulp tests. 
+    //  Currently failing all ulp tests. Does not work well with /fp:fast.
     template<class T>
-        requires std::same_as<T, Real>
+        requires std::is_arithmetic_v<T>
     constexpr bool nearly_equal(T a, T b, T epsilon = BRAZZY_EPSILON) noexcept {
         if (a == b) { // shortcut, handles infinities
             return true;
@@ -62,12 +68,5 @@ namespace math {
         }
         // use relative error
         return diff / std::min((absA + absB), std::numeric_limits<T>::max()) < epsilon;
-    }
-
-    //borrowed from QT
-    template<class T>
-        requires std::same_as<T, Real>
-    constexpr bool qFuzzyCompare(T a, T b, [[maybe_unused]] T) noexcept {
-        return (math::abs(a - b) * 100000.f <= std::min(std::abs(a), math::abs(b)));
     }
 }

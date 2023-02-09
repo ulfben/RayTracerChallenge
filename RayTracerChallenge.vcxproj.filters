@@ -30,6 +30,9 @@
       <Filter>tests</Filter>
     </ClInclude>
     <ClInclude Include="Math.h" />
+    <ClInclude Include="tests\MatrixTransformationTests.h">
+      <Filter>tests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

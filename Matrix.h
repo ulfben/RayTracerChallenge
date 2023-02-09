@@ -267,3 +267,11 @@ constexpr Matrix inverse(const Matrix& in) noexcept {
     }    
     return result;
 }
+
+constexpr Matrix4 translation(Real x, Real y, Real z) noexcept {            
+    auto result = Matrix4Identity;
+    result(0, 3) = x; 
+    result(1, 3) = y; 
+    result(2, 3) = z; 
+    return result;
+}
