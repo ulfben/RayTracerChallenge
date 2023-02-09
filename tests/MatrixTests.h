@@ -232,23 +232,87 @@ TEST(Matrix, canInvert) {
         -0.808271f, -1.45677f, -0.443609f, 0.520677f, 
         -0.0789474f, -0.223684f, -0.0526316f, 0.197368f, 
         -0.522556f, -0.81391f, -0.300752f, 0.306391f 
-    };
-    //oracle from the book 
-    /*const Matrix4 truth{
+    };    
+    const Matrix4 BOOK_ORACLE{ //truth / "good enough" according to the book.
          0.21805f, 0.45113f,0.24060f,-0.04511f,
         -0.80827f,-1.45677f,-0.44361f,0.52068f,
         -0.07895f,-0.22368f,-0.05263f,0.19737f,
         -0.52256f,-0.81391f,-0.30075f,0.30639f
-    };*/
-    const Matrix4 b = inverse(a);
+    };
+    const Matrix4 inv_a = inverse(a);
 
     EXPECT_TRUE(is_invertible(a));    
     EXPECT_EQ(determinant(a), 532);
     EXPECT_FLOAT_EQ(cofactor(a, 2, 3), -160.0f);    
-    EXPECT_FLOAT_EQ(b(3,2), -160.0f/532);
+    EXPECT_FLOAT_EQ(inv_a(3,2), -160.0f/532);
     EXPECT_FLOAT_EQ(cofactor(a, 3, 2), 105.0f);
-    EXPECT_FLOAT_EQ(b(2,3), 105.0f/532);
-    EXPECT_TRUE(b == truth);    
-    EXPECT_EQ(b, truth);    
+    EXPECT_FLOAT_EQ(inv_a(2,3), 105.0f/532);
+    EXPECT_TRUE(inv_a == truth);    
+    EXPECT_EQ(inv_a, truth);    
 }
 
+TEST(Matrix, canInvert2) {
+    const Matrix4 a = { 
+        8,-5,9,2,
+        7,5,6,1,
+        -6,0,9,6,
+        -3,0,-9,-4
+    };        
+    const Matrix4 truth{
+        -0.153846f, -0.153846f, -0.282051f, -0.538462f,
+        -0.0769231f, 0.123077f, 0.025641f, 0.0307692f,
+        0.358974f, 0.358974f, 0.435897f, 0.923077f,
+        -0.692308f, -0.692308f, -0.769231f, -1.92308f
+    };
+    const Matrix4 BOOK_ORACLE{ //truth / "good enough" according to the book.
+        -0.15385f, -0.15385f, -0.28205f, -0.53846f,
+        -0.07692f, 0.12308f, 0.02564f, 0.03077f,
+        0.35897f, 0.35897f, 0.43590f, 0.92308f,
+        -0.69231f, -0.69231f, -0.76923f, -1.92308f
+    };
+    const Matrix4 inv_a = inverse(a);
+        
+    EXPECT_EQ(inv_a, truth);    
+}
+
+TEST(Matrix, canInvert3) {
+    const Matrix4 a = { 
+        9,3,0,9,
+        -5,-2,-6,-3,
+        -4,9,6,4,
+        -7,6,6,2
+    };        
+    const Matrix4 truth{
+        -0.0407407f, -0.0777778f, 0.144444f, -0.222222f,
+        -0.0777778f, 0.0333333f, 0.366667f, -0.333333f,
+        -0.0290123f, -0.146296f, -0.109259f, 0.12963f,
+        0.177778f, 0.0666667f, -0.266667f, 0.333333f
+    };
+    const Matrix4 BOOK_ORACLE{ //truth / "good enough" according to the book.
+        -0.04074f, -0.07778f, 0.14444f, -0.22222f,
+        -0.07778f, 0.03333f, 0.36667f, -0.33333f,
+        -0.02901f, -0.14630f, -0.10926f, 0.12963f,
+        0.17778f, 0.06667f, -0.26667f, 0.33333f
+    };
+    const Matrix4 inv_a = inverse(a);
+        
+    EXPECT_EQ(inv_a, truth);    
+}
+
+TEST(Matrix, canRoundtripInvert) {
+    const Matrix4 a = { 
+        3,-9,7,3,
+        3,-8,2,-9,
+        -4,4,4,1,
+        -6,5,-1,1
+    };        
+    const Matrix4 b{ 
+        8,2,2,2,
+        3,-8,2,-9,
+        -4,4,4,1,
+        -6,5,-1,1
+    };    
+    const Matrix4 prod = a * b;
+    const Matrix4 inv_b = inverse(b);          
+    EXPECT_EQ(prod*inv_b, a);    
+}

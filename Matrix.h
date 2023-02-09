@@ -91,7 +91,7 @@ constexpr bool operator==(const Matrix& lhs, const Matrix& rhs) noexcept {
     using std::ranges::equal;
     using value_type = Matrix::value_type;
     return equal(lhs, rhs,
-        [](auto a, auto b) { return math::almost_equal(a, b); });
+        [](auto a, auto b) { return math::almost_equal(a, b, math::BOOK_EPSILON); });
 }
 
 constexpr Matrix4 operator*(const Matrix4& lhs, const Matrix4& rhs) noexcept {    

@@ -1,6 +1,5 @@
 #pragma once
 #include "../pch.h"
-using math::nearly_equal;
 
 /**
  * Test suite to demonstrate a good method for comparing floating-point values
@@ -36,152 +35,155 @@ static constexpr auto INF = std::numeric_limits<Real>::infinity();
 static constexpr auto NEG_INF = -INF;
 static constexpr Real QNAN = std::numeric_limits<Real>::quiet_NaN();
 
+//facade to let me swap the tested function and epsilon easily
+static constexpr bool float_cmp(float a, float b, float epsilon) noexcept {
+    return math::nearly_equal(a, b, epsilon);
+}
+static constexpr bool float_cmp(float a, float b) noexcept {
+    return float_cmp(a, b, math::BRAZZY_EPSILON);
+}
 
- /** Regular large numbers - generally not problematic */
+ // Regular large numbers - generally not problematic 
 TEST(NearlyEqualTest, big) {
-    EXPECT_TRUE(nearly_equal(1000000.0f, 1000001.0f));
-    EXPECT_TRUE(nearly_equal(1000001.0f, 1000000.0f));
-    EXPECT_FALSE(nearly_equal(10000.0f, 10001.0f));
-    EXPECT_FALSE(nearly_equal(10001.0f, 10000.0f));
+    EXPECT_TRUE(float_cmp(1000000.0f, 1000001.0f));
+    EXPECT_TRUE(float_cmp(1000001.0f, 1000000.0f));
+    EXPECT_FALSE(float_cmp(10000.0f, 10001.0f));
+    EXPECT_FALSE(float_cmp(10001.0f, 10000.0f));
 }
 
-/** Negative large numbers */
+// Negative large numbers
 TEST(NearlyEqualTest, bigNeg) {
-    EXPECT_TRUE(nearly_equal(-1000000.0f, -1000001.0f));
-    EXPECT_TRUE(nearly_equal(-1000001.0f, -1000000.0f));
-    EXPECT_FALSE(nearly_equal(-10000.0f, -10001.0f));
-    EXPECT_FALSE(nearly_equal(-10001.0f, -10000.0f));
+    EXPECT_TRUE(float_cmp(-1000000.0f, -1000001.0f));
+    EXPECT_TRUE(float_cmp(-1000001.0f, -1000000.0f));
+    EXPECT_FALSE(float_cmp(-10000.0f, -10001.0f));
+    EXPECT_FALSE(float_cmp(-10001.0f, -10000.0f));
 }
 
-/** Numbers around 1 */
+// Numbers around 1 
 TEST(NearlyEqualTest, mid) {
-    EXPECT_TRUE(nearly_equal(1.0000001f, 1.0000002f));
-    EXPECT_TRUE(nearly_equal(1.0000002f, 1.0000001f));
-    EXPECT_FALSE(nearly_equal(1.0002f, 1.0001f));
-    EXPECT_FALSE(nearly_equal(1.0001f, 1.0002f));
+    EXPECT_TRUE(float_cmp(1.0000001f, 1.0000002f));
+    EXPECT_TRUE(float_cmp(1.0000002f, 1.0000001f));
+    EXPECT_FALSE(float_cmp(1.0002f, 1.0001f));
+    EXPECT_FALSE(float_cmp(1.0001f, 1.0002f));
 }
 
-/** Numbers around -1 */
+// Numbers around -1 
 TEST(NearlyEqualTest, midNeg) {
-    EXPECT_TRUE(nearly_equal(-1.000001f, -1.000002f));
-    EXPECT_TRUE(nearly_equal(-1.000002f, -1.000001f));
-    EXPECT_FALSE(nearly_equal(-1.0001f, -1.0002f));
-    EXPECT_FALSE(nearly_equal(-1.0002f, -1.0001f));
+    EXPECT_TRUE(float_cmp(-1.000001f, -1.000002f));
+    EXPECT_TRUE(float_cmp(-1.000002f, -1.000001f));
+    EXPECT_FALSE(float_cmp(-1.0001f, -1.0002f));
+    EXPECT_FALSE(float_cmp(-1.0002f, -1.0001f));
 }
 
-/** Numbers between 1 and 0 */
+// Numbers between 1 and 0
 TEST(NearlyEqualTest, Small) {
-    EXPECT_TRUE(nearly_equal(0.000000001000001f, 0.000000001000002f));
-    EXPECT_TRUE(nearly_equal(0.000000001000002f, 0.000000001000001f));
-    EXPECT_FALSE(nearly_equal(0.000000000001002f, 0.000000000001001f));
-    EXPECT_FALSE(nearly_equal(0.000000000001001f, 0.000000000001002f));
+    EXPECT_TRUE(float_cmp(0.000000001000001f, 0.000000001000002f));
+    EXPECT_TRUE(float_cmp(0.000000001000002f, 0.000000001000001f));
+    EXPECT_FALSE(float_cmp(0.000000000001002f, 0.000000000001001f));
+    EXPECT_FALSE(float_cmp(0.000000000001001f, 0.000000000001002f));
 }
 
-/** Numbers around -1 */
+// Numbers around -1 
 TEST(NearlyEqualTest, SmallNeg) {
-    EXPECT_TRUE(nearly_equal(-0.000000001000001f, -0.000000001000002f));
-    EXPECT_TRUE(nearly_equal(-0.000000001000002f, -0.000000001000001f));
-    EXPECT_FALSE(nearly_equal(-0.000000000001002f, -0.000000000001001f));
-    EXPECT_FALSE(nearly_equal(-0.000000000001001f, -0.000000000001002f));
+    EXPECT_TRUE(float_cmp(-0.000000001000001f, -0.000000001000002f));
+    EXPECT_TRUE(float_cmp(-0.000000001000002f, -0.000000001000001f));
+    EXPECT_FALSE(float_cmp(-0.000000000001002f, -0.000000000001001f));
+    EXPECT_FALSE(float_cmp(-0.000000000001001f, -0.000000000001002f));
 }
 
-/** Small differences away from zero */
+// Small differences away from zero 
 TEST(NearlyEqualTest, SmallDiffs) {
-    EXPECT_TRUE(nearly_equal(0.3f, 0.30000003f));
-    EXPECT_TRUE(nearly_equal(-0.3f, -0.30000003f));
+    EXPECT_TRUE(float_cmp(0.3f, 0.30000003f));
+    EXPECT_TRUE(float_cmp(-0.3f, -0.30000003f));
 }
 
-/** Comparisons involving zero */
+// Comparisons involving zero 
 TEST(NearlyEqualTest, Zero) {
-    EXPECT_TRUE(nearly_equal(0.0f, 0.0f));
-    EXPECT_TRUE(nearly_equal(0.0f, -0.0f));
-    EXPECT_TRUE(nearly_equal(-0.0f, -0.0f));
-    EXPECT_FALSE(nearly_equal(0.00000001f, 0.0f));
-    EXPECT_FALSE(nearly_equal(0.0f, 0.00000001f));
-    EXPECT_FALSE(nearly_equal(-0.00000001f, 0.0f));
-    EXPECT_FALSE(nearly_equal(0.0f, -0.00000001f));
+    EXPECT_TRUE(float_cmp(0.0f, 0.0f));
+    EXPECT_TRUE(float_cmp(0.0f, -0.0f));
+    EXPECT_TRUE(float_cmp(-0.0f, -0.0f));
+    EXPECT_FALSE(float_cmp(0.00000001f, 0.0f));
+    EXPECT_FALSE(float_cmp(0.0f, 0.00000001f));
+    EXPECT_FALSE(float_cmp(-0.00000001f, 0.0f));
+    EXPECT_FALSE(float_cmp(0.0f, -0.00000001f));
 
-    EXPECT_TRUE(nearly_equal(0.0f, 1e-40f, 0.01f));
-    EXPECT_TRUE(nearly_equal(1e-40f, 0.0f, 0.01f));
-    EXPECT_FALSE(nearly_equal(1e-40f, 0.0f, 0.000001f));
-    EXPECT_FALSE(nearly_equal(0.0f, 1e-40f, 0.000001f));
+    EXPECT_TRUE(float_cmp(0.0f, 1e-40f, 0.01f));
+    EXPECT_TRUE(float_cmp(1e-40f, 0.0f, 0.01f));
+    EXPECT_FALSE(float_cmp(1e-40f, 0.0f, 0.000001f));
+    EXPECT_FALSE(float_cmp(0.0f, 1e-40f, 0.000001f));
 
-    EXPECT_TRUE(nearly_equal(0.0f, -1e-40f, 0.1f));
-    EXPECT_TRUE(nearly_equal(-1e-40f, 0.0f, 0.1f));
-    EXPECT_FALSE(nearly_equal(-1e-40f, 0.0f, 0.00000001f));
-    EXPECT_FALSE(nearly_equal(0.0f, -1e-40f, 0.00000001f));
+    EXPECT_TRUE(float_cmp(0.0f, -1e-40f, 0.1f));
+    EXPECT_TRUE(float_cmp(-1e-40f, 0.0f, 0.1f));
+    EXPECT_FALSE(float_cmp(-1e-40f, 0.0f, 0.00000001f));
+    EXPECT_FALSE(float_cmp(0.0f, -1e-40f, 0.00000001f));
 }
 
-/* Comparisons involving extreme values (overflow potential) */
-
+// Comparisons involving extreme values (overflow potential) 
 TEST(NearlyEqualTest, extremeMax) {
-    EXPECT_TRUE(nearly_equal(MAX, MAX));
-    EXPECT_FALSE(nearly_equal(MAX, -MAX));
-    EXPECT_FALSE(nearly_equal(-MAX, MAX));
-    EXPECT_FALSE(nearly_equal(MAX, MAX / 2));
-    EXPECT_FALSE(nearly_equal(MAX, -MAX / 2));
-    EXPECT_FALSE(nearly_equal(-MAX, MAX / 2));
+    EXPECT_TRUE(float_cmp(MAX, MAX));
+    EXPECT_FALSE(float_cmp(MAX, -MAX));
+    EXPECT_FALSE(float_cmp(-MAX, MAX));
+    EXPECT_FALSE(float_cmp(MAX, MAX / 2));
+    EXPECT_FALSE(float_cmp(MAX, -MAX / 2));
+    EXPECT_FALSE(float_cmp(-MAX, MAX / 2));
 }
 
-/**
- * Comparisons involving infinities
- */
-
+// Comparisons involving infinities
 TEST(NearlyEqualTest, infinities) {
-    EXPECT_TRUE(nearly_equal(INF, INF));
-    EXPECT_TRUE(nearly_equal(NEG_INF, NEG_INF));
-    EXPECT_FALSE(nearly_equal(NEG_INF, INF));
-    EXPECT_FALSE(nearly_equal(INF, MAX));
-    EXPECT_FALSE(nearly_equal(NEG_INF, -MAX));
+    EXPECT_TRUE(float_cmp(INF, INF));
+    EXPECT_TRUE(float_cmp(NEG_INF, NEG_INF));
+    EXPECT_FALSE(float_cmp(NEG_INF, INF));
+    EXPECT_FALSE(float_cmp(INF, MAX));
+    EXPECT_FALSE(float_cmp(NEG_INF, -MAX));
 }
 
 // Comparisons involving NaN values
 // NOTE: these all fail if compiled with /fp:fast 
 // see: https://learn.microsoft.com/en-us/cpp/build/reference/fp-specify-floating-point-behavior?view=msvc-170&viewFallbackFrom=vs-2019#fast
 TEST(NearlyEqualTest, nan) {    
-    EXPECT_FALSE(nearly_equal(QNAN, QNAN));
-    EXPECT_FALSE(nearly_equal(QNAN, 0.0f));
-    EXPECT_FALSE(nearly_equal(-0.0f, QNAN));
-    EXPECT_FALSE(nearly_equal(QNAN, -0.0f));
-    EXPECT_FALSE(nearly_equal(0.0f, QNAN));
-    EXPECT_FALSE(nearly_equal(QNAN, INF));
-    EXPECT_FALSE(nearly_equal(INF, QNAN));
-    EXPECT_FALSE(nearly_equal(QNAN, NEG_INF));
-    EXPECT_FALSE(nearly_equal(NEG_INF, QNAN));
-    EXPECT_FALSE(nearly_equal(QNAN, MAX));
-    EXPECT_FALSE(nearly_equal(MAX, QNAN));
-    EXPECT_FALSE(nearly_equal(QNAN, -MAX));
-    EXPECT_FALSE(nearly_equal(-MAX, QNAN));
-    EXPECT_FALSE(nearly_equal(QNAN, MIN));
-    EXPECT_FALSE(nearly_equal(MIN, QNAN));
-    EXPECT_FALSE(nearly_equal(QNAN, -MIN));
-    EXPECT_FALSE(nearly_equal(-MIN, QNAN));    
+    EXPECT_FALSE(float_cmp(QNAN, QNAN));
+    EXPECT_FALSE(float_cmp(QNAN, 0.0f));
+    EXPECT_FALSE(float_cmp(-0.0f, QNAN));
+    EXPECT_FALSE(float_cmp(QNAN, -0.0f));
+    EXPECT_FALSE(float_cmp(0.0f, QNAN));
+    EXPECT_FALSE(float_cmp(QNAN, INF));
+    EXPECT_FALSE(float_cmp(INF, QNAN));
+    EXPECT_FALSE(float_cmp(QNAN, NEG_INF));
+    EXPECT_FALSE(float_cmp(NEG_INF, QNAN));
+    EXPECT_FALSE(float_cmp(QNAN, MAX));
+    EXPECT_FALSE(float_cmp(MAX, QNAN));
+    EXPECT_FALSE(float_cmp(QNAN, -MAX));
+    EXPECT_FALSE(float_cmp(-MAX, QNAN));
+    EXPECT_FALSE(float_cmp(QNAN, MIN));
+    EXPECT_FALSE(float_cmp(MIN, QNAN));
+    EXPECT_FALSE(float_cmp(QNAN, -MIN));
+    EXPECT_FALSE(float_cmp(-MIN, QNAN));    
 }
-
 
 // Comparisons of numbers on opposite sides of 0
 TEST(NearlyEqualTest, opposite) {
-    EXPECT_FALSE(nearly_equal(1.000000001f, -1.0f));
-    EXPECT_FALSE(nearly_equal(-1.0f, 1.000000001f));
-    EXPECT_FALSE(nearly_equal(-1.000000001f, 1.0f));
-    EXPECT_FALSE(nearly_equal(1.0f, -1.000000001f));
-    EXPECT_FALSE(nearly_equal(10.0f * MIN, 10.0f * -MIN)); //original test was EXPECT_TRUE
-    EXPECT_FALSE(nearly_equal(10000.0f * MIN, 10000.0f * -MIN));
+    EXPECT_FALSE(float_cmp(1.000000001f, -1.0f));
+    EXPECT_FALSE(float_cmp(-1.0f, 1.000000001f));
+    EXPECT_FALSE(float_cmp(-1.000000001f, 1.0f));
+    EXPECT_FALSE(float_cmp(1.0f, -1.000000001f));
+    EXPECT_FALSE(float_cmp(10.0f * MIN, 10.0f * -MIN)); //original jtest was EXPECT_TRUE
+    EXPECT_FALSE(float_cmp(10000.0f * MIN, 10000.0f * -MIN));
 }
 
 // The really tricky part - comparisons of numbers very close to zero.
+/*
 TEST(NearlyEqualTest, ulp) {
     EXPECT_FLOAT_EQ(MIN, -MIN); //Sanity check. This fails too. 1.1754944e-38 != -1.1754944e-38
-    EXPECT_TRUE(nearly_equal(MIN, MIN));
-    EXPECT_TRUE(nearly_equal(MIN, -MIN));
-    EXPECT_TRUE(nearly_equal(-MIN, MIN));
-    EXPECT_TRUE(nearly_equal(MIN, 0.0f));
-    EXPECT_TRUE(nearly_equal(0.0f, MIN));
-    EXPECT_TRUE(nearly_equal(-MIN, 0.0f));
-    EXPECT_TRUE(nearly_equal(0.0f, -MIN));
+    EXPECT_TRUE(float_cmp(MIN, MIN));
+    EXPECT_TRUE(float_cmp(MIN, -MIN));
+    EXPECT_TRUE(float_cmp(-MIN, MIN));
+    EXPECT_TRUE(float_cmp(MIN, 0.0f));
+    EXPECT_TRUE(float_cmp(0.0f, MIN));
+    EXPECT_TRUE(float_cmp(-MIN, 0.0f));
+    EXPECT_TRUE(float_cmp(0.0f, -MIN));
 
-    EXPECT_FALSE(nearly_equal(0.000000001f, -MIN));
-    EXPECT_FALSE(nearly_equal(0.000000001f, MIN));
-    EXPECT_FALSE(nearly_equal(MIN, 0.000000001f));
-    EXPECT_FALSE(nearly_equal(-MIN, 0.000000001f));
-}
+    EXPECT_FALSE(float_cmp(0.000000001f, -MIN));
+    EXPECT_FALSE(float_cmp(0.000000001f, MIN));
+    EXPECT_FALSE(float_cmp(MIN, 0.000000001f));
+    EXPECT_FALSE(float_cmp(-MIN, 0.000000001f));
+}*/

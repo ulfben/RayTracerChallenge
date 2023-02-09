@@ -32,15 +32,15 @@ namespace math {
             : std::numeric_limits<Real>::quiet_NaN();
     }
 
+    static constexpr auto BOOK_EPSILON   = 0.0001f; //value suggested as "good enough" by the book.
     static constexpr auto BRAZZY_EPSILON = 0.00001f; //https://github.com/brazzy/floating-point-gui.de
-    static constexpr auto TESTED_EPSILON = 0.000003f; //the smallest epsilon I've used with my function and still passed all tests.                                     
-    static constexpr auto BOOK_EPSILON = 0.0001f; //value suggested as "good enough" by the book.
-    static constexpr auto MACHINE_EPSILON = std::numeric_limits<Real>::epsilon();
+    static constexpr auto TESTED_EPSILON = 0.000003f; //the smallest epsilon I've used with my function and still passed all tests.                                         
+    static constexpr auto MACHINE_EPSILON= 0.000000119209f; //== std::numeric_limits<Real>::epsilon();
 
     template<class T>
         requires std::same_as<T, Real>
-    constexpr bool almost_equal(T x, T y, T epsilon = TESTED_EPSILON) noexcept {
-        return math::abs(x - y) <= epsilon;
+    constexpr bool almost_equal(T a, T b, T epsilon = TESTED_EPSILON) noexcept {
+        return math::abs(a - b) <= epsilon;
     }
 
     //ported from Java implementation at https://floating-point-gui.de/errors/comparison/
@@ -58,7 +58,7 @@ namespace math {
         if (a == 0 || b == 0 || (absA + absB < std::numeric_limits<T>::min())) {
             // a or b is zero or both are extremely close to it
             // relative error is less meaningful here
-            return diff < (epsilon* std::numeric_limits<T>::min());
+            return diff < (epsilon * std::numeric_limits<T>::min());
         }
         // use relative error
         return diff / std::min((absA + absB), std::numeric_limits<T>::max()) < epsilon;
@@ -67,7 +67,7 @@ namespace math {
     //borrowed from QT
     template<class T>
         requires std::same_as<T, Real>
-    constexpr bool qFuzzyCompare(T p1, T p2) noexcept {
-        return (math::abs(p1 - p2) * 100000.f <= std::min(std::abs(p1), math::abs(p2)));
+    constexpr bool qFuzzyCompare(T a, T b, [[maybe_unused]] T) noexcept {
+        return (math::abs(a - b) * 100000.f <= std::min(std::abs(a), math::abs(b)));
     }
 }
