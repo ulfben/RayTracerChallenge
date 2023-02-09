@@ -275,3 +275,11 @@ constexpr Matrix4 translation(Real x, Real y, Real z) noexcept {
     result(2, 3) = z; 
     return result;
 }
+
+constexpr Matrix4 scaling(Real x, Real y, Real z) noexcept {            
+    auto result = Matrix4Identity;
+    result(0, 0) = x; 
+    result(1, 1) = y; 
+    result(2, 2) = z; 
+    return result;
+}
