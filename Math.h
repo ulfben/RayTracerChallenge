@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include <numbers>
 namespace Detail {
     Real constexpr sqrtNewtonRaphson(Real x, Real curr, Real prev) {
         return curr == prev ? curr
@@ -8,6 +9,9 @@ namespace Detail {
 }
 
 namespace math {
+    constexpr auto PI = std::numbers::pi_v<Real>;
+    constexpr auto INV_PI = std::numbers::inv_pi_v<Real>;
+
     template<class T>
         requires std::integral<T>
     constexpr bool is_odd(T v) noexcept {
