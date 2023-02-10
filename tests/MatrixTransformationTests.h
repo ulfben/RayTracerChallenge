@@ -83,3 +83,34 @@ TEST(Transformation, rotationOnZ) {
     EXPECT_EQ(half_quarter*p, point(-ROOT_TWO / 2, ROOT_TWO / 2, 0.0f));    
     EXPECT_EQ(full_quarter*p, point(-1.0f,0.0f,0.0f));    
 }
+
+TEST(Shearing, movesXInProportionToY) {               
+    const auto transform = shearing(1,0,0,0,0,0);
+    const auto p = point(2, 3, 4);    
+    EXPECT_EQ(transform*p, point(5,3,4));    
+}
+TEST(Shearing, movesXInProportionToZ) {               
+    const auto transform = shearing(0,1,0,0,0,0);
+    const auto p = point(2, 3, 4);    
+    EXPECT_EQ(transform*p, point(6,3,4));    
+}
+TEST(Shearing, movesYInProportionToX) {               
+    const auto transform = shearing(0,0,1,0,0,0);
+    const auto p = point(2, 3, 4);    
+    EXPECT_EQ(transform*p, point(2,5,4));    
+}
+TEST(Shearing, movesYInProportionToZ) {               
+    const auto transform = shearing(0,0,0,1,0,0);
+    const auto p = point(2, 3, 4);    
+    EXPECT_EQ(transform*p, point(2,7,4));    
+}
+TEST(Shearing, movesZInProportionToX) {               
+    const auto transform = shearing(0,0,0,0,1,0);
+    const auto p = point(2, 3, 4);    
+    EXPECT_EQ(transform*p, point(2,3,6));    
+}
+TEST(Shearing, movesZInProportionToY) {               
+    const auto transform = shearing(0,0,0,0,0,1);
+    const auto p = point(2, 3, 4);    
+    EXPECT_EQ(transform*p, point(2,3,7));    
+}

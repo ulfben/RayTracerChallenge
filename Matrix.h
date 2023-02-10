@@ -313,3 +313,11 @@ constexpr Matrix4 scaling(Real x, Real y, Real z) noexcept {
         0.0f, 0.0f, 0.0f, 1.0f
     };
 }
+constexpr Matrix4 shearing(Real Xy, Real Xx, Real Yx, Real Yz, Real Zx, Real Zy) noexcept {    
+    return {
+        1.0f,   Xy,     Xx,     0.0f,
+        Yx,     1.0f,   Yz,     0.0f,
+        Zx,     Zy,     1.0f,   0.0f,
+        0.0f,   0.0f,   0.0f,   1.0f
+    };
+}
