@@ -10,6 +10,7 @@ namespace Detail {
 
 namespace math {
     constexpr auto PI = std::numbers::pi_v<Real>;
+    constexpr auto HALF_PI = math::PI/2;
     constexpr auto INV_PI = std::numbers::inv_pi_v<Real>;
 
     template<class T>
