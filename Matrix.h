@@ -35,16 +35,12 @@ struct Matrix final {
     constexpr reference operator[](size_type i) noexcept {
         assert(i < size() && "Matrix::operator[i] index is out of bounds");
         return _data[i];
-    }
+    } 
 
-    constexpr size_type index_to_column(size_type index) const noexcept {
-        assert(index < size());
-        return index % columns();
-    }
-    constexpr size_type index_to_row(size_type index) const noexcept {
-        assert(index < size());
-        return index / columns();
-    }
+    constexpr reference rotate_x(size_type i) noexcept {
+        assert(i < size() && "Matrix::operator[i] index is out of bounds");
+        return _data[i];
+    }   
         
     constexpr auto submatrix(size_type remove_row, size_type remove_column) const noexcept {
         assert(remove_row < rows() && remove_column < columns() && "Matrix::submatrix() arguments are out of range. row and column must be inside the matrix.");
@@ -69,6 +65,15 @@ struct Matrix final {
     constexpr iterator end() noexcept { return begin() + size(); }
     constexpr const_iterator begin() const noexcept { return data(); }
     constexpr const_iterator end() const noexcept { return begin() + size(); }
+
+     constexpr size_type index_to_column(size_type index) const noexcept {
+        assert(index < size());
+        return index % columns();
+    }
+    constexpr size_type index_to_row(size_type index) const noexcept {
+        assert(index < size());
+        return index / columns();
+    }
 
     static constexpr auto identity() noexcept {
         static_assert(ROWS_ == COLUMNS_, "Matrix::identity only supports square matrixes");
@@ -151,10 +156,10 @@ constexpr auto operator*(const Matrix& lhs, const Matrix& rhs) noexcept {
 }
 
 Tuple operator*(const Matrix4& lhs, const Tuple rhs) noexcept {
-    const auto x = rhs.x * lhs(0, 0) + rhs.y * lhs(0, 1) + rhs.z * lhs(0, 2) + rhs.w * lhs(0, 3);
-    const auto y = rhs.x * lhs(1, 0) + rhs.y * lhs(1, 1) + rhs.z * lhs(1, 2) + rhs.w * lhs(1, 3);
-    const auto z = rhs.x * lhs(2, 0) + rhs.y * lhs(2, 1) + rhs.z * lhs(2, 2) + rhs.w * lhs(2, 3);
-    const auto w = rhs.x * lhs(3, 0) + rhs.y * lhs(3, 1) + rhs.z * lhs(3, 2) + rhs.w * lhs(3, 3);
+    const auto x = rhs.x * lhs[0] + rhs.y   * lhs[1] + rhs.z * lhs[2]  + rhs.w * lhs[3];
+    const auto y = rhs.x * lhs[4] + rhs.y   * lhs[5] + rhs.z * lhs[6]  + rhs.w * lhs[7];
+    const auto z = rhs.x * lhs[8] + rhs.y   * lhs[9] + rhs.z * lhs[10] + rhs.w * lhs[11];
+    const auto w = rhs.x * lhs[12] + rhs.y  * lhs[13]+ rhs.z * lhs[14] + rhs.w * lhs[15];
     return Tuple{ x, y, z, w };
 }
 
@@ -320,6 +325,24 @@ constexpr Matrix4 scaling(Point p) noexcept {
         0.0f, 0.0f, 0.0f, 1.0f
     };
 }
+
+/*constexpr*/ Matrix4 rotation(Real radians_x, Real radians_y, Real radians_z) noexcept {    
+    //return rotation_z(radians_z) * rotation_y(radians_y) * rotation_x(radians_x);   
+    const auto cos_x = std::cos(radians_x);
+    const auto sin_x = -std::sin(radians_x);
+    const auto cos_y = std::cos(radians_y);
+    const auto sin_y = -std::sin(radians_y);
+    const auto cos_z = std::cos(radians_z);
+    const auto sin_z = -std::sin(radians_z);    
+    return {
+        cos_y * cos_z,                          cos_y * sin_z,                          -sin_y,         0.0f,
+        sin_x * sin_y * cos_z - cos_x * sin_z,  sin_x * sin_y * sin_z + cos_x * cos_z,  sin_x * cos_y,  0.0f,
+        cos_x * sin_y * cos_z + sin_x * sin_z,  cos_x * sin_y * sin_z - sin_x * cos_z,  cos_x * cos_y,  0.0f,
+        0.0f,                                   0.0f,                                   0.0f,           1.0f
+    };
+}
+
+
 constexpr Matrix4 shearing(Real Xy, Real Xx, Real Yx, Real Yz, Real Zx, Real Zy) noexcept {    
     return {
         1.0f,   Xy,     Xx,     0.0f,

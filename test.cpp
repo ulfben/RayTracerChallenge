@@ -94,19 +94,19 @@
 //    ofs << c.to_ppm();  
 //}
 
-TEST(Chapter4, CanDrawClock) {       
-    const auto WHITE = color(1, 1, 1);
-    auto c = Canvas(200, 200);
-    const auto origo = point(c.widthf() / 2, c.heightf() / 2, 0);                 
-    const auto dist = c.widthf()*0.375f; 
-    const auto trans = translation(origo);
-    const auto twelve = point(0, -dist, 0);
-    const auto angle = (math::TWO_PI / 12.0f);//full circle is 2xPI, clock face has 12 positions. 
-    for (auto i = 0; i < 12; ++i) {
-        const auto rot = rotation_z(static_cast<float>(i) * angle); 
-        const auto p = trans * rot * twelve;  //TODO: combine matrices!       
-        c.set(p, WHITE);
-    }
-    std::ofstream ofs("output/chapter4_4.ppm", std::ofstream::out);
-    ofs << c.to_ppm();  
-}
+//TEST(Chapter4, CanDrawClock) {       
+//    const auto WHITE = color(1, 1, 1);
+//    auto c = Canvas(200, 200);
+//    const auto origo = point(c.widthf() / 2, c.heightf() / 2, 0);                 
+//    const auto dist = c.widthf()*0.375f; 
+//    const auto trans = translation(origo);
+//    const auto twelve = point(0, -dist, 0);
+//    const auto angle = (math::TWO_PI / 12.0f);//full circle is 2xPI, clock face has 12 positions. 
+//    for (auto i = 0; i < 12; ++i) {
+//        const auto rot = rotation_z(static_cast<float>(i) * angle);         
+//        const auto p = trans * rot * twelve;
+//        c.set(p, WHITE);
+//    }
+//    std::ofstream ofs("output/chapter4_4.ppm", std::ofstream::out);
+//    ofs << c.to_ppm();  
+//}

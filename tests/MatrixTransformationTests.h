@@ -142,3 +142,32 @@ TEST(Tranformations, chainedTransformsAreAppliedInReverse) {
     const auto result = transform * p; //then apply translation
     EXPECT_EQ(result, point(15.0f, 0.0f, 7.0f));    
 }
+TEST(RotationTest, RotationAroundX) {
+    const auto radians = math::PI / 4.0f;
+    const auto result = rotation(radians, 0.0f, 0.0f);
+    const auto expected = rotation_x(radians);
+    EXPECT_EQ(result, expected);    
+}
+
+TEST(RotationTest, RotationAroundY) {
+    const auto radians = math::PI / 4.0f;
+    const auto result = rotation(0.0f, radians, 0.0f);
+    const auto expected = rotation_y(radians);
+    EXPECT_EQ(result, expected);    
+}
+
+TEST(RotationTest, RotationAroundZ) {
+    const auto radians = math::PI / 4.0f;
+    const auto result = rotation(0.0f, 0.0f, radians);
+    const auto expected = rotation_z(radians);
+    EXPECT_EQ(result, expected);    
+}
+
+TEST(RotationTest, RotationAroundAllAxis) {
+    const auto radians_x = math::PI / 4.0f;
+    const auto radians_y = math::PI / 3.0f;
+    const auto radians_z = math::PI / 6.0f;
+    const auto result = rotation(radians_x, radians_y, radians_z);
+    const auto expected = rotation_z(radians_z) * rotation_y(radians_y) * rotation_x(radians_x);
+    EXPECT_EQ(result, expected);    
+}
