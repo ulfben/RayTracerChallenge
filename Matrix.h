@@ -101,43 +101,43 @@ constexpr bool operator==(const Matrix& lhs, const Matrix& rhs) noexcept {
 
 constexpr Matrix4 operator*(const Matrix4& lhs, const Matrix4& rhs) noexcept {    
     return Matrix4{
-    lhs(0, 0) * rhs(0, 0) + lhs(0, 1) * rhs(1, 0) + lhs(0, 2) * rhs(2, 0) + lhs(0, 3) * rhs(3, 0), //0,0
-    lhs(0, 0) * rhs(0, 1) + lhs(0, 1) * rhs(1, 1) + lhs(0, 2) * rhs(2, 1) + lhs(0, 3) * rhs(3, 1), //0,1
-    lhs(0, 0) * rhs(0, 2) + lhs(0, 1) * rhs(1, 2) + lhs(0, 2) * rhs(2, 2) + lhs(0, 3) * rhs(3, 2), //0,2 
-    lhs(0, 0) * rhs(0, 3) + lhs(0, 1) * rhs(1, 3) + lhs(0, 2) * rhs(2, 3) + lhs(0, 3) * rhs(3, 3), //0,3
-    lhs(1, 0) * rhs(0, 0) + lhs(1, 1) * rhs(1, 0) + lhs(1, 2) * rhs(2, 0) + lhs(1, 3) * rhs(3, 0),
-    lhs(1, 0) * rhs(0, 1) + lhs(1, 1) * rhs(1, 1) + lhs(1, 2) * rhs(2, 1) + lhs(1, 3) * rhs(3, 1),
+    lhs[0] * rhs[0] + lhs[1] * rhs(1, 0) + lhs(0, 2) * rhs(2, 0) + lhs(0, 3) * rhs(3, 0), //0,0
+    lhs[0] * rhs[1] + lhs[1] * rhs(1, 1) + lhs(0, 2) * rhs(2, 1) + lhs(0, 3) * rhs(3, 1), //0,1
+    lhs[0] * rhs(0, 2) + lhs[1] * rhs(1, 2) + lhs(0, 2) * rhs(2, 2) + lhs(0, 3) * rhs(3, 2), //0,2 
+    lhs[0] * rhs(0, 3) + lhs[1] * rhs(1, 3) + lhs(0, 2) * rhs(2, 3) + lhs(0, 3) * rhs(3, 3), //0,3
+    lhs(1, 0) * rhs[0] + lhs(1, 1) * rhs(1, 0) + lhs(1, 2) * rhs(2, 0) + lhs(1, 3) * rhs(3, 0),
+    lhs(1, 0) * rhs[1] + lhs(1, 1) * rhs(1, 1) + lhs(1, 2) * rhs(2, 1) + lhs(1, 3) * rhs(3, 1),
     lhs(1, 0) * rhs(0, 2) + lhs(1, 1) * rhs(1, 2) + lhs(1, 2) * rhs(2, 2) + lhs(1, 3) * rhs(3, 2),
     lhs(1, 0) * rhs(0, 3) + lhs(1, 1) * rhs(1, 3) + lhs(1, 2) * rhs(2, 3) + lhs(1, 3) * rhs(3, 3),
-    lhs(2, 0) * rhs(0, 0) + lhs(2, 1) * rhs(1, 0) + lhs(2, 2) * rhs(2, 0) + lhs(2, 3) * rhs(3, 0),
-    lhs(2, 0) * rhs(0, 1) + lhs(2, 1) * rhs(1, 1) + lhs(2, 2) * rhs(2, 1) + lhs(2, 3) * rhs(3, 1),
+    lhs(2, 0) * rhs[0] + lhs(2, 1) * rhs(1, 0) + lhs(2, 2) * rhs(2, 0) + lhs(2, 3) * rhs(3, 0),
+    lhs(2, 0) * rhs[1] + lhs(2, 1) * rhs(1, 1) + lhs(2, 2) * rhs(2, 1) + lhs(2, 3) * rhs(3, 1),
     lhs(2, 0) * rhs(0, 2) + lhs(2, 1) * rhs(1, 2) + lhs(2, 2) * rhs(2, 2) + lhs(2, 3) * rhs(3, 2),
     lhs(2, 0) * rhs(0, 3) + lhs(2, 1) * rhs(1, 3) + lhs(2, 2) * rhs(2, 3) + lhs(2, 3) * rhs(3, 3),
-    lhs(3, 0) * rhs(0, 0) + lhs(3, 1) * rhs(1, 0) + lhs(3, 2) * rhs(2, 0) + lhs(3, 3) * rhs(3, 0), //3,0
-    lhs(3, 0) * rhs(0, 1) + lhs(3, 1) * rhs(1, 1) + lhs(3, 2) * rhs(2, 1) + lhs(3, 3) * rhs(3, 1), //3,1
+    lhs(3, 0) * rhs[0] + lhs(3, 1) * rhs(1, 0) + lhs(3, 2) * rhs(2, 0) + lhs(3, 3) * rhs(3, 0), //3,0
+    lhs(3, 0) * rhs[1] + lhs(3, 1) * rhs(1, 1) + lhs(3, 2) * rhs(2, 1) + lhs(3, 3) * rhs(3, 1), //3,1
     lhs(3, 0) * rhs(0, 2) + lhs(3, 1) * rhs(1, 2) + lhs(3, 2) * rhs(2, 2) + lhs(3, 3) * rhs(3, 2), //3,2
     lhs(3, 0) * rhs(0, 3) + lhs(3, 1) * rhs(1, 3) + lhs(3, 2) * rhs(2, 3) + lhs(3, 3) * rhs(3, 3)};//3,3
 }
 
 constexpr Matrix3 operator*(const Matrix3& lhs, const Matrix3& rhs) noexcept {    
     return Matrix3{
-    lhs(0, 0) * rhs(0, 0) + lhs(0, 1) * rhs(1, 0) + lhs(0, 2) * rhs(2, 0), //(0, 0)
-    lhs(0, 0) * rhs(0, 1) + lhs(0, 1) * rhs(1, 1) + lhs(0, 2) * rhs(2, 1), //(0, 1)
-    lhs(0, 0) * rhs(0, 2) + lhs(0, 1) * rhs(1, 2) + lhs(0, 2) * rhs(2, 2), //(0, 2)
-    lhs(1, 0) * rhs(0, 0) + lhs(1, 1) * rhs(1, 0) + lhs(1, 2) * rhs(2, 0),
-    lhs(1, 0) * rhs(0, 1) + lhs(1, 1) * rhs(1, 1) + lhs(1, 2) * rhs(2, 1),
+    lhs[0] * rhs[0] + lhs[1] * rhs(1, 0) + lhs(0, 2) * rhs(2, 0), //(0, 0)
+    lhs[0] * rhs[1] + lhs[1] * rhs(1, 1) + lhs(0, 2) * rhs(2, 1), //(0, 1)
+    lhs[0] * rhs(0, 2) + lhs[1] * rhs(1, 2) + lhs(0, 2) * rhs(2, 2), //(0, 2)
+    lhs(1, 0) * rhs[0] + lhs(1, 1) * rhs(1, 0) + lhs(1, 2) * rhs(2, 0),
+    lhs(1, 0) * rhs[1] + lhs(1, 1) * rhs(1, 1) + lhs(1, 2) * rhs(2, 1),
     lhs(1, 0) * rhs(0, 2) + lhs(1, 1) * rhs(1, 2) + lhs(1, 2) * rhs(2, 2),
-    lhs(2, 0) * rhs(0, 0) + lhs(2, 1) * rhs(1, 0) + lhs(2, 2) * rhs(2, 0), //(2, 0)
-    lhs(2, 0) * rhs(0, 1) + lhs(2, 1) * rhs(1, 1) + lhs(2, 2) * rhs(2, 1), //(2, 1)
+    lhs(2, 0) * rhs[0] + lhs(2, 1) * rhs(1, 0) + lhs(2, 2) * rhs(2, 0), //(2, 0)
+    lhs(2, 0) * rhs[1] + lhs(2, 1) * rhs(1, 1) + lhs(2, 2) * rhs(2, 1), //(2, 1)
     lhs(2, 0) * rhs(0, 2) + lhs(2, 1) * rhs(1, 2) + lhs(2, 2) * rhs(2, 2)};//(2, 2)    
 }
 
 constexpr Matrix2 operator*(const Matrix2& lhs, const Matrix2& rhs) noexcept {    
     return Matrix2{
-    lhs(0, 0) * rhs(0, 0) + lhs(0, 1) * rhs(1, 0), //(0, 0)
-    lhs(0, 0) * rhs(0, 1) + lhs(0, 1) * rhs(1, 1), //(0, 1)
-    lhs(1, 0) * rhs(0, 0) + lhs(1, 1) * rhs(1, 0), //(1, 0)
-    lhs(1, 0) * rhs(0, 1) + lhs(1, 1) * rhs(1, 1)};//(1, 1)    
+    lhs[0] * rhs[0] + lhs[1] * rhs(1, 0), //(0, 0)
+    lhs[0] * rhs[1] + lhs[1] * rhs(1, 1), //(0, 1)
+    lhs(1, 0) * rhs[0] + lhs(1, 1) * rhs(1, 0), //(1, 0)
+    lhs(1, 0) * rhs[1] + lhs(1, 1) * rhs(1, 1)};//(1, 1)    
 }
 
 //multiplying arbitrarily sized (square) Matrices.
