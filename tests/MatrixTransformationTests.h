@@ -167,7 +167,7 @@ TEST(RotationTest, RotationAroundAllAxis) {
     const auto radians_x = math::PI / 4.0f;
     const auto radians_y = math::PI / 3.0f;
     const auto radians_z = math::PI / 6.0f;
-    const auto result = rotation(radians_x, radians_y, radians_z);
-    const auto expected = rotation_z(radians_z) * rotation_y(radians_y) * rotation_x(radians_x);
+    const auto result = rotation(radians_x, radians_y, radians_z);    
+    const auto expected = rotation_x(radians_x) * rotation_y(radians_y) * rotation_z(radians_z);
     EXPECT_EQ(result, expected);    
 }
