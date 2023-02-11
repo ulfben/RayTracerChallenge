@@ -47,6 +47,12 @@ public:
   constexpr uint32_t height() const noexcept {
     return static_cast<uint32_t>(_height);
   }
+  constexpr Real widthf() const noexcept {
+    return static_cast<Real>(_width);
+  }
+  constexpr Real heightf() const noexcept {
+    return static_cast<Real>(_height);
+  }
   constexpr auto begin() const noexcept { return bitmap.begin(); }
   constexpr auto end() const noexcept { return bitmap.end(); }
   

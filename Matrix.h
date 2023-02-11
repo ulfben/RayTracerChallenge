@@ -275,6 +275,9 @@ constexpr Matrix4 translation(Real x, Real y, Real z) noexcept {
     result(2, 3) = z; 
     return result;
 }
+constexpr Matrix4 translation(Point p) noexcept {                
+    return translation(p.x, p.y, p.z);
+}
 
 constexpr Matrix4 scaling(Real x, Real y, Real z) noexcept {            
     auto result = Matrix4Identity;
@@ -283,6 +286,10 @@ constexpr Matrix4 scaling(Real x, Real y, Real z) noexcept {
     result(2, 2) = z; 
     return result;
 }
+constexpr Matrix4 scaling(Point p) noexcept {                
+    return scaling(p.x, p.y, p.z);
+}
+
 /*constexpr*/ Matrix4 rotation_x(Real radians) noexcept {
     const auto cos = std::cos(radians); //not available as constexpr yet...
     const auto sin = std::sin(radians);

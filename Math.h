@@ -10,8 +10,11 @@ namespace Detail {
 
 namespace math {
     constexpr auto PI = std::numbers::pi_v<Real>;
-    constexpr auto HALF_PI = math::PI/2;
+    constexpr auto TWO_PI = PI * 2.0f; //full circle
+    constexpr auto HALF_PI = math::PI/2.0f;
     constexpr auto INV_PI = std::numbers::inv_pi_v<Real>;
+    constexpr auto TO_DEG = 180.0f / PI;
+    constexpr auto TO_RAD = PI / 180.0f;
 
     template<class T>
         requires std::integral<T>
