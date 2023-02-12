@@ -2,8 +2,6 @@
 #include "../pch.h"
 #include "../Ray.h"
 
-
-
 TEST(Ray, CanBeConstructed) {
     const auto origin = point(1, 2, 3);
     const auto direction = vector(4,5,6);
@@ -32,8 +30,8 @@ TEST(Ray, intersectSphereAtTwoPoints) {
     const auto xs = intersect(s, r);
 
     EXPECT_EQ(xs.count, 2);
-    EXPECT_FLOAT_EQ(xs[0], 4.0f);
-    EXPECT_FLOAT_EQ(xs[1], 6.0f);
+    EXPECT_FLOAT_EQ(xs[0].t, 4.0f);
+    EXPECT_FLOAT_EQ(xs[1].t, 6.0f);
 }
 
 TEST(Ray, intersectSphereAtATangent) {
@@ -42,8 +40,8 @@ TEST(Ray, intersectSphereAtATangent) {
     const auto xs = intersect(s, r);
 
     EXPECT_EQ(xs.count, 2);
-    EXPECT_FLOAT_EQ(xs[0], 5.0f);
-    EXPECT_FLOAT_EQ(xs[1], 5.0f);
+    EXPECT_FLOAT_EQ(xs[0].t, 5.0f);
+    EXPECT_FLOAT_EQ(xs[1].t, 5.0f);
 }
 
 TEST(Ray, intersectMissingASphere) {
@@ -60,8 +58,8 @@ TEST(Ray, intersectWhenOriginInsideSphere) {
     const auto xs = intersect(s, r);
 
     EXPECT_EQ(xs.count, 2);
-    EXPECT_FLOAT_EQ(xs[0], -1.0f); //ray extends backwards! critical for reflections. 
-    EXPECT_FLOAT_EQ(xs[1], 1.0f);
+    EXPECT_FLOAT_EQ(xs[0].t, -1.0f); //ray extends backwards! critical for reflections. 
+    EXPECT_FLOAT_EQ(xs[1].t, 1.0f);
 }
 
 TEST(Ray, intersectWhenSphereBehindRay) {
@@ -70,6 +68,37 @@ TEST(Ray, intersectWhenSphereBehindRay) {
     const auto xs = intersect(s, r);
 
     EXPECT_EQ(xs.count, 2);
-    EXPECT_FLOAT_EQ(xs[0], -6.0f); //ray extends backwards! critical for reflections. 
-    EXPECT_FLOAT_EQ(xs[1], -4.0f);
+    EXPECT_FLOAT_EQ(xs[0].t, -6.0f); //ray extends backwards! critical for reflections. 
+    EXPECT_FLOAT_EQ(xs[1].t, -4.0f);
+}
+
+TEST(Intersection, encapsulatesTandObject) {    
+    const auto s = sphere(point(0,0,0), 1.0f);
+    const auto i = intersection(3.5f, s);
+    EXPECT_EQ(i, i);    
+    EXPECT_FLOAT_EQ(i.t, 3.5f);    
+    EXPECT_EQ(i.obj, s);
+}
+
+TEST(Intersections, aggregatesIntersection) {    
+    const auto s = sphere(point(0,0,0), 1.0f);
+    const auto i1 = intersection(1, s);
+    const auto i2 = intersection(2, s);    
+    const auto xs = intersections(i1, i2);    
+    EXPECT_EQ(xs.count, 2);
+    EXPECT_EQ(xs.size(), 2);
+    EXPECT_EQ(xs[0].t, 1);
+    EXPECT_EQ(xs[1].t, 2);
+}
+
+TEST(intersect, setsTheObjectOnTheIntersections) {
+    const auto r = ray(point(0,0,-5), vector(0,0,1));    
+    const auto s = sphere(point(0,0,0), 1.0f);
+    const auto xs = intersect(s, r);
+
+    EXPECT_EQ(xs.count, 2);
+    EXPECT_FLOAT_EQ(xs[0].t, 4.0f);
+    EXPECT_FLOAT_EQ(xs[1].t, 6.0f);
+    EXPECT_EQ(xs[0].obj, s);
+    EXPECT_EQ(xs[1].obj, s);
 }

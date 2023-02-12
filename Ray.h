@@ -7,45 +7,74 @@ constexpr Point position(const Ray& r, Real time) noexcept;
 struct Sphere {
     Point position; 
     Real radius;
+    constexpr bool operator==(const Sphere& that) const noexcept {
+        return position == that.position && math::almost_equal(radius, that.radius, math::BOOK_EPSILON);
+    }
 };
 
 constexpr Sphere sphere(Point p, Real radius) noexcept {
     return Sphere{ p, radius };
 }
 
-struct Intersection {
-    using size_type = uint8_t;
-    using value_type = Real;
-    using reference = value_type&;
-    size_type count{0};
-    value_type xs[2];
-    
-    constexpr value_type operator[](size_type i) const noexcept {
-        assert(i < count && "Intersection::operator[i] index is out of bounds");
-        return xs[i];
-    }
-    constexpr reference operator[](size_type i) noexcept {
-        assert(i < count && "Intersection::operator[i] index is out of bounds");
-        return xs[i];
+template<class Object>
+struct Intersection {            
+    Object obj;
+    Real t{0};
+
+    constexpr bool operator==(const Intersection& that) const noexcept {
+        return obj == that.obj && math::almost_equal(t, that.t, math::BOOK_EPSILON);
     }
 };
 
+template<class Object>
 struct Intersections {
-    using size_type = Intersection::size_type;
-    using value_type = Intersection;
+    using size_type = uint8_t;
+    using value_type = Intersection<Object>;
     using reference = value_type&;
-    size_type count{0};
+    using pointer = value_type*;
+    using const_pointer = const value_type*;
+    using iterator = pointer;
+    using const_iterator = const_pointer;
     value_type xs[2];
-    
+    uint8_t count{0};    
+           
     constexpr value_type operator[](size_type i) const noexcept {
-        assert(i < count && "Intersections::operator[i] index is out of bounds");
+        assert(i < count && "Intersection::operator[i] index is out of bounds");
         return xs[i];
     }
     constexpr reference operator[](size_type i) noexcept {
-        assert(i < count && "Intersections::operator[i] index is out of bounds");
+        assert(i < count && "Intersection::operator[i] index is out of bounds");
         return xs[i];
     }
+    constexpr pointer data() noexcept { return &xs[0]; }
+    constexpr const_pointer data() const noexcept { return &xs[0]; }
+    constexpr size_type size() const noexcept { return count; }
+    constexpr iterator begin() noexcept { return data(); }
+    constexpr iterator end() noexcept { return begin() + size(); }
+    constexpr const_iterator begin() const noexcept { return data(); }
+    constexpr const_iterator end() const noexcept { return begin() + size(); }  
+    constexpr bool operator==(const Intersections& that) const noexcept {
+        using std::ranges::equal;    
+         return count == that.count && equal(*this, that,
+            [](auto a, auto b) { return math::almost_equal(a, b, math::BOOK_EPSILON); });
+    }
+
 };
+
+template<class Object>
+constexpr auto intersection(Real t, Object obj) noexcept {
+    return Intersection{std::move(obj), t};
+}
+
+template<class Object>
+constexpr auto intersections() noexcept {
+    return Intersections<Object>{};
+}
+
+template<class InterSection>
+constexpr auto intersections(InterSection i1, InterSection i2) noexcept {
+    return Intersections{ std::move(i1), std::move(i2), 2 };
+}
 
 struct Ray {
     Point origin;
@@ -65,16 +94,16 @@ constexpr Point position(const Ray& r, Real time) noexcept {
     return r.origin + r.direction * time;
 }
 
-constexpr Intersection intersect(const Sphere& s, const Ray& r) noexcept {
+constexpr auto intersect(const Sphere& s, const Ray& r) noexcept {
     const Vector sphere_to_ray = r.origin - s.position;
     const auto a = dot(r.direction, r.direction);
     const auto b = 2 * dot(r.direction, sphere_to_ray);
     const auto c = dot(sphere_to_ray, sphere_to_ray) - 1;
     const auto discriminant = (b * b) - (4 * a * c);
     if (discriminant < 0) {
-        return Intersection{};
+        return intersections<Sphere>();
     }
     const auto t1 = (-b - std::sqrt(discriminant)) / (2*a);
     const auto t2 = (-b + std::sqrt(discriminant)) / (2*a);
-    return Intersection{ 2, t1, t2 };
+    return intersections( intersection(t1, s), intersection(t2, s));
 };
