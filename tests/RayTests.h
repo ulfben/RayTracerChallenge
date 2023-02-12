@@ -2,7 +2,7 @@
 #include "../pch.h"
 #include "../Ray.h"
 
-TEST(Ray, CanBeConstructed) {
+TEST(Ray, canBeConstructed) {
     const auto origin = point(1, 2, 3);
     const auto direction = vector(4,5,6);
     const auto r = ray(origin, direction);
