@@ -52,9 +52,9 @@ TEST(Matrix, canBeMultiplied) {
     Matrix4 a{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 8, 7, 6, 5, 4, 3, 2 };
     Matrix4 b{ -2, 1, 2, 3, 3, 2, 1, -1, 4, 3, 6, 5, 1, 2, 7, 8 };    
     auto product = a * b;    
-    const Matrix4 truth{ 20, 22, 50,  48,  44, 54, 114, 108,
+    const Matrix4 expected{ 20, 22, 50,  48,  44, 54, 114, 108,
                         40, 58, 110, 102, 16, 26, 46,  42 };
-    EXPECT_TRUE(product == truth);
+    EXPECT_TRUE(product == expected);
 }
 
 TEST(Matrix, canBeMultipliedWithTuple) {
@@ -66,8 +66,8 @@ TEST(Matrix, canBeMultipliedWithTuple) {
     };
     auto b = Tuple{ 1, 2, 3, 1 };
     auto product = a * b; 
-    const auto truth = Tuple{ 18,24,33,1 };
-    EXPECT_TRUE(product == truth);
+    const auto expected = Tuple{ 18,24,33,1 };
+    EXPECT_TRUE(product == expected);
 }
 
 TEST(Matrix, hasIdentity) {
@@ -89,14 +89,14 @@ TEST(Matrix, canBeTransposed) {
         1,8,5,3,
         0,0,5,8 
     };
-    const Matrix4 truth{
+    const Matrix4 expected{
         0,9,1,0,
         9,8,8,0,
         3,0,5,5,
         0,8,3,8
     };
     const Matrix4 b = transpose(a);    
-    EXPECT_TRUE(b == truth);
+    EXPECT_TRUE(b == expected);
     const Matrix4 c = transpose(b);
     EXPECT_TRUE(a == c); //2x transpose = back to original
     const Matrix4 identity = Matrix4::identity();
@@ -109,10 +109,10 @@ TEST(Matrix, getRowFromIndex) {
         -3,2,7,
         0,6,-3
     };
-    EXPECT_EQ(0, a.index_to_row(0));
-    EXPECT_EQ(0, a.index_to_row(2));
-    EXPECT_EQ(2, a.index_to_row(6));
-    EXPECT_EQ(2, a.index_to_row(8));
+    EXPECT_EQ(0, index_to_row(a,0));
+    EXPECT_EQ(0, index_to_row(a,2));
+    EXPECT_EQ(2, index_to_row(a,6));
+    EXPECT_EQ(2, index_to_row(a,8));
 }
 
 TEST(Matrix, getColumnFromIndex) {
@@ -121,12 +121,12 @@ TEST(Matrix, getColumnFromIndex) {
         -3,2,7,
         0,6,-3
     };
-    EXPECT_EQ(0, a.index_to_column(0));
-    EXPECT_EQ(1, a.index_to_column(1));
-    EXPECT_EQ(2, a.index_to_column(2));
-    EXPECT_EQ(0, a.index_to_column(6));
-    EXPECT_EQ(1, a.index_to_column(7));
-    EXPECT_EQ(2, a.index_to_column(8));
+    EXPECT_EQ(0, index_to_column(a,0));
+    EXPECT_EQ(1, index_to_column(a,1));
+    EXPECT_EQ(2, index_to_column(a,2));
+    EXPECT_EQ(0, index_to_column(a,6));
+    EXPECT_EQ(1, index_to_column(a,7));
+    EXPECT_EQ(2, index_to_column(a,8));
 }
 
 TEST(Matrix, canExtractSubmatrix) {
@@ -135,14 +135,14 @@ TEST(Matrix, canExtractSubmatrix) {
         -3,2,7,
         0,6,-3
     };
-    const Matrix2 truth{
+    const Matrix2 expected{
         -3, 2,
         0, 6
     };
     const auto b = submatrix(a, 0, 2);
     const auto c = a.submatrix(0, 2);
-    EXPECT_TRUE(b == truth);
-    EXPECT_TRUE(c == truth);
+    EXPECT_TRUE(b == expected);
+    EXPECT_TRUE(c == expected);
 }
 
 TEST(Matrix, canCalculateMinor) {
@@ -227,13 +227,13 @@ TEST(Matrix, canInvert) {
         7,7,-6,-7,
         1,-3,7,4
     };        
-    const Matrix4 truth{ 
+    const Matrix4 expected{ 
         0.218045f, 0.451128f, 0.240602f, -0.0451128f, 
         -0.808271f, -1.45677f, -0.443609f, 0.520677f, 
         -0.0789474f, -0.223684f, -0.0526316f, 0.197368f, 
         -0.522556f, -0.81391f, -0.300752f, 0.306391f 
     };    
-    const Matrix4 BOOK_ORACLE{ //truth / "good enough" according to the book.
+    const Matrix4 BOOK_ORACLE{ //expected / "good enough" according to the book.
          0.21805f, 0.45113f,0.24060f,-0.04511f,
         -0.80827f,-1.45677f,-0.44361f,0.52068f,
         -0.07895f,-0.22368f,-0.05263f,0.19737f,
@@ -247,8 +247,8 @@ TEST(Matrix, canInvert) {
     EXPECT_FLOAT_EQ(inv_a(3,2), -160.0f/532);
     EXPECT_FLOAT_EQ(cofactor(a, 3, 2), 105.0f);
     EXPECT_FLOAT_EQ(inv_a(2,3), 105.0f/532);
-    EXPECT_TRUE(inv_a == truth);    
-    EXPECT_EQ(inv_a, truth);    
+    EXPECT_TRUE(inv_a == expected);    
+    EXPECT_EQ(inv_a, expected);    
 }
 
 TEST(Matrix, canInvert2) {
@@ -258,13 +258,13 @@ TEST(Matrix, canInvert2) {
         -6,0,9,6,
         -3,0,-9,-4
     };        
-    const Matrix4 truth{
+    const Matrix4 expected{
         -0.153846f, -0.153846f, -0.282051f, -0.538462f,
         -0.0769231f, 0.123077f, 0.025641f, 0.0307692f,
         0.358974f, 0.358974f, 0.435897f, 0.923077f,
         -0.692308f, -0.692308f, -0.769231f, -1.92308f
     };
-    const Matrix4 BOOK_ORACLE{ //truth / "good enough" according to the book.
+    const Matrix4 BOOK_ORACLE{ //expected / "good enough" according to the book.
         -0.15385f, -0.15385f, -0.28205f, -0.53846f,
         -0.07692f, 0.12308f, 0.02564f, 0.03077f,
         0.35897f, 0.35897f, 0.43590f, 0.92308f,
@@ -272,7 +272,7 @@ TEST(Matrix, canInvert2) {
     };
     const Matrix4 inv_a = inverse(a);
         
-    EXPECT_EQ(inv_a, truth);    
+    EXPECT_EQ(inv_a, expected);    
 }
 
 TEST(Matrix, canInvert3) {
@@ -282,13 +282,13 @@ TEST(Matrix, canInvert3) {
         -4,9,6,4,
         -7,6,6,2
     };        
-    const Matrix4 truth{
+    const Matrix4 expected{
         -0.0407407f, -0.0777778f, 0.144444f, -0.222222f,
         -0.0777778f, 0.0333333f, 0.366667f, -0.333333f,
         -0.0290123f, -0.146296f, -0.109259f, 0.12963f,
         0.177778f, 0.0666667f, -0.266667f, 0.333333f
     };
-    const Matrix4 BOOK_ORACLE{ //truth / "good enough" according to the book.
+    const Matrix4 BOOK_ORACLE{ //expected / "good enough" according to the book.
         -0.04074f, -0.07778f, 0.14444f, -0.22222f,
         -0.07778f, 0.03333f, 0.36667f, -0.33333f,
         -0.02901f, -0.14630f, -0.10926f, 0.12963f,
@@ -296,7 +296,7 @@ TEST(Matrix, canInvert3) {
     };
     const Matrix4 inv_a = inverse(a);
         
-    EXPECT_EQ(inv_a, truth);    
+    EXPECT_EQ(inv_a, expected);    
 }
 
 TEST(Matrix, canRoundtripInvert) {

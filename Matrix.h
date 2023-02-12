@@ -50,8 +50,8 @@ struct Matrix final {
         submatrix_type r;          
         size_type ri = 0;
         for (size_type i = 0; i < size(); i++) {
-            if(index_to_row(i) == remove_row) { i += columns(); } //skip the entire row
-            if(index_to_column(i) != remove_column) {
+            if(index_to_row(*this, i) == remove_row) { i += columns(); } //skip the entire row
+            if(index_to_column(*this, i) != remove_column) {
                 r[ri++] = _data[i];
             }
         }     
@@ -63,20 +63,11 @@ struct Matrix final {
     constexpr pointer data() noexcept { return &_data[0]; }
     constexpr const_pointer data() const noexcept { return &_data[0]; }
     constexpr size_type size() const noexcept { return columns() * rows(); }
-
     constexpr iterator begin() noexcept { return data(); }
     constexpr iterator end() noexcept { return begin() + size(); }
     constexpr const_iterator begin() const noexcept { return data(); }
     constexpr const_iterator end() const noexcept { return begin() + size(); }
-
-     constexpr size_type index_to_column(size_type index) const noexcept {
-        assert(index < size());
-        return index % columns();
-    }
-    constexpr size_type index_to_row(size_type index) const noexcept {
-        assert(index < size());
-        return index / columns();
-    }
+    
 
     static constexpr auto identity() noexcept {
         static_assert(ROWS_ == COLUMNS_, "Matrix::identity only supports square matrixes");
@@ -94,12 +85,43 @@ using Matrix2 = Matrix<2, 2>;
 using Matrix1 = Matrix<1, 1>; //to stop template deductions from breaking
 static constexpr auto Matrix4Identity = Matrix4::identity();
 
+template <class Matrix, typename size_type = Matrix::size_type>
+constexpr size_type index_to_column(const Matrix& m, size_type index) noexcept {    
+    assert(index < m.size() && "index_to_column(m,i) index out of range.");    
+    return index % m.columns();
+}
+template <class Matrix, typename size_type = Matrix::size_type>
+constexpr size_type index_to_row(const Matrix& m, size_type index) noexcept {    
+    assert(index < m.size() && "index_to_column(m,i) index out of range.");
+    return index / m.columns();
+}
+
 template <class Matrix>
 constexpr bool operator==(const Matrix& lhs, const Matrix& rhs) noexcept {
-    using std::ranges::equal;
-    using value_type = Matrix::value_type;
+    using std::ranges::equal;    
     return equal(lhs, rhs,
         [](auto a, auto b) { return math::almost_equal(a, b, math::BOOK_EPSILON); });
+}
+
+constexpr Matrix2 operator*(const Matrix2& lhs, const Matrix2& rhs) noexcept {    
+    return Matrix2{
+    lhs[0] * rhs[0] + lhs[1] * rhs[4], //(0, 0)
+    lhs[0] * rhs[1] + lhs[1] * rhs[5], //(0, 1)
+    lhs[4] * rhs[0] + lhs[5] * rhs[4], //(1, 0)
+    lhs[4] * rhs[1] + lhs[5] * rhs[5]};//(1, 1)    
+}
+
+constexpr Matrix3 operator*(const Matrix3& lhs, const Matrix3& rhs) noexcept {    
+    return Matrix3{
+    lhs[0] * rhs[0] + lhs[1] * rhs[4] + lhs[2] * rhs[8], //(0, 0)
+    lhs[0] * rhs[1] + lhs[1] * rhs[5] + lhs[2] * rhs[9], //(0, 1)
+    lhs[0] * rhs[2] + lhs[1] * rhs[6] + lhs[2] * rhs[10], //(0, 2)
+    lhs[4] * rhs[0] + lhs[5] * rhs[4] + lhs[6] * rhs[8],
+    lhs[4] * rhs[1] + lhs[5] * rhs[5] + lhs[6] * rhs[9],
+    lhs[4] * rhs[2] + lhs[5] * rhs[6] + lhs[6] * rhs[10],
+    lhs[8] * rhs[0] + lhs[9] * rhs[4] + lhs[10] * rhs[8], //(2, 0)
+    lhs[8] * rhs[1] + lhs[9] * rhs[5] + lhs[10] * rhs[9], //(2, 1)
+    lhs[8] * rhs[2] + lhs[9] * rhs[6] + lhs[10] * rhs[10]};//(2, 2)    
 }
 
 constexpr Matrix4 operator*(const Matrix4& lhs, const Matrix4& rhs) noexcept {    
@@ -120,27 +142,6 @@ constexpr Matrix4 operator*(const Matrix4& lhs, const Matrix4& rhs) noexcept {
     lhs[12] * rhs[1] + lhs[13] * rhs[5] + lhs[14] * rhs[9] + lhs[15] * rhs[13], //3,1
     lhs[12] * rhs[2] + lhs[13] * rhs[6] + lhs[14] * rhs[10] + lhs[15] * rhs[14], //3,2
     lhs[12] * rhs[3] + lhs[13] * rhs[7] + lhs[14] * rhs[11] + lhs[15] * rhs[15]};//3,3
-}
-
-constexpr Matrix3 operator*(const Matrix3& lhs, const Matrix3& rhs) noexcept {    
-    return Matrix3{
-    lhs[0] * rhs[0] + lhs[1] * rhs[4] + lhs[2] * rhs[8], //(0, 0)
-    lhs[0] * rhs[1] + lhs[1] * rhs[5] + lhs[2] * rhs[9], //(0, 1)
-    lhs[0] * rhs[2] + lhs[1] * rhs[6] + lhs[2] * rhs[10], //(0, 2)
-    lhs[4] * rhs[0] + lhs[5] * rhs[4] + lhs[6] * rhs[8],
-    lhs[4] * rhs[1] + lhs[5] * rhs[5] + lhs[6] * rhs[9],
-    lhs[4] * rhs[2] + lhs[5] * rhs[6] + lhs[6] * rhs[10],
-    lhs[8] * rhs[0] + lhs[9] * rhs[4] + lhs[10] * rhs[8], //(2, 0)
-    lhs[8] * rhs[1] + lhs[9] * rhs[5] + lhs[10] * rhs[9], //(2, 1)
-    lhs[8] * rhs[2] + lhs[9] * rhs[6] + lhs[10] * rhs[10]};//(2, 2)    
-}
-
-constexpr Matrix2 operator*(const Matrix2& lhs, const Matrix2& rhs) noexcept {    
-    return Matrix2{
-    lhs[0] * rhs[0] + lhs[1] * rhs[4], //(0, 0)
-    lhs[0] * rhs[1] + lhs[1] * rhs[5], //(0, 1)
-    lhs[4] * rhs[0] + lhs[5] * rhs[4], //(1, 0)
-    lhs[4] * rhs[1] + lhs[5] * rhs[5]};//(1, 1)    
 }
 
 //multiplying arbitrarily sized (square) Matrices.
@@ -262,10 +263,10 @@ constexpr bool is_invertible(const Matrix& m) noexcept {
 
 template <class Matrix>
 constexpr Matrix inverse(const Matrix& in) noexcept {        
+    using size_type = typename Matrix::size_type;          
     const auto det = determinant(in);
     assert(det != 0 && "Matrix inverse called with non-invertible Matrix");    
-    const auto invDet = 1.0f / det;
-    using size_type = typename Matrix::size_type;          
+    const auto invDet = 1.0f / det;    
     Matrix result; 
     for (size_type row = 0; row < Matrix::ROWS; ++row) {
         for (size_type col = 0; col < Matrix::COLUMNS; ++col) {            
@@ -284,7 +285,7 @@ constexpr Matrix4 translation(Real x, Real y, Real z) noexcept {
         0.0f, 0.0f, 0.0f,   1.0f
     };
 }
-constexpr Matrix4 translation(Point p) noexcept {                
+constexpr Matrix4 translation(Tuple p) noexcept {                
     return translation(p.x, p.y, p.z);
 }
 
@@ -296,7 +297,7 @@ constexpr Matrix4 scaling(Real x, Real y, Real z) noexcept {
         0.0f, 0.0f, 0.0f,   1.0f
     };
 }
-constexpr Matrix4 scaling(Point p) noexcept {                
+constexpr Matrix4 scaling(Tuple p) noexcept {                
     return scaling(p.x, p.y, p.z);
 }
 
@@ -345,6 +346,10 @@ constexpr Matrix4 scaling(Point p) noexcept {
         cos_x * sin_y * cos_z + sin_x * sin_z,  cos_x * sin_y * sin_z - sin_x * cos_z,  cos_x * cos_y,  0.0f,
         0.0f,                                   0.0f,                                   0.0f,           1.0f
     };
+}
+
+/*constexpr*/ Matrix4 rotation(Tuple p) noexcept {
+    return rotation(p.x, p.y, p.z);
 }
 
 

@@ -42,8 +42,8 @@ TEST(Tuples, canBeAdded) {
   const Tuple t1{3, -2, 5, 1};
   const Tuple t2{-2, 3, 1, 0};
   const Tuple res = t1 + t2;
-  const Tuple truth{1, 1, 6, 1};
-  EXPECT_TRUE(res == truth);
+  const Tuple expected{1, 1, 6, 1};
+  EXPECT_TRUE(res == expected);
 }
 
 TEST(Tuples, pointPlusVectorIsPoint) {
@@ -96,19 +96,19 @@ TEST(Tuples, canBeNegated) {
 TEST(Tuples, canBeMultiplied) {
   const auto t1 = Tuple{3, 2, 1, 1};
   const auto t2 = vector(5, 6, 7);
-  const auto truth = Tuple{9, 6, 3, 3};
-  EXPECT_EQ(t1 * 3, truth);
+  const auto expected = Tuple{9, 6, 3, 3};
+  EXPECT_EQ(t1 * 3, expected);
   EXPECT_EQ(t2 * 3, vector(15, 18, 21));
 }
 
 TEST(Tuples, canBeMultipliedByFraction) {
   const auto t1 = Tuple{1, -2, 3, -4};
-  const auto truth = Tuple{0.5, -1, 1.5, -2};
-  EXPECT_EQ(t1 * 0.5f, truth);
+  const auto expected = Tuple{0.5, -1, 1.5, -2};
+  EXPECT_EQ(t1 * 0.5f, expected);
 }
 
 TEST(Tuples, canBeDividedByScalar) {
   const auto t1 = Tuple{1, -2, 3, -4};
-  const auto truth = Tuple{0.5, -1, 1.5, -2};
-  EXPECT_EQ(t1 / 2, truth);
+  const auto expected = Tuple{0.5, -1, 1.5, -2};
+  EXPECT_EQ(t1 / 2, expected);
 }
