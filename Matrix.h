@@ -17,7 +17,7 @@ struct Matrix final {
     using submatrix_type = Matrix<ROWS_ - 1, COLUMNS_ - 1>;
     static constexpr size_type ROWS = ROWS_;
     static constexpr size_type COLUMNS = COLUMNS_;
-
+    
     value_type _data[COLUMNS_ * ROWS_]{};
 
     constexpr reference operator()(size_type row, size_type col) noexcept {
@@ -43,8 +43,7 @@ struct Matrix final {
     constexpr value_type operator()(size_type i) const noexcept {
         assert(i < size() && "Matrix::operator(i) index is out of bounds");
         return _data[i];
-    }
-        
+    }        
     constexpr auto submatrix(size_type remove_row, size_type remove_column) const noexcept {
         assert(remove_row < rows() && remove_column < columns() && "Matrix::submatrix() arguments are out of range. row and column must be inside the matrix.");
         submatrix_type r;          
@@ -57,7 +56,6 @@ struct Matrix final {
         }     
         return r;
     }
-
     constexpr size_type columns() const noexcept { return COLUMNS_; }
     constexpr size_type rows() const noexcept { return ROWS_; }
     constexpr pointer data() noexcept { return &_data[0]; }
@@ -66,8 +64,7 @@ struct Matrix final {
     constexpr iterator begin() noexcept { return data(); }
     constexpr iterator end() noexcept { return begin() + size(); }
     constexpr const_iterator begin() const noexcept { return data(); }
-    constexpr const_iterator end() const noexcept { return begin() + size(); }
-    
+    constexpr const_iterator end() const noexcept { return begin() + size(); }   
 
     static constexpr auto identity() noexcept {
         static_assert(ROWS_ == COLUMNS_, "Matrix::identity only supports square matrixes");

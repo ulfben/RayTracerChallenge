@@ -4,12 +4,14 @@
 #include "Tuple.h"
 #include "Matrix.h"
 
+#include "tests/CanvasTests.h"
 #include "tests/FloatCompareTests.h"
 #include "tests/ColorTests.h"
 #include "tests/TupleTests.h"
 #include "tests/VectorTests.h"
 #include "tests/MatrixTests.h"
 #include "tests/MatrixTransformationTests.h"
+#include "tests/RayTests.h"
 
 //TEST(Chapter2, CanOutputPPM) {
 //    auto c = Canvas(300, 300);

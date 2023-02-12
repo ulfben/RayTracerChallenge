@@ -41,12 +41,14 @@
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Projectile.h" />
+    <ClInclude Include="Ray.h" />
     <ClInclude Include="StringHelpers.h" />
     <ClInclude Include="tests\CanvasTests.h" />
     <ClInclude Include="tests\ColorTests.h" />
     <ClInclude Include="tests\FloatCompareTests.h" />
     <ClInclude Include="tests\MatrixTests.h" />
     <ClInclude Include="tests\MatrixTransformationTests.h" />
+    <ClInclude Include="tests\RayTests.h" />
     <ClInclude Include="tests\VectorTests.h" />
     <ClInclude Include="Tuple.h" />
   </ItemGroup>

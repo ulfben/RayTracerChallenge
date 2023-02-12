@@ -33,6 +33,10 @@
     <ClInclude Include="tests\MatrixTransformationTests.h">
       <Filter>tests</Filter>
     </ClInclude>
+    <ClInclude Include="Ray.h" />
+    <ClInclude Include="tests\RayTests.h">
+      <Filter>tests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
