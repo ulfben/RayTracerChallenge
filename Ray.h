@@ -27,46 +27,55 @@ struct Intersection {
     constexpr bool operator==(const Intersection& that) const noexcept {
         return obj == that.obj && math::almost_equal(t, that.t, math::BOOK_EPSILON);
     }
+    constexpr bool operator==(const Real that) const noexcept {
+        return math::almost_equal(t, that, math::BOOK_EPSILON);
+    }
+    constexpr bool operator<(const Intersection& that) const noexcept {
+        return this->t < that.t;
+    }
+     constexpr bool operator<(Real that) const noexcept {
+        return t < that;
+    }
 };
 
 template<class Object>
 struct Intersections {
     using size_type = uint8_t;
     using value_type = Intersection<Object>;
-    using reference = value_type&;
-    using pointer = value_type*;
-    using const_pointer = const value_type*;
-    using iterator = pointer;
-    using const_iterator = const_pointer;
-    value_type xs[2];
-    uint8_t count{0};    
-           
+    using container = std::vector<value_type>;
+    using reference = container::reference;
+    using pointer = container::pointer;
+    using const_pointer = container::const_pointer;
+    using iterator = container::iterator;
+    using const_iterator = container::const_iterator;
+    container xs;    
+    
+    explicit constexpr Intersections(std::initializer_list<value_type> intersections) noexcept : xs(intersections) {};
+
     constexpr value_type operator[](size_type i) const noexcept {
-        assert(i < count && "Intersection::operator[i] index is out of bounds");
+        assert(i < size() && "Intersection::operator[i] index is out of bounds");
         return xs[i];
     }
     constexpr reference operator[](size_type i) noexcept {
-        assert(i < count && "Intersection::operator[i] index is out of bounds");
+        assert(i < size() && "Intersection::operator[i] index is out of bounds");
         return xs[i];
-    }
-
+    }    
     explicit constexpr operator bool() const noexcept {
         return !empty();
     }
-    constexpr pointer data() noexcept { return &xs[0]; }
-    constexpr const_pointer data() const noexcept { return &xs[0]; }
-    constexpr size_type size() const noexcept { return count; }
-    constexpr bool empty() const noexcept { return size() == 0; }
-    constexpr iterator begin() noexcept { return data(); }
-    constexpr iterator end() noexcept { return begin() + size(); }
-    constexpr const_iterator begin() const noexcept { return data(); }
-    constexpr const_iterator end() const noexcept { return begin() + size(); }  
+    constexpr pointer data() noexcept { return xs.data(); }
+    constexpr const_pointer data() const noexcept { return xs.data(); }
+    constexpr size_type size() const noexcept { return static_cast<size_type>(xs.size()); }
+    constexpr bool empty() const noexcept { return xs.empty(); }
+    constexpr iterator begin() noexcept { return xs.begin(); }
+    constexpr iterator end() noexcept { return xs.end(); }
+    constexpr const_iterator begin() const noexcept { return xs.begin(); }
+    constexpr const_iterator end() const noexcept { return xs.end(); }  
     constexpr bool operator==(const Intersections& that) const noexcept {
         using std::ranges::equal;    
-         return count == that.count && equal(*this, that,
-            [](auto a, auto b) { return math::almost_equal(a, b, math::BOOK_EPSILON); });
+         return size() == that.size() && equal(*this, that,
+            [](auto a, auto b) noexcept { return math::almost_equal(a, b, math::BOOK_EPSILON); });
     }
-
 };
 
 template<class Object>
@@ -81,11 +90,11 @@ constexpr auto intersections() noexcept {
 
 template<class InterSection>
 constexpr auto intersections(InterSection i1, InterSection i2) noexcept {
-    return Intersections{ std::move(i1), std::move(i2), 2 };
+    return Intersections{ std::move(i1), std::move(i2) };
 }
 template<class InterSection>
-constexpr auto intersections(std::span<InterSection> is) noexcept {
-    return Intersections{};
+constexpr auto intersections(std::initializer_list<InterSection> is) noexcept {
+    return Intersections(is);
 }
 
 struct Ray {
@@ -117,11 +126,24 @@ constexpr auto intersect(const Sphere& s, const Ray& r) noexcept {
     }
     const auto t1 = (-b - std::sqrt(discriminant)) / (2*a);
     const auto t2 = (-b + std::sqrt(discriminant)) / (2*a);
-    return intersections( intersection(t1, s), intersection(t2, s));
+    return intersections({ intersection(t1, s), intersection(t2, s) });
 };
 
 //TODO: limit template argument to Interactions-struct
 template <class Intersections>
 constexpr auto hit(const Intersections& xs) noexcept {
-    return xs[0];
+    using value_type = Intersections::value_type;        
+    const auto iter = std::ranges::min_element(xs, 
+        // This comparison function allows us to find the smallest positive number 
+        // by considering negative numbers as larger than positive numbers. 
+        [](const value_type& i1, const value_type& i2) noexcept {                
+            if (i1 < 0.0f) { return false; }
+            if (i2 < 0.0f) { return true; }
+            return i1.t < i2.t;                
+        }
+    );
+    if (iter == std::end(xs) || *iter < 0.0f) { 
+        return value_type{}; //empty set, or no positive T's in the set. Return 0. 
+    }
+    return *iter;    
 };

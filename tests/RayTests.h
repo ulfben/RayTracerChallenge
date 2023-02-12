@@ -29,7 +29,7 @@ TEST(Ray, intersectSphereAtTwoPoints) {
     const auto s = sphere(point(0,0,0), 1.0f);
     const auto xs = intersect(s, r);
 
-    EXPECT_EQ(xs.count, 2);
+    EXPECT_EQ(xs.size(), 2);
     EXPECT_FLOAT_EQ(xs[0].t, 4.0f);
     EXPECT_FLOAT_EQ(xs[1].t, 6.0f);
 }
@@ -40,7 +40,7 @@ TEST(Ray, intersectSphereAtATangent) {
     const auto xs = intersect(s, r);
 
     EXPECT_TRUE(xs);
-    EXPECT_EQ(xs.count, 2);
+    EXPECT_EQ(xs.size(), 2);
     EXPECT_FLOAT_EQ(xs[0].t, 5.0f);
     EXPECT_FLOAT_EQ(xs[1].t, 5.0f);
 }
@@ -50,7 +50,7 @@ TEST(Ray, intersectMissingASphere) {
     const auto s = sphere(point(0,0,0), 1.0f);
     const auto xs = intersect(s, r);
     EXPECT_FALSE(xs);
-    EXPECT_EQ(xs.count, 0);
+    EXPECT_EQ(xs.size(), 0);
 }
 
 TEST(Ray, intersectWhenOriginInsideSphere) {
@@ -58,7 +58,7 @@ TEST(Ray, intersectWhenOriginInsideSphere) {
     const auto s = sphere(point(0,0,0), 1.0f);
     const auto xs = intersect(s, r);
 
-    EXPECT_EQ(xs.count, 2);
+    EXPECT_EQ(xs.size(), 2);
     EXPECT_FLOAT_EQ(xs[0].t, -1.0f); //ray extends backwards! critical for reflections. 
     EXPECT_FLOAT_EQ(xs[1].t, 1.0f);
 }
@@ -68,7 +68,7 @@ TEST(Ray, intersectWhenSphereBehindRay) {
     const auto s = sphere(point(0,0,0), 1.0f);
     const auto xs = intersect(s, r);
 
-    EXPECT_EQ(xs.count, 2);
+    EXPECT_EQ(xs.size(), 2);
     EXPECT_FLOAT_EQ(xs[0].t, -6.0f); //ray extends backwards! critical for reflections. 
     EXPECT_FLOAT_EQ(xs[1].t, -4.0f);
 }
@@ -87,8 +87,7 @@ TEST(Intersections, aggregatesIntersection) {
     const auto i1 = intersection(1, s);
     const auto i2 = intersection(2, s);    
     const auto xs = intersections(i1, i2);
-    EXPECT_TRUE(xs);
-    EXPECT_EQ(xs.count, 2);
+    EXPECT_TRUE(xs);    
     EXPECT_EQ(xs.size(), 2);
     EXPECT_EQ(xs[0].t, 1);
     EXPECT_EQ(xs[1].t, 2);
@@ -98,7 +97,7 @@ TEST(intersect, setsTheObjectOnTheIntersections) {
     const auto r = ray(point(0,0,-5), vector(0,0,1));    
     const auto s = sphere(point(0,0,0), 1.0f);
     const auto xs = intersect(s, r);
-    EXPECT_EQ(xs.count, 2);
+    EXPECT_EQ(xs.size(), 2);
     EXPECT_FLOAT_EQ(xs[0].t, 4.0f);
     EXPECT_FLOAT_EQ(xs[1].t, 6.0f);
     EXPECT_TRUE(xs[0]);
@@ -131,7 +130,7 @@ TEST(hit, allIntersectionsHaveNegativeT) {
     const auto i2 = intersection(-1, s);
     const auto xs = intersections(i1, i2);
     const auto i = hit(xs);    
-    EXPECT_EQ(i.t, 0);
+    EXPECT_FLOAT_EQ(i.t, 0.0f);
     EXPECT_FALSE(i);
 }
 
@@ -141,7 +140,8 @@ TEST(hit, isAlwaysLowestPositiveIntersection) {
     const auto i2 = intersection(7, s);
     const auto i3 = intersection(-3, s);
     const auto i4 = intersection(2, s);
-    //const auto xs = intersections(i1, i2, i3, i4);
-    //const auto i = hit(xs);    
-    //EXPECT_EQ(i, i4);    
+    const auto i5 = intersection(-4, s);
+    const auto xs = intersections({ i1, i2, i3, i4, i5 });
+    const auto i = hit(xs);    
+    EXPECT_EQ(i, i4);    
 }
