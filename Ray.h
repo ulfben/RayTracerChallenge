@@ -21,6 +21,9 @@ struct Intersection {
     Object obj;
     Real t{0};
 
+    explicit constexpr operator bool() const noexcept {
+        return t != 0;
+    }
     constexpr bool operator==(const Intersection& that) const noexcept {
         return obj == that.obj && math::almost_equal(t, that.t, math::BOOK_EPSILON);
     }
@@ -46,9 +49,14 @@ struct Intersections {
         assert(i < count && "Intersection::operator[i] index is out of bounds");
         return xs[i];
     }
+
+    explicit constexpr operator bool() const noexcept {
+        return !empty();
+    }
     constexpr pointer data() noexcept { return &xs[0]; }
     constexpr const_pointer data() const noexcept { return &xs[0]; }
     constexpr size_type size() const noexcept { return count; }
+    constexpr bool empty() const noexcept { return size() == 0; }
     constexpr iterator begin() noexcept { return data(); }
     constexpr iterator end() noexcept { return begin() + size(); }
     constexpr const_iterator begin() const noexcept { return data(); }
@@ -74,6 +82,10 @@ constexpr auto intersections() noexcept {
 template<class InterSection>
 constexpr auto intersections(InterSection i1, InterSection i2) noexcept {
     return Intersections{ std::move(i1), std::move(i2), 2 };
+}
+template<class InterSection>
+constexpr auto intersections(std::span<InterSection> is) noexcept {
+    return Intersections{};
 }
 
 struct Ray {
@@ -106,4 +118,10 @@ constexpr auto intersect(const Sphere& s, const Ray& r) noexcept {
     const auto t1 = (-b - std::sqrt(discriminant)) / (2*a);
     const auto t2 = (-b + std::sqrt(discriminant)) / (2*a);
     return intersections( intersection(t1, s), intersection(t2, s));
+};
+
+//TODO: limit template argument to Interactions-struct
+template <class Intersections>
+constexpr auto hit(const Intersections& xs) noexcept {
+    return xs[0];
 };
