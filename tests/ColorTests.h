@@ -2,7 +2,7 @@
 #include "../pch.h"
 #include "../Tuple.h"
 
-TEST(color, canBeDefaultConstructed) {
+TEST(Color, canBeDefaultConstructed) {
   const Tuple a;
   EXPECT_FLOAT_EQ(a.r, .0f);
   EXPECT_FLOAT_EQ(a.g, .0f);
@@ -10,7 +10,7 @@ TEST(color, canBeDefaultConstructed) {
   EXPECT_FLOAT_EQ(a.a, .0f);
 }
 
-TEST(color, canBeConstructed) {
+TEST(Color, canBeConstructed) {
   const auto a = color(-0.5f, 0.4f, 1.7f);
   EXPECT_FLOAT_EQ(a.r, -0.5f);
   EXPECT_FLOAT_EQ(a.g, 0.4f);
@@ -18,7 +18,7 @@ TEST(color, canBeConstructed) {
   EXPECT_FLOAT_EQ(a.a, 1.0f);
 }
 
-TEST(color, canBeMultiplied) {
+TEST(Color, canBeMultiplied) {
   const auto a = color(1.0f, 0.2f, 0.4f);
   const auto b = color(0.9f, 1.0f, 0.1f);
   const auto result = a * b;

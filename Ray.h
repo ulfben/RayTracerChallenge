@@ -124,8 +124,9 @@ constexpr auto intersect(const Sphere& s, const Ray& r) noexcept {
     if (discriminant < 0) {
         return intersections<Sphere>();
     }
-    const auto t1 = (-b - std::sqrt(discriminant)) / (2*a);
-    const auto t2 = (-b + std::sqrt(discriminant)) / (2*a);
+    const auto sqrt = std::sqrt(discriminant);
+    const auto t1 = (-b - sqrt) / (2*a);
+    const auto t2 = (-b + sqrt) / (2*a);
     return intersections({ intersection(t1, s), intersection(t2, s) });
 };
 
@@ -137,8 +138,8 @@ constexpr auto hit(const Intersections& xs) noexcept {
         // This comparison function allows us to find the smallest positive number 
         // by considering negative numbers as larger than positive numbers. 
         [](const value_type& i1, const value_type& i2) noexcept {                
-            if (i1 < 0.0f) { return false; }
-            if (i2 < 0.0f) { return true; }
+            if (i1.t < 0.0f) { return false; }
+            if (i2.t < 0.0f) { return true; }
             return i1.t < i2.t;                
         }
     );
