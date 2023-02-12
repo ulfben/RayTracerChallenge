@@ -35,12 +35,15 @@ struct Matrix final {
     constexpr reference operator[](size_type i) noexcept {
         assert(i < size() && "Matrix::operator[i] index is out of bounds");
         return _data[i];
-    } 
-
-    constexpr reference rotate_x(size_type i) noexcept {
-        assert(i < size() && "Matrix::operator[i] index is out of bounds");
+    }
+    constexpr reference operator()(size_type i) noexcept {
+        assert(i < size() && "Matrix::operator(i) index is out of bounds");
         return _data[i];
-    }   
+    }
+    constexpr value_type operator()(size_type i) const noexcept {
+        assert(i < size() && "Matrix::operator(i) index is out of bounds");
+        return _data[i];
+    }
         
     constexpr auto submatrix(size_type remove_row, size_type remove_column) const noexcept {
         assert(remove_row < rows() && remove_column < columns() && "Matrix::submatrix() arguments are out of range. row and column must be inside the matrix.");
@@ -105,14 +108,14 @@ constexpr Matrix4 operator*(const Matrix4& lhs, const Matrix4& rhs) noexcept {
     lhs[0] * rhs[1] + lhs[1] * rhs[5] + lhs[2] * rhs[9] + lhs[3] * rhs[13], //0,1
     lhs[0] * rhs[2] + lhs[1] * rhs[6] + lhs[2] * rhs[10] + lhs[3] * rhs[14], //0,2 
     lhs[0] * rhs[3] + lhs[1] * rhs[7] + lhs[2] * rhs[11] + lhs[3] * rhs[15], //0,3
-    lhs[4] * rhs[0] + lhs[5] * rhs[4] + lhs(1, 2) * rhs[8] + lhs(1, 3) * rhs[12],
-    lhs[4] * rhs[1] + lhs[5] * rhs[5] + lhs(1, 2) * rhs[9] + lhs(1, 3) * rhs[13],
-    lhs[4] * rhs[2] + lhs[5] * rhs[6] + lhs(1, 2) * rhs[10] + lhs(1, 3) * rhs[14],
-    lhs[4] * rhs[3] + lhs[5] * rhs[7] + lhs(1, 2) * rhs[11] + lhs(1, 3) * rhs[15],
-    lhs[8] * rhs[0] + lhs[9] * rhs[4] + lhs[10] * rhs[8] + lhs(2, 3) * rhs[12],
-    lhs[8] * rhs[1] + lhs[9] * rhs[5] + lhs[10] * rhs[9] + lhs(2, 3) * rhs[13],
-    lhs[8] * rhs[2] + lhs[9] * rhs[6] + lhs[10] * rhs[10] + lhs(2, 3) * rhs[14],
-    lhs[8] * rhs[3] + lhs[9] * rhs[7] + lhs[10] * rhs[11] + lhs(2, 3) * rhs[15],
+    lhs[4] * rhs[0] + lhs[5] * rhs[4] + lhs[6] * rhs[8] + lhs[7] * rhs[12],
+    lhs[4] * rhs[1] + lhs[5] * rhs[5] + lhs[6] * rhs[9] + lhs[7] * rhs[13],
+    lhs[4] * rhs[2] + lhs[5] * rhs[6] + lhs[6] * rhs[10] + lhs[7] * rhs[14],
+    lhs[4] * rhs[3] + lhs[5] * rhs[7] + lhs[6] * rhs[11] + lhs[7] * rhs[15],
+    lhs[8] * rhs[0] + lhs[9] * rhs[4] + lhs[10] * rhs[8] + lhs[11] * rhs[12],
+    lhs[8] * rhs[1] + lhs[9] * rhs[5] + lhs[10] * rhs[9] + lhs[11] * rhs[13],
+    lhs[8] * rhs[2] + lhs[9] * rhs[6] + lhs[10] * rhs[10] + lhs[11] * rhs[14],
+    lhs[8] * rhs[3] + lhs[9] * rhs[7] + lhs[10] * rhs[11] + lhs[11] * rhs[15],
     lhs[12] * rhs[0] + lhs[13] * rhs[4] + lhs[14] * rhs[8] + lhs[15] * rhs[12], //3,0
     lhs[12] * rhs[1] + lhs[13] * rhs[5] + lhs[14] * rhs[9] + lhs[15] * rhs[13], //3,1
     lhs[12] * rhs[2] + lhs[13] * rhs[6] + lhs[14] * rhs[10] + lhs[15] * rhs[14], //3,2
@@ -124,9 +127,9 @@ constexpr Matrix3 operator*(const Matrix3& lhs, const Matrix3& rhs) noexcept {
     lhs[0] * rhs[0] + lhs[1] * rhs[4] + lhs[2] * rhs[8], //(0, 0)
     lhs[0] * rhs[1] + lhs[1] * rhs[5] + lhs[2] * rhs[9], //(0, 1)
     lhs[0] * rhs[2] + lhs[1] * rhs[6] + lhs[2] * rhs[10], //(0, 2)
-    lhs[4] * rhs[0] + lhs[5] * rhs[4] + lhs(1, 2) * rhs[8],
-    lhs[4] * rhs[1] + lhs[5] * rhs[5] + lhs(1, 2) * rhs[9],
-    lhs[4] * rhs[2] + lhs[5] * rhs[6] + lhs(1, 2) * rhs[10],
+    lhs[4] * rhs[0] + lhs[5] * rhs[4] + lhs[6] * rhs[8],
+    lhs[4] * rhs[1] + lhs[5] * rhs[5] + lhs[6] * rhs[9],
+    lhs[4] * rhs[2] + lhs[5] * rhs[6] + lhs[6] * rhs[10],
     lhs[8] * rhs[0] + lhs[9] * rhs[4] + lhs[10] * rhs[8], //(2, 0)
     lhs[8] * rhs[1] + lhs[9] * rhs[5] + lhs[10] * rhs[9], //(2, 1)
     lhs[8] * rhs[2] + lhs[9] * rhs[6] + lhs[10] * rhs[10]};//(2, 2)    
@@ -176,37 +179,37 @@ Matrix transpose(const Matrix& a) noexcept {
 }
 
 constexpr Real determinant(const Matrix1& m) noexcept {    
-    return m(0, 0); //necessary for the template deduction
+    return m[0]; //necessary for the template deduction
 }
 
 constexpr Real determinant(const Matrix2& m) noexcept {
-    return m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0);
+    return m[0] * m[3] - m[1] * m[2];
 }
 
 constexpr Real determinant(const Matrix3& m) noexcept {
-    return m(0,0) * (m(1,1) * m(2,2) - m(1,2) * m(2,1)) - 
-           m(0,1) * (m(1,0) * m(2,2) - m(1,2) * m(2,0)) + 
-           m(0,2) * (m(1,0) * m(2,1) - m(1,1) * m(2,0));
+    return m[0] * (m[4] * m[8] - m[5] * m[7]) - 
+           m[1] * (m[3] * m[8] - m[5] * m[6]) + 
+           m[2] * (m[3] * m[7] - m[4] * m[6]);
 }
 
 constexpr Real determinant(const Matrix4& m) noexcept {
     return 
-        m(0,0) * 
-            (m(1,1) * m(2,2) * m(3,3) + m(1,2) * m(2,3) * m(3,1) + 
-             m(1,3) * m(2,1) * m(3,2) - m(1,3) * m(2,2) * m(3,1) - 
-             m(1,1) * m(2,3) * m(3,2) - m(1,2) * m(2,1) * m(3,3)) - 
-        m(0,1) * 
-            (m(1,0) * m(2,2) * m(3,3) + m(1,2) * m(2,3) * m(3,0) + 
-            m(1,3) * m(2,0) * m(3,2) - m(1,3) * m(2,2) * m(3,0) - 
-            m(1,0) * m(2,3) * m(3,2) - m(1,2) * m(2,0) * m(3,3)) +
-        m(0,2) * 
-            (m(1,0) * m(2,1) * m(3,3) + m(1,1) * m(2,3) * m(3,0) + 
-            m(1,3) * m(2,0) * m(3,1) - m(1,3) * m(2,1) * m(3,0) - 
-            m(1,0) * m(2,3) * m(3,1) - m(1,1) * m(2,0) * m(3,3)) - 
-        m(0,3) * 
-            (m(1,0) * m(2,1) * m(3,2) + m(1,1) * m(2,2) * m(3,0) + 
-             m(1,2) * m(2,0) * m(3,1) - m(1,2) * m(2,1) * m(3,0) - 
-             m(1,0) * m(2,2) * m(3,1) - m(1,1) * m(2,0) * m(3,2));
+        m[0] * 
+            (m[5] * m[10] * m[15] + m[6] * m[11] * m[13] + 
+             m[7] * m[9] * m[14] - m[7] * m[10] * m[13] - 
+             m[5] * m[11] * m[14] - m[6] * m[9] * m[15]) - 
+        m[1] * 
+            (m[4] * m[10] * m[15] + m[6] * m[11] * m[12] + 
+            m[7] * m[8] * m[14] - m[7] * m[10] * m[12] - 
+            m[4] * m[11] * m[14] - m[6] * m[8] * m[15]) +
+        m[2] * 
+            (m[4] * m[9] * m[15] + m[5] * m[11] * m[12] + 
+            m[7] * m[8] * m[13] - m[7] * m[9] * m[12] - 
+            m[4] * m[11] * m[13] - m[5] * m[8] * m[15]) - 
+        m[3] * 
+            (m[4] * m[9] * m[14] + m[5] * m[10] * m[12] + 
+             m[6] * m[8] * m[13] - m[6] * m[9] * m[12] - 
+             m[4] * m[10] * m[13] - m[5] * m[8] * m[14]);
 }
 
 //calculate determinant on arbitrary Matrix sizes.
@@ -215,7 +218,7 @@ constexpr Real determinant2(const Matrix& m) noexcept {
     using size_type = typename Matrix::size_type;
     Real out = 0;
     for (size_type col = 0; col < Matrix::COLUMNS; col++) {
-        out += m(0, col) * cofactor(m, 0, col);
+        out += m[col] * cofactor(m, 0, col);
     }
     return out;
 }
@@ -274,22 +277,24 @@ constexpr Matrix inverse(const Matrix& in) noexcept {
 }
 
 constexpr Matrix4 translation(Real x, Real y, Real z) noexcept {            
-    auto result = Matrix4Identity;
-    result(0, 3) = x; 
-    result(1, 3) = y; 
-    result(2, 3) = z; 
-    return result;
+    return {
+        1.0f, 0.0f, 0.0f,   x,
+        0.0f, 1.0f, 0.0f,   y,
+        0.0f, 0.0f, 1.0f,   z,
+        0.0f, 0.0f, 0.0f,   1.0f
+    };
 }
 constexpr Matrix4 translation(Point p) noexcept {                
     return translation(p.x, p.y, p.z);
 }
 
-constexpr Matrix4 scaling(Real x, Real y, Real z) noexcept {            
-    auto result = Matrix4Identity;
-    result(0, 0) = x; 
-    result(1, 1) = y; 
-    result(2, 2) = z; 
-    return result;
+constexpr Matrix4 scaling(Real x, Real y, Real z) noexcept {
+    return {
+        x,    0.0f, 0.0f,   0.0f,
+        0.0f, y,    0.0f,   0.0f,
+        0.0f, 0.0f, z,      0.0f,
+        0.0f, 0.0f, 0.0f,   1.0f
+    };
 }
 constexpr Matrix4 scaling(Point p) noexcept {                
     return scaling(p.x, p.y, p.z);
