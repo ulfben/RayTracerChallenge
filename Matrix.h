@@ -76,9 +76,9 @@ struct Matrix final {
         return result;
     }
 };
-template <typename> inline constexpr bool isMatrix = false;
+template<typename> constexpr bool is_matrix = false;
 template <std::size_t ROWS, std::size_t COLUMNS>
-inline constexpr bool isMatrix<Matrix<ROWS, COLUMNS>> = true;
+constexpr bool is_matrix<Matrix<ROWS, COLUMNS>> = true;
 
 using Matrix4 = Matrix<4, 4>;
 using Matrix3 = Matrix<3, 3>;
@@ -86,24 +86,24 @@ using Matrix2 = Matrix<2, 2>;
 using Matrix1 = Matrix<1, 1>; //to stop template deductions from breaking
 static constexpr auto Matrix4Identity = Matrix4::identity();
 
-static_assert(isMatrix<Matrix4>, "Constraint test failed. Matrix4 should be identified as a Matrix");
-static_assert(!isMatrix<Tuple>, "Constraint test failed. Tuple shouldn't be identified as a Matrix.");
+static_assert(is_matrix<Matrix4>, "Constraint test failed. Matrix4 should be identified as a Matrix");
+static_assert(!is_matrix<Tuple>, "Constraint test failed. Tuple shouldn't be identified as a Matrix.");
 
 template <class Matrix, typename size_type = Matrix::size_type>
-    requires (isMatrix<Matrix>)
+    requires (is_matrix<Matrix>)
 constexpr size_type index_to_column(const Matrix& m, size_type index) noexcept {    
     assert(index < m.size() && "index_to_column(m,i) index out of range.");    
     return index % m.columns();
 }
 template <class Matrix, typename size_type = Matrix::size_type>
-    requires (isMatrix<Matrix>)
+    requires (is_matrix<Matrix>)
 constexpr size_type index_to_row(const Matrix& m, size_type index) noexcept {    
     assert(index < m.size() && "index_to_column(m,i) index out of range.");
     return index / m.columns();
 }
 
 template <class Matrix> 
-    requires (isMatrix<Matrix>)
+    requires (is_matrix<Matrix>)
 constexpr bool operator==(const Matrix& lhs, const Matrix& rhs) noexcept {
     using std::ranges::equal;    
     return equal(lhs, rhs,
@@ -153,7 +153,7 @@ constexpr Matrix4 operator*(const Matrix4& lhs, const Matrix4& rhs) noexcept {
 
 //multiplying arbitrarily sized (square) Matrices.
 template <class Matrix>
-    requires (isMatrix<Matrix>)
+    requires (is_matrix<Matrix>)
 constexpr auto operator*(const Matrix& lhs, const Matrix& rhs) noexcept {
     using size_type = typename Matrix::size_type;
     Matrix result;
@@ -176,7 +176,7 @@ constexpr Tuple operator*(const Matrix4& lhs, const Tuple& rhs) noexcept {
 }
 
 template <class Matrix>
-   requires (isMatrix<Matrix>)
+   requires (is_matrix<Matrix>)
 constexpr Matrix transpose(const Matrix& a) noexcept {
     using size_type = typename Matrix::size_type;
     Matrix result;
@@ -224,7 +224,7 @@ constexpr Real determinant(const Matrix4& m) noexcept {
 
 //calculate determinant on arbitrary Matrix sizes.
 template <class Matrix>
-    requires (isMatrix<Matrix>)
+    requires (is_matrix<Matrix>)
 constexpr Real determinant2(const Matrix& m) noexcept {        
     using size_type = typename Matrix::size_type;
     Real out = 0;
@@ -235,7 +235,7 @@ constexpr Real determinant2(const Matrix& m) noexcept {
 }
 
 template <class Matrix>
-    requires (isMatrix<Matrix>)
+    requires (is_matrix<Matrix>)
 constexpr auto submatrix(const Matrix& in, uint8_t remove_row, uint8_t remove_column) noexcept {
     assert(remove_row < Matrix::ROWS && remove_column < Matrix::COLUMNS && "submatrix() arguments are out of range. row and column must be inside the input matrix.");
     using size_type = typename Matrix::size_type;
@@ -253,7 +253,7 @@ constexpr auto submatrix(const Matrix& in, uint8_t remove_row, uint8_t remove_co
 }
 
 template <class Matrix>
-    requires (isMatrix<Matrix>)
+    requires (is_matrix<Matrix>)
 constexpr Real minor(const Matrix& in, uint8_t remove_row, uint8_t remove_column) noexcept {
     //Returns the determinant of a submatrix
     assert(remove_row < Matrix::ROWS && remove_column < Matrix::COLUMNS && "minor() arguments are out of range. row and column must be inside the input matrix.");
@@ -262,7 +262,7 @@ constexpr Real minor(const Matrix& in, uint8_t remove_row, uint8_t remove_column
 }
 
 template <class Matrix>
-    requires (isMatrix<Matrix>)
+    requires (is_matrix<Matrix>)
 constexpr Real cofactor(const Matrix& in, uint8_t remove_row, uint8_t remove_column) noexcept {
     assert(remove_row < Matrix::ROWS && remove_column < Matrix::COLUMNS && "cofactor() arguments are out of range. row and column must be inside the input matrix.");
     const auto min = minor(in, remove_row, remove_column);
@@ -270,13 +270,13 @@ constexpr Real cofactor(const Matrix& in, uint8_t remove_row, uint8_t remove_col
 }
 
 template <class Matrix>
-   requires (isMatrix<Matrix>)
+   requires (is_matrix<Matrix>)
 constexpr bool is_invertible(const Matrix& m) noexcept {        
     return determinant(m) != 0;
 }
 
 template <class Matrix>
-   requires (isMatrix<Matrix>)
+   requires (is_matrix<Matrix>)
 constexpr Matrix inverse(const Matrix& in) noexcept {        
     using size_type = typename Matrix::size_type;          
     const auto det = determinant(in);
