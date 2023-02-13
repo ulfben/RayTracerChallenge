@@ -10,7 +10,7 @@ struct Sphere {
     Matrix4 transform{ Matrix4Identity };
 
     constexpr bool operator==(const Sphere& that) const noexcept {
-        return position == that.position && math::almost_equal(radius, that.radius, math::BOOK_EPSILON);
+        return position == that.position && math::float_cmp(radius, that.radius);
     }
 };
 
@@ -27,10 +27,10 @@ struct Intersection {
         return t != 0;
     }
     constexpr bool operator==(const Intersection& that) const noexcept {
-        return obj == that.obj && math::almost_equal(t, that.t, math::BOOK_EPSILON);
+        return obj == that.obj && math::float_cmp(t, that.t);
     }
     constexpr bool operator==(const Real that) const noexcept {
-        return math::almost_equal(t, that, math::BOOK_EPSILON);
+        return math::float_cmp(t, that);
     }
     constexpr bool operator<(const Intersection& that) const noexcept {
         return this->t < that.t;
@@ -76,7 +76,7 @@ struct Intersections {
     constexpr bool operator==(const Intersections& that) const noexcept {
         using std::ranges::equal;    
          return size() == that.size() && equal(*this, that,
-            [](auto a, auto b) noexcept { return math::almost_equal(a, b, math::BOOK_EPSILON); });
+            [](auto a, auto b) noexcept { return math::float_cmp(a, b); });
     }
 };
 

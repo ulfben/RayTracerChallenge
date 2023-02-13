@@ -1,6 +1,6 @@
 #pragma once
 #include "../pch.h"
-
+#include "../Math.h"
 /**
  * Test suite to demonstrate a good method for comparing floating-point values
  * using an epsilon. Run via Google Test.
@@ -34,14 +34,8 @@ static constexpr auto MIN = std::numeric_limits<Real>::min();
 static constexpr auto INF = std::numeric_limits<Real>::infinity();
 static constexpr auto NEG_INF = -INF;
 static constexpr Real QNAN = std::numeric_limits<Real>::quiet_NaN();
+using math::float_cmp;
 
-//facade to let me swap the tested function and epsilon easily
-static constexpr bool float_cmp(float a, float b, float epsilon) noexcept {
-    return math::nearly_equal(a, b, epsilon);
-}
-static constexpr bool float_cmp(float a, float b) noexcept {
-    return float_cmp(a, b, math::BRAZZY_EPSILON);
-}
 
  // Regular large numbers - generally not problematic 
 TEST(NearlyEqualTest, big) {
@@ -171,19 +165,19 @@ TEST(NearlyEqualTest, opposite) {
 }
 
 // The really tricky part - comparisons of numbers very close to zero.
-/*
-TEST(NearlyEqualTest, ulp) {
-    EXPECT_FLOAT_EQ(MIN, -MIN); //Sanity check. This fails too. 1.1754944e-38 != -1.1754944e-38
+TEST(NearlyEqualTest, ulp) { 
     EXPECT_TRUE(float_cmp(MIN, MIN));
-    EXPECT_TRUE(float_cmp(MIN, -MIN));
+
+    //   EXPECT_FLOAT_EQ(MIN, -MIN); //Sanity check. This fails too. 1.1754944e-38 != -1.1754944e-38
+   /* EXPECT_TRUE(float_cmp(MIN, -MIN));
     EXPECT_TRUE(float_cmp(-MIN, MIN));
     EXPECT_TRUE(float_cmp(MIN, 0.0f));
     EXPECT_TRUE(float_cmp(0.0f, MIN));
     EXPECT_TRUE(float_cmp(-MIN, 0.0f));
-    EXPECT_TRUE(float_cmp(0.0f, -MIN));
+    EXPECT_TRUE(float_cmp(0.0f, -MIN));*/
 
     EXPECT_FALSE(float_cmp(0.000000001f, -MIN));
     EXPECT_FALSE(float_cmp(0.000000001f, MIN));
     EXPECT_FALSE(float_cmp(MIN, 0.000000001f));
     EXPECT_FALSE(float_cmp(-MIN, 0.000000001f));
-}*/
+}

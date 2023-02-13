@@ -11,7 +11,7 @@ namespace Detail {
 namespace math {
     constexpr auto PI = std::numbers::pi_v<Real>;
     constexpr auto TWO_PI = PI * 2.0f; //full circle
-    constexpr auto HALF_PI = math::PI/2.0f;
+    constexpr auto HALF_PI = math::PI / 2.0f;
     constexpr auto INV_PI = std::numbers::inv_pi_v<Real>;
     constexpr auto TO_DEG = 180.0f / PI;
     constexpr auto TO_RAD = PI / 180.0f;
@@ -33,27 +33,34 @@ namespace math {
     constexpr T abs(T x) noexcept {
         return x < 0 ? -x : x; //in use only until std::abs becomes constexpr...
     }
-     
+
+    constexpr bool is_nan(Real x) noexcept { 
+        return x != x; //in use until std::is_nan becomes constexpr.
+    } 
+
     constexpr Real sqrt(Real x) noexcept {
         return x >= 0.0f && x < std::numeric_limits<Real>::infinity()
             ? Detail::sqrtNewtonRaphson(x, x, 0.0f)
             : std::numeric_limits<Real>::quiet_NaN();
     }
 
-    static constexpr auto BOOK_EPSILON   = 0.0001f; //value suggested as "good enough" by the book.
-    static constexpr auto BRAZZY_EPSILON = 0.00001f; //https://github.com/brazzy/floating-point-gui.de
-    static constexpr auto TESTED_EPSILON = 0.000003f; //the smallest epsilon I've used with my function and still passed all tests.                                         
-    static constexpr auto MACHINE_EPSILON= 0.000000119209f; //== std::numeric_limits<Real>::epsilon();
-
+    static constexpr auto BOOK_EPSILON      = 0.0001f; //1.0e-4f, value suggested as "good enough" by the book.
+    static constexpr auto BRAZZY_EPSILON    = 0.00001f; //1.0e-5f, https://github.com/brazzy/floating-point-gui.de
+    static constexpr auto TESTED_EPSILON    = 0.000003f; // 3.0e-6f, the smallest epsilon I've used with my function and still passed all tests.                                         
+    static constexpr auto GTEST_EPSILON     = 0.000001f;// 1.0e-6f; //from Google Test
+    static constexpr auto MACHINE_EPSILON   = 0.000000119209f; //1.19209e-7f, == std::numeric_limits<Real>::epsilon();
+    
+    //from the book. fails on big, bigneg, infinities, oppoite, small, smallneg, ulp and zero
     template<class T>
         requires std::is_arithmetic_v<T>
-    constexpr bool almost_equal(T a, T b, T epsilon = TESTED_EPSILON) noexcept {
+    constexpr bool almost_equal(T a, T b, T epsilon) noexcept {
         return math::abs(a - b) <= epsilon;
     }
 
     //borrowed from QT
     //dummy argument added to match the other comparison interfaces (easier to facade during testing).
-    constexpr bool fuzzy_compare(Real a, Real b, [[maybe_unused]] Real) noexcept {
+    //doesn't handle infinities, ulp or near-zero values
+    constexpr bool qt_fuzzy_compare(Real a, Real b, [[maybe_unused]] Real) noexcept {
         return (math::abs(a - b) * 100000.f <= std::min(std::abs(a), math::abs(b)));
     }
 
@@ -62,7 +69,7 @@ namespace math {
     //  Currently failing all ulp tests. Does not work well with /fp:fast.
     template<class T>
         requires std::is_arithmetic_v<T>
-    constexpr bool nearly_equal(T a, T b, T epsilon = BRAZZY_EPSILON) noexcept {
+    constexpr bool brazzy_nearly_equal(T a, T b, T epsilon) noexcept {
         if (a == b) { // shortcut, handles infinities
             return true;
         }
@@ -76,5 +83,26 @@ namespace math {
         }
         // use relative error
         return diff / std::min((absA + absB), std::numeric_limits<T>::max()) < epsilon;
+    }
+
+    //borrowed from google test, doesn't handle infinities at all
+    constexpr  bool gtest_almost_equals(Real expected, Real actual, Real max_abs_error) noexcept {
+        if (is_nan(expected) || is_nan(actual)) {
+            return false;
+        }
+        const Real abs_diff = std::abs(expected - actual);
+        if (abs_diff <= max_abs_error) {
+            return true;
+        }
+        const Real abs_max = std::max(std::abs(expected), std::abs(actual));
+        return abs_diff <= abs_max * max_abs_error;
+    }
+
+    //facade to let me swap the tested function and epsilon easily
+    static constexpr bool float_cmp(float a, float b, float epsilon) noexcept {
+        return math::brazzy_nearly_equal(a, b, epsilon);
+    }
+    static constexpr bool float_cmp(float a, float b) noexcept {
+        return float_cmp(a, b, math::BRAZZY_EPSILON);
     }
 }

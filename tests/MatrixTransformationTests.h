@@ -51,7 +51,7 @@ TEST(TransformationMatrix, reflectionByScaling) {
 }
 
 TEST(TransformationMatrix, rotationOnX) {       
-    const auto ROOT_TWO = std::sqrt(2.0f); 
+    constexpr auto ROOT_TWO = math::sqrt(2.0f); 
     const auto p = point(0, 1, 0);    
     const auto half_quarter = rotation_x(math::PI * 0.25f);
     const auto full_quarter = rotation_x(math::PI * 0.5f);    
@@ -60,15 +60,15 @@ TEST(TransformationMatrix, rotationOnX) {
 }
 
 TEST(TransformationMatrix, invRotationOnX) {         
-    const auto ROOT_TWO = std::sqrt(2.0f); 
+    constexpr auto ROOT_TWO = math::sqrt(2.0f); 
     const auto p = point(0, 1, 0);    
     const auto inv_half_quarter = inverse(rotation_x(math::PI * 0.25f));    
     EXPECT_EQ(inv_half_quarter*p, point(0.0f, ROOT_TWO / 2, -ROOT_TWO / 2));        
 }
 
 TEST(TransformationMatrix, rotationOnY) {       
-    const auto ROOT_TWO = std::sqrt(2.0f); 
-    const auto p = point(0, 0, 1);    
+    constexpr auto ROOT_TWO = math::sqrt(2.0f); 
+    const auto p = point(0.0f, 0.0f, 1.0f);    
     const auto half_quarter = rotation_y(math::PI * 0.25f);
     const auto full_quarter = rotation_y(math::PI * 0.5f);    
     EXPECT_EQ(half_quarter*p, point(ROOT_TWO / 2, 0.0f, ROOT_TWO / 2));    
@@ -76,12 +76,15 @@ TEST(TransformationMatrix, rotationOnY) {
 }
 
 TEST(TransformationMatrix, rotationOnZ) {       
-    const auto ROOT_TWO = std::sqrt(2.0f); 
-    const auto p = point(0, 1, 0);    
+    constexpr auto ROOT_TWO = math::sqrt(2.0f); 
+    const auto p = point(0.0f, 1.0f, 0.0f);    
     const auto half_quarter = rotation_z(math::PI * 0.25f);
     const auto full_quarter = rotation_z(math::PI * 0.5f);    
     EXPECT_EQ(half_quarter*p, point(-ROOT_TWO / 2, ROOT_TWO / 2, 0.0f));    
-    EXPECT_EQ(full_quarter*p, point(-1.0f,0.0f,0.0f));    
+
+    const auto result = full_quarter * p;
+    const auto expected = point(-1.0f, 0.0f, 0.0f);
+    EXPECT_EQ(result, expected);    
 }
 
 TEST(TransformationMatrix, shearingMovesXInProportionToY) {               

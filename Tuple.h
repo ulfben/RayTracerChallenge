@@ -55,9 +55,9 @@ struct Tuple final {
   }
   constexpr Tuple operator-() const noexcept { return Tuple{-x, -y, -z, w}; }
   constexpr bool operator==(const Tuple &rhs) const noexcept {
-    using math::almost_equal;
-    return almost_equal(rhs.x, x) && almost_equal(rhs.y, y) &&
-           almost_equal(rhs.z, z) && almost_equal(rhs.w, w);
+    using math::float_cmp;
+    return float_cmp(x, rhs.x) && float_cmp(y, rhs.y) &&
+           float_cmp(z, rhs.z) && float_cmp(w, rhs.w);
   };
 };
 
