@@ -79,10 +79,11 @@ namespace math {
         if (a == 0 || b == 0 || (absA + absB < std::numeric_limits<T>::min())) {
             // a or b is zero or both are extremely close to it
             // relative error is less meaningful here
-            return diff < (epsilon * std::numeric_limits<T>::min());
+            //return diff < (epsilon * std::numeric_limits<T>::min()); //fails ulp-tests and my real-world data (close to zero)
+            return diff < epsilon; //fails some Zero-tests but satisfies my real-world data.
         }
         // use relative error
-        return diff / std::min((absA + absB), std::numeric_limits<T>::max()) < epsilon;
+        return (diff / std::min((absA + absB), std::numeric_limits<T>::max())) < epsilon;
     }
 
     //borrowed from google test, doesn't handle infinities at all

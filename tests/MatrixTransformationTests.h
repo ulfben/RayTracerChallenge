@@ -55,8 +55,11 @@ TEST(TransformationMatrix, rotationOnX) {
     const auto p = point(0, 1, 0);    
     const auto half_quarter = rotation_x(math::PI * 0.25f);
     const auto full_quarter = rotation_x(math::PI * 0.5f);    
-    EXPECT_EQ(half_quarter*p, point(0.0f, ROOT_TWO / 2, ROOT_TWO / 2));    
-    EXPECT_EQ(full_quarter*p, point(0.0f,0.0f,1.0f));    
+    EXPECT_EQ(half_quarter*p, point(0.0f, ROOT_TWO / 2, ROOT_TWO / 2));       
+
+    const auto result = full_quarter * p;
+    const auto expected = point(0.0f,0.0f,1.0f);
+    EXPECT_EQ(result, expected);   
 }
 
 TEST(TransformationMatrix, invRotationOnX) {         
@@ -71,8 +74,11 @@ TEST(TransformationMatrix, rotationOnY) {
     const auto p = point(0.0f, 0.0f, 1.0f);    
     const auto half_quarter = rotation_y(math::PI * 0.25f);
     const auto full_quarter = rotation_y(math::PI * 0.5f);    
-    EXPECT_EQ(half_quarter*p, point(ROOT_TWO / 2, 0.0f, ROOT_TWO / 2));    
-    EXPECT_EQ(full_quarter*p, point(1.0f,0.0f,0.0f));    
+    EXPECT_EQ(half_quarter*p, point(ROOT_TWO / 2, 0.0f, ROOT_TWO / 2));
+
+    const auto result = full_quarter * p;
+    const auto expected = point(1.0f,0.0f,0.0f);
+    EXPECT_EQ(result, expected);    
 }
 
 TEST(TransformationMatrix, rotationOnZ) {       
@@ -83,7 +89,7 @@ TEST(TransformationMatrix, rotationOnZ) {
     EXPECT_EQ(half_quarter*p, point(-ROOT_TWO / 2, ROOT_TWO / 2, 0.0f));    
 
     const auto result = full_quarter * p;
-    const auto expected = point(-1.0f, 0.0f, 0.0f);
+    const auto expected = point(-1.0f, 0.0f, 0.0f); //actual y:-0.0000000437114
     EXPECT_EQ(result, expected);    
 }
 
@@ -125,13 +131,16 @@ TEST(TransformationMatrix, individualTransformsAreAppliedInSequence) {
     const auto tran = translation(10, 5, 7);
 
     const auto p2 = rot * p; //apply rotation first    
-    EXPECT_EQ(p2, point(1.0f, -1.0f, 0.0f));    
+    auto expected = point(1.0f, -1.0f, 0.0f);
+    EXPECT_EQ(p2, expected);    
 
     const auto p3 = scal * p2; //then apply scaling
-    EXPECT_EQ(p3, point(5.0f, -5.0f, 0.0f));    
+    expected = point(5.0f, -5.0f, 0.0f);
+    EXPECT_EQ(p3, expected);    
 
     const auto result = tran * p3; //then apply translation
-    EXPECT_EQ(result, point(15.0f, 0.0f, 7.0f));    
+    expected = point(15.0f, 0.0f, 7.0f);
+    EXPECT_EQ(result, expected);    
 }
 
 TEST(TransformationMatrix, chainedTransformsAreAppliedInReverse) {           

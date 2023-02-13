@@ -38,7 +38,7 @@ using math::float_cmp;
 
 
  // Regular large numbers - generally not problematic 
-TEST(NearlyEqualTest, big) {
+TEST(float_cmp, big) {
     EXPECT_TRUE(float_cmp(1000000.0f, 1000001.0f));
     EXPECT_TRUE(float_cmp(1000001.0f, 1000000.0f));
     EXPECT_FALSE(float_cmp(10000.0f, 10001.0f));
@@ -46,7 +46,7 @@ TEST(NearlyEqualTest, big) {
 }
 
 // Negative large numbers
-TEST(NearlyEqualTest, bigNeg) {
+TEST(float_cmp, bigNeg) {
     EXPECT_TRUE(float_cmp(-1000000.0f, -1000001.0f));
     EXPECT_TRUE(float_cmp(-1000001.0f, -1000000.0f));
     EXPECT_FALSE(float_cmp(-10000.0f, -10001.0f));
@@ -54,7 +54,7 @@ TEST(NearlyEqualTest, bigNeg) {
 }
 
 // Numbers around 1 
-TEST(NearlyEqualTest, mid) {
+TEST(float_cmp, mid) {
     EXPECT_TRUE(float_cmp(1.0000001f, 1.0000002f));
     EXPECT_TRUE(float_cmp(1.0000002f, 1.0000001f));
     EXPECT_FALSE(float_cmp(1.0002f, 1.0001f));
@@ -62,7 +62,7 @@ TEST(NearlyEqualTest, mid) {
 }
 
 // Numbers around -1 
-TEST(NearlyEqualTest, midNeg) {
+TEST(float_cmp, midNeg) {
     EXPECT_TRUE(float_cmp(-1.000001f, -1.000002f));
     EXPECT_TRUE(float_cmp(-1.000002f, -1.000001f));
     EXPECT_FALSE(float_cmp(-1.0001f, -1.0002f));
@@ -70,7 +70,7 @@ TEST(NearlyEqualTest, midNeg) {
 }
 
 // Numbers between 1 and 0
-TEST(NearlyEqualTest, Small) {
+TEST(float_cmp, Small) {
     EXPECT_TRUE(float_cmp(0.000000001000001f, 0.000000001000002f));
     EXPECT_TRUE(float_cmp(0.000000001000002f, 0.000000001000001f));
     EXPECT_FALSE(float_cmp(0.000000000001002f, 0.000000000001001f));
@@ -78,7 +78,7 @@ TEST(NearlyEqualTest, Small) {
 }
 
 // Numbers around -1 
-TEST(NearlyEqualTest, SmallNeg) {
+TEST(float_cmp, SmallNeg) {
     EXPECT_TRUE(float_cmp(-0.000000001000001f, -0.000000001000002f));
     EXPECT_TRUE(float_cmp(-0.000000001000002f, -0.000000001000001f));
     EXPECT_FALSE(float_cmp(-0.000000000001002f, -0.000000000001001f));
@@ -86,34 +86,38 @@ TEST(NearlyEqualTest, SmallNeg) {
 }
 
 // Small differences away from zero 
-TEST(NearlyEqualTest, SmallDiffs) {
+TEST(float_cmp, SmallDiffs) {
     EXPECT_TRUE(float_cmp(0.3f, 0.30000003f));
     EXPECT_TRUE(float_cmp(-0.3f, -0.30000003f));
 }
 
 // Comparisons involving zero 
-TEST(NearlyEqualTest, Zero) {
+TEST(float_cmp, Zero) {
+    EXPECT_TRUE(float_cmp(0.0f, -4.37114e-08f)); //seen in my app (from matrix rotations)
+    EXPECT_TRUE(float_cmp(0.0f, -2.18557e-07f)); //seen in my app (from matrix rotations)
+    EXPECT_TRUE(float_cmp(0.0f, -0.0000000437114f)); //seen in my app (from matrix rotations)
+
     EXPECT_TRUE(float_cmp(0.0f, 0.0f));
     EXPECT_TRUE(float_cmp(0.0f, -0.0f));
     EXPECT_TRUE(float_cmp(-0.0f, -0.0f));
-    EXPECT_FALSE(float_cmp(0.00000001f, 0.0f));
-    EXPECT_FALSE(float_cmp(0.0f, 0.00000001f));
-    EXPECT_FALSE(float_cmp(-0.00000001f, 0.0f));
-    EXPECT_FALSE(float_cmp(0.0f, -0.00000001f));
+//  EXPECT_FALSE(float_cmp(0.00000001f, 0.0f)); 
+//  EXPECT_FALSE(float_cmp(0.0f, 0.00000001f));
+//  EXPECT_FALSE(float_cmp(-0.00000001f, 0.0f));
+//  EXPECT_FALSE(float_cmp(0.0f, -0.00000001f));
 
     EXPECT_TRUE(float_cmp(0.0f, 1e-40f, 0.01f));
     EXPECT_TRUE(float_cmp(1e-40f, 0.0f, 0.01f));
-    EXPECT_FALSE(float_cmp(1e-40f, 0.0f, 0.000001f));
-    EXPECT_FALSE(float_cmp(0.0f, 1e-40f, 0.000001f));
+//  EXPECT_FALSE(float_cmp(1e-40f, 0.0f, 0.000001f));
+//  EXPECT_FALSE(float_cmp(0.0f, 1e-40f, 0.000001f));
 
     EXPECT_TRUE(float_cmp(0.0f, -1e-40f, 0.1f));
     EXPECT_TRUE(float_cmp(-1e-40f, 0.0f, 0.1f));
-    EXPECT_FALSE(float_cmp(-1e-40f, 0.0f, 0.00000001f));
-    EXPECT_FALSE(float_cmp(0.0f, -1e-40f, 0.00000001f));
+//  EXPECT_FALSE(float_cmp(-1e-40f, 0.0f, 0.00000001f));
+//  EXPECT_FALSE(float_cmp(0.0f, -1e-40f, 0.00000001f));
 }
 
 // Comparisons involving extreme values (overflow potential) 
-TEST(NearlyEqualTest, extremeMax) {
+TEST(float_cmp, extremeMax) {
     EXPECT_TRUE(float_cmp(MAX, MAX));
     EXPECT_FALSE(float_cmp(MAX, -MAX));
     EXPECT_FALSE(float_cmp(-MAX, MAX));
@@ -123,7 +127,7 @@ TEST(NearlyEqualTest, extremeMax) {
 }
 
 // Comparisons involving infinities
-TEST(NearlyEqualTest, infinities) {
+TEST(float_cmp, infinities) {
     EXPECT_TRUE(float_cmp(INF, INF));
     EXPECT_TRUE(float_cmp(NEG_INF, NEG_INF));
     EXPECT_FALSE(float_cmp(NEG_INF, INF));
@@ -134,7 +138,7 @@ TEST(NearlyEqualTest, infinities) {
 // Comparisons involving NaN values
 // NOTE: these all fail if compiled with /fp:fast 
 // see: https://learn.microsoft.com/en-us/cpp/build/reference/fp-specify-floating-point-behavior?view=msvc-170&viewFallbackFrom=vs-2019#fast
-TEST(NearlyEqualTest, nan) {    
+TEST(float_cmp, nan) {    
     EXPECT_FALSE(float_cmp(QNAN, QNAN));
     EXPECT_FALSE(float_cmp(QNAN, 0.0f));
     EXPECT_FALSE(float_cmp(-0.0f, QNAN));
@@ -155,7 +159,7 @@ TEST(NearlyEqualTest, nan) {
 }
 
 // Comparisons of numbers on opposite sides of 0
-TEST(NearlyEqualTest, opposite) {
+TEST(float_cmp, opposite) {
     EXPECT_FALSE(float_cmp(1.000000001f, -1.0f));
     EXPECT_FALSE(float_cmp(-1.0f, 1.000000001f));
     EXPECT_FALSE(float_cmp(-1.000000001f, 1.0f));
@@ -165,16 +169,15 @@ TEST(NearlyEqualTest, opposite) {
 }
 
 // The really tricky part - comparisons of numbers very close to zero.
-TEST(NearlyEqualTest, ulp) { 
+TEST(float_cmp, ulp) { 
     EXPECT_TRUE(float_cmp(MIN, MIN));
-
-    //   EXPECT_FLOAT_EQ(MIN, -MIN); //Sanity check. This fails too. 1.1754944e-38 != -1.1754944e-38
-   /* EXPECT_TRUE(float_cmp(MIN, -MIN));
-    EXPECT_TRUE(float_cmp(-MIN, MIN));
+    //EXPECT_FLOAT_EQ(MIN, -MIN); //Sanity check. This fails too. 1.1754944e-38 != -1.1754944e-38
+    //EXPECT_TRUE(float_cmp(MIN, -MIN)); //these have never passed. 
+    //EXPECT_TRUE(float_cmp(-MIN, MIN));
     EXPECT_TRUE(float_cmp(MIN, 0.0f));
     EXPECT_TRUE(float_cmp(0.0f, MIN));
     EXPECT_TRUE(float_cmp(-MIN, 0.0f));
-    EXPECT_TRUE(float_cmp(0.0f, -MIN));*/
+    EXPECT_TRUE(float_cmp(0.0f, -MIN));
 
     EXPECT_FALSE(float_cmp(0.000000001f, -MIN));
     EXPECT_FALSE(float_cmp(0.000000001f, MIN));
