@@ -7,6 +7,8 @@ constexpr Point position(const Ray& r, Real time) noexcept;
 struct Sphere {
     Point position; 
     Real radius;
+    Matrix4 transform{ Matrix4Identity };
+
     constexpr bool operator==(const Sphere& that) const noexcept {
         return position == that.position && math::almost_equal(radius, that.radius, math::BOOK_EPSILON);
     }

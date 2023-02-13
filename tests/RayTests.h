@@ -162,3 +162,8 @@ TEST(Ray, canBeScaled) {
     EXPECT_EQ(r2.origin, point(2, 6, 12));
     EXPECT_EQ(r2.direction, vector(0,3,0));
 }
+
+TEST(Sphere, hasTransform) {
+    auto s = sphere(point(0,0,0), 1.0f);
+    EXPECT_EQ(s.transform, Matrix4Identity);    
+}
