@@ -40,3 +40,17 @@ string_view trim(string_view in, string_view delims = WHITE_SPACE) noexcept {
   }
   return values;
 }
+
+std::string join(std::input_iterator auto begin, std::input_iterator auto end,
+                 const std::string& delim = ", "s) {
+  if (empty(begin, end)) {
+    return {};
+  }
+  using namespace std;
+  // std::accumulate until we get std::experimental::make_ostream_joiner, or
+  // std::format::join
+  return std::accumulate(begin + 1, end, to_string(*begin),
+                         [&delim](const string &a, auto b) {
+                           return a + delim + to_string(b);
+                         });
+}

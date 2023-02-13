@@ -61,6 +61,11 @@ struct Tuple final {
   };
 };
 
+std::ostream& operator<<(std::ostream& os, const Tuple&t){
+    os << t.x << ", " << t.y << ", " << t.z << ", " << t.w;
+    return os;
+}
+
 constexpr Tuple vector(Real x, Real y, Real z) noexcept {
   return Tuple{x, y, z, 0.0f};
 }

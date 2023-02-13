@@ -39,11 +39,12 @@ TEST(Matrix, threeByThree) {
 TEST(Matrix, isEqualityComparable) {
     Matrix3 a = { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f };
     Matrix3 b = { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f };
+    EXPECT_EQ(a, b);
     EXPECT_TRUE(a == b);
     EXPECT_FALSE(a != b);
 
     Matrix2 c = { 1.0f, 2.0f, 3.0f, 4.0f };
-    Matrix2 d = { 1.1f, 2.1f, 3.0f, 4.0f };
+    Matrix2 d = { 1.1f, 2.1f, 3.0f, 4.0f };    
     EXPECT_FALSE(c == d);
     EXPECT_TRUE(c != d);
 }
@@ -54,6 +55,7 @@ TEST(Matrix, canBeMultiplied) {
     auto product = a * b;    
     const Matrix4 expected{ 20, 22, 50,  48,  44, 54, 114, 108,
                         40, 58, 110, 102, 16, 26, 46,  42 };
+    EXPECT_EQ(product, expected);
     EXPECT_TRUE(product == expected);
 }
 

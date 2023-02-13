@@ -3,6 +3,7 @@
 #include <cassert>
 #include <limits>
 #include <algorithm>
+#include <numeric> //std::accumulate
 #include <vector>
 #include <format>
 #include <fstream>
@@ -24,3 +25,7 @@ using Color = Tuple;
 
 static constexpr auto PPM_VERSION = "P3"sv;
 static constexpr auto PPM_MAX = 255; //max value of color components in PPM file. 
+
+[[nodiscard]] bool empty(auto begin, auto end) noexcept {
+  return std::distance(begin, end) == 0;
+}

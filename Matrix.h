@@ -151,6 +151,13 @@ constexpr Matrix4 operator*(const Matrix4& lhs, const Matrix4& rhs) noexcept {
     lhs[12] * rhs[3] + lhs[13] * rhs[7] + lhs[14] * rhs[11] + lhs[15] * rhs[15]};//3,3
 }
 
+template <class Matrix>
+    requires (is_matrix<Matrix>)
+std::ostream& operator<<(std::ostream& os, const Matrix& m){
+    os << join(m.begin(), m.end());
+    return os;
+}
+
 //multiplying arbitrarily sized (square) Matrices.
 template <class Matrix>
     requires (is_matrix<Matrix>)
