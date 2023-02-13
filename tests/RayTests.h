@@ -105,7 +105,7 @@ TEST(intersect, setsTheObjectOnTheIntersections) {
     EXPECT_EQ(xs[1].obj, s);
 }
 
-TEST(hit, allIntersectionsHavePositiveT) {    
+TEST(hit, returnsClosestIntersection) {    
     const auto s = sphere(point(0,0,0), 1.0f);
     const auto i1 = intersection(1, s);
     const auto i2 = intersection(2, s);
@@ -115,7 +115,7 @@ TEST(hit, allIntersectionsHavePositiveT) {
     EXPECT_EQ(i, i1);
 }
 
-TEST(hit, someIntersectionsHaveNegativeT) {    
+TEST(hit, returnsClosestPositiveIntersection) {    
     const auto s = sphere(point(0,0,0), 1.0f);
     const auto i1 = intersection(-1, s);
     const auto i2 = intersection(1, s);
@@ -124,7 +124,7 @@ TEST(hit, someIntersectionsHaveNegativeT) {
     EXPECT_EQ(i, i2);
 }
 
-TEST(hit, allIntersectionsHaveNegativeT) {    
+TEST(hit, returnsEmptyIntersectionIfAllAreNegative) {    
     const auto s = sphere(point(0,0,0), 1.0f);
     const auto i1 = intersection(-2, s);
     const auto i2 = intersection(-1, s);
@@ -134,7 +134,7 @@ TEST(hit, allIntersectionsHaveNegativeT) {
     EXPECT_FALSE(i);
 }
 
-TEST(hit, isAlwaysLowestPositiveIntersection) {    
+TEST(hit, canHandleMultipleIntersections) {    
     const auto s = sphere(point(0,0,0), 1.0f);
     const auto i1 = intersection(5, s);
     const auto i2 = intersection(7, s);
@@ -144,4 +144,21 @@ TEST(hit, isAlwaysLowestPositiveIntersection) {
     const auto xs = intersections({ i1, i2, i3, i4, i5 });
     const auto i = hit(xs);    
     EXPECT_EQ(i, i4);    
+}
+
+TEST(Ray, canBeTranslated) {
+    const auto r = ray(point(1,2,3), vector(0,1,0));    
+    const auto m = translation(3, 4, 5);
+    const auto r2 = m * r;    
+    const auto r3 = r * m;   
+    EXPECT_EQ(r2.origin, point(4, 6, 8));
+    EXPECT_EQ(r2.direction, vector(0,1,0));
+    EXPECT_EQ(r2, r3);
+}
+TEST(Ray, canBeScaled) {
+    const auto r = ray(point(1,2,3), vector(0,1,0));    
+    const auto m = scaling(2, 3, 4);
+    const auto r2 = transform(r, m);    
+    EXPECT_EQ(r2.origin, point(2, 6, 12));
+    EXPECT_EQ(r2.direction, vector(0,3,0));
 }

@@ -115,18 +115,35 @@ constexpr Point position(const Ray& r, Real time) noexcept {
     return r.origin + r.direction * time;
 }
 
+constexpr bool operator==(const Ray& lhs, const Ray& rhs) noexcept {    
+    return lhs.origin == rhs.origin && lhs.direction == rhs.direction;
+}
+
+constexpr Ray operator*(const Matrix4& m, const Ray& r) noexcept {    
+    return Ray{ m * r.origin, m * r.direction };
+}
+constexpr Ray operator*(const Ray& r, const Matrix4& m) noexcept {    
+    return m * r;
+}
+
+constexpr Ray transform(const Ray& r, Matrix4 m) noexcept {    
+    return m * r;
+}
+
+//https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
 constexpr auto intersect(const Sphere& s, const Ray& r) noexcept {
+    constexpr auto SPHERE_RADIUS = 1; //assuming unit spheres for now
     const Vector sphere_to_ray = r.origin - s.position;
     const auto a = dot(r.direction, r.direction);
     const auto b = 2 * dot(r.direction, sphere_to_ray);
-    const auto c = dot(sphere_to_ray, sphere_to_ray) - 1;
+    const auto c = dot(sphere_to_ray, sphere_to_ray) - SPHERE_RADIUS;
     const auto discriminant = (b * b) - (4 * a * c);
     if (discriminant < 0) {
         return intersections<Sphere>();
     }
-    const auto sqrt = std::sqrt(discriminant);
-    const auto t1 = (-b - sqrt) / (2*a);
-    const auto t2 = (-b + sqrt) / (2*a);
+    const auto sqrtOfDiscriminant = std::sqrt(discriminant);
+    const auto t1 = (-b - sqrtOfDiscriminant) / (2*a);
+    const auto t2 = (-b + sqrtOfDiscriminant) / (2*a);
     return intersections({ intersection(t1, s), intersection(t2, s) });
 };
 
