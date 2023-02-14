@@ -112,3 +112,29 @@
 //    std::ofstream ofs("output/chapter4_4.ppm", std::ofstream::out);
 //    ofs << c.to_ppm();  
 //}
+
+TEST(Chapter5, CanRenderShadowOfASphere) {       
+    using size_type = Canvas::size_type;
+    auto c = Canvas(100, 100);
+    const auto shape = sphere();
+    const auto RED = color(1, 0, 0);
+    const auto ray_origin = point(0, 0, -5);    
+    const auto wall_z = 10.0f;
+    const auto wall_size = 7.0f;
+    const auto wall_center = wall_size / 2.0f;    
+    const auto pixel_size = wall_size / c.widthf(); //assuming canvas is square
+    for (size_type y = 0; y < c.width(); ++y) {
+        const auto world_y = wall_center - pixel_size * y;
+        for (size_type x = 0; x < c.height(); ++x) {
+            const auto world_x = wall_center - pixel_size * x;
+            const auto target_pos = point(world_x, world_y, wall_z);
+            const auto r = ray(ray_origin, normalize(target_pos - ray_origin));
+            const auto xs = intersect(shape, r);
+            if (hit(xs)) {
+                c.set(x, y, RED);
+            }
+        }
+    }
+    std::ofstream ofs("output/chapter5_0.ppm", std::ofstream::out);
+    ofs << c.to_ppm();  
+}

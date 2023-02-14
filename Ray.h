@@ -17,6 +17,9 @@ struct Sphere {
 constexpr Sphere sphere(Point p, Real radius) noexcept {
     return Sphere{ p, radius };
 }
+constexpr Sphere sphere() noexcept {
+    return Sphere{ point(0,0,0), 1.0f };
+}
 
 template<class Object>
 struct Intersection {            
@@ -152,6 +155,7 @@ constexpr auto intersect(const Sphere& s, const Ray& r) noexcept {
 };
 
 //TODO: limit template argument to Interactions-struct
+//TODO: consider an alternative algo: remove + min_element
 template <class Intersections>
 constexpr auto hit(const Intersections& xs) noexcept {
     using value_type = Intersections::value_type;        

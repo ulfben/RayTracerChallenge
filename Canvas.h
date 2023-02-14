@@ -13,12 +13,14 @@ class Canvas final {
   size_t _height = 0;
 
 public:
-  Canvas(uint32_t width, uint32_t height) {
+  using size_type = uint16_t;
+
+  Canvas(size_type width, size_type height) {
     resize(width, height);
     clear();
   }
 
-  constexpr void resize(uint32_t w, uint32_t h) {
+  constexpr void resize(size_type w, size_type h) {
     bitmap.resize(static_cast<size_t>(w) * h);
     _width = w;
     _height = h;
@@ -28,24 +30,26 @@ public:
     std::ranges::fill(bitmap, c);
   }
 
-  constexpr void set(uint32_t x, uint32_t y, const Color &c) noexcept {
+  constexpr void set(size_type x, size_type y, const Color &c) noexcept {
     if (x < _width && y < _height) {
       bitmap[y * _width + x] = c;
     }
   }
-  constexpr void set(const Point& p, const Color &c) noexcept {    
-    set(std::lroundf(p.x), std::lroundf(p.y), c);
+  constexpr void set(const Point& p, const Color &c) noexcept { 
+    assert(p.x < std::numeric_limits<size_type>::max());
+    assert(p.y < std::numeric_limits<size_type>::max());
+    set(static_cast<size_type>(std::lroundf(p.x)), static_cast<size_type>(std::lroundf(p.y)), c);
   }
-  constexpr Color get(uint32_t x, uint32_t y) const noexcept {    
+  constexpr Color get(size_type x, size_type y) const noexcept {    
       assert(x <= _width && "Buffer::get called with invalid x position");
       assert(y <= _height && "Buffer::get called with invalid y position");  
       return bitmap[y * _width + x];    
   }
-  constexpr uint32_t width() const noexcept {
-    return static_cast<uint32_t>(_width);
+  constexpr size_type width() const noexcept {
+    return static_cast<size_type>(_width);
   }
-  constexpr uint32_t height() const noexcept {
-    return static_cast<uint32_t>(_height);
+  constexpr size_type height() const noexcept {
+    return static_cast<size_type>(_height);
   }
   constexpr Real widthf() const noexcept {
     return static_cast<Real>(_width);
