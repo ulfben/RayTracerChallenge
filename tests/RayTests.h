@@ -167,3 +167,13 @@ TEST(Sphere, hasTransform) {
     auto s = sphere(point(0,0,0), 1.0f);
     EXPECT_EQ(s.transform, Matrix4Identity);    
 }
+
+TEST(intersect, aScaledSphere) {    
+    const auto r = ray(point(0,0,-5), vector(0,0,1));
+    auto s = sphere(point(0,0,0), 1.0f);
+    s.transform = scaling(2, 2, 2);    
+    const auto xs = intersect(s, r);    
+    EXPECT_EQ(xs.count(), 2);
+    EXPECT_FLOAT_EQ(xs[0].t, 3.0f);
+    EXPECT_FLOAT_EQ(xs[1].t, 7.0f);    
+}

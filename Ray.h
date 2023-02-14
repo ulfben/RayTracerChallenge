@@ -68,6 +68,7 @@ struct Intersections {
     constexpr pointer data() noexcept { return xs.data(); }
     constexpr const_pointer data() const noexcept { return xs.data(); }
     constexpr size_type size() const noexcept { return static_cast<size_type>(xs.size()); }
+    constexpr size_type count() const noexcept { return size(); }
     constexpr bool empty() const noexcept { return xs.empty(); }
     constexpr iterator begin() noexcept { return xs.begin(); }
     constexpr iterator end() noexcept { return xs.end(); }
@@ -134,12 +135,13 @@ constexpr Ray transform(const Ray& r, Matrix4 m) noexcept {
 
 //https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
 constexpr auto intersect(const Sphere& s, const Ray& r) noexcept {
-    constexpr auto SPHERE_RADIUS = 1; //assuming unit spheres for now
-    const Vector sphere_to_ray = r.origin - s.position;
-    const auto a = dot(r.direction, r.direction);
-    const auto b = 2 * dot(r.direction, sphere_to_ray);
+    constexpr Real SPHERE_RADIUS = 1.0f; //assuming unit spheres for now
+    const auto ray2 = transform(r, inverse(s.transform));    
+    const Vector sphere_to_ray = ray2.origin - s.position;
+    const auto a = dot(ray2.direction, ray2.direction);
+    const auto b = 2 * dot(ray2.direction, sphere_to_ray);
     const auto c = dot(sphere_to_ray, sphere_to_ray) - SPHERE_RADIUS;
-    const auto discriminant = (b * b) - (4 * a * c);
+    const auto discriminant = (b * b) - (4.0f * a * c);
     if (discriminant < 0) {
         return intersections<Sphere>();
     }

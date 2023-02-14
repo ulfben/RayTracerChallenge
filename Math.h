@@ -45,8 +45,7 @@ namespace math {
     }
 
     static constexpr auto BOOK_EPSILON      = 0.0001f; //1.0e-4f, value suggested as "good enough" by the book.
-    static constexpr auto BRAZZY_EPSILON    = 0.00001f; //1.0e-5f, https://github.com/brazzy/floating-point-gui.de
-    static constexpr auto TESTED_EPSILON    = 0.000003f; // 3.0e-6f, the smallest epsilon I've used with my function and still passed all tests.                                         
+    static constexpr auto BRAZZY_EPSILON    = 0.00001f; //1.0e-5f, https://github.com/brazzy/floating-point-gui.de    
     static constexpr auto GTEST_EPSILON     = 0.000001f;// 1.0e-6f; //from Google Test
     static constexpr auto MACHINE_EPSILON   = 0.000000119209f; //1.19209e-7f, == std::numeric_limits<Real>::epsilon();
     
@@ -57,10 +56,11 @@ namespace math {
         return math::abs(a - b) <= epsilon;
     }
 
-    //borrowed from QT
-    //dummy argument added to match the other comparison interfaces (easier to facade during testing).
+    //borrowed from QT    
     //doesn't handle infinities, ulp or near-zero values
-    constexpr bool qt_fuzzy_compare(Real a, Real b, [[maybe_unused]] Real) noexcept {
+    template<class T>
+        requires std::is_arithmetic_v<T>
+    constexpr bool qt_fuzzy_compare(T a, T b, [[maybe_unused]] T) noexcept {
         return (math::abs(a - b) * 100000.f <= std::min(std::abs(a), math::abs(b)));
     }
 
@@ -80,30 +80,32 @@ namespace math {
             // a or b is zero or both are extremely close to it
             // relative error is less meaningful here
             //return diff < (epsilon * std::numeric_limits<T>::min()); //fails ulp-tests and my real-world data (close to zero)
-            return diff < epsilon; //fails some Zero-tests but satisfies my real-world data.
+            return diff < epsilon; //fails some Zero-tests but satisfies my real-world data.            
         }
         // use relative error
         return (diff / std::min((absA + absB), std::numeric_limits<T>::max())) < epsilon;
     }
 
-    //borrowed from google test, doesn't handle infinities at all
-    constexpr  bool gtest_almost_equals(Real expected, Real actual, Real max_abs_error) noexcept {
+    //borrowed from google test. Doesn't handle infinities, opposite, Small, SmallNeg or ulp
+    template<class T>
+        requires std::is_arithmetic_v<T>
+    constexpr  bool gtest_almost_equals(T expected, T actual, T max_abs_error) noexcept {
         if (is_nan(expected) || is_nan(actual)) {
             return false;
         }
-        const Real abs_diff = std::abs(expected - actual);
+        const T abs_diff = std::abs(expected - actual);
         if (abs_diff <= max_abs_error) {
             return true;
         }
-        const Real abs_max = std::max(std::abs(expected), std::abs(actual));
+        const T abs_max = std::max(std::abs(expected), std::abs(actual));
         return abs_diff <= abs_max * max_abs_error;
     }
 
     //facade to let me swap the tested function and epsilon easily
-    static constexpr bool float_cmp(float a, float b, float epsilon) noexcept {
+    static constexpr bool float_cmp(Real a, Real b, Real epsilon) noexcept {
         return math::brazzy_nearly_equal(a, b, epsilon);
     }
-    static constexpr bool float_cmp(float a, float b) noexcept {
+    static constexpr bool float_cmp(Real a, Real b) noexcept {
         return float_cmp(a, b, math::BRAZZY_EPSILON);
     }
 }
