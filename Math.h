@@ -34,9 +34,9 @@ namespace math {
         return x < 0 ? -x : x; //in use only until std::abs becomes constexpr...
     }
 
-    constexpr bool is_nan(Real x) noexcept { 
+    constexpr bool is_nan(Real x) noexcept {
         return x != x; //in use until std::is_nan becomes constexpr.
-    } 
+    }
 
     constexpr Real sqrt(Real x) noexcept {
         return x >= 0.0f && x < std::numeric_limits<Real>::infinity()
@@ -44,11 +44,11 @@ namespace math {
             : std::numeric_limits<Real>::quiet_NaN();
     }
 
-    static constexpr auto BOOK_EPSILON      = 0.0001f; //1.0e-4f, value suggested as "good enough" by the book.
-    static constexpr auto BRAZZY_EPSILON    = 0.00001f; //1.0e-5f, https://github.com/brazzy/floating-point-gui.de    
-    static constexpr auto GTEST_EPSILON     = 0.000001f;// 1.0e-6f; //from Google Test
-    static constexpr auto MACHINE_EPSILON   = 0.000000119209f; //1.19209e-7f, == std::numeric_limits<Real>::epsilon();
-    
+    static constexpr auto BOOK_EPSILON = 0.0001f; //1.0e-4f, value suggested as "good enough" by the book.
+    static constexpr auto BRAZZY_EPSILON = 0.00001f; //1.0e-5f, https://github.com/brazzy/floating-point-gui.de    
+    static constexpr auto GTEST_EPSILON = 0.000001f;// 1.0e-6f; //from Google Test
+    static constexpr auto MACHINE_EPSILON = 0.000000119209f; //1.19209e-7f, == std::numeric_limits<Real>::epsilon();
+
     //from the book. fails on big, bigneg, infinities, oppoite, small, smallneg, ulp and zero
     template<class T>
         requires std::is_arithmetic_v<T>
@@ -99,6 +99,16 @@ namespace math {
         }
         const T abs_max = std::max(std::abs(expected), std::abs(actual));
         return abs_diff <= abs_max * max_abs_error;
+    }
+
+    //borrowed from Paul Floyd, https://accu.org/journals/overload/31/173/floyd/
+    constexpr bool cmpEq(float a, float b, float epsilon = 1.0e-7f, float abstol =  1.0e-12f) noexcept{
+        if (a == b) {
+            return true;
+        }
+        float diff = std::fabs(a - b);
+        float reltol = std::max(std::fabs(a), std::fabs(b)) * epsilon;
+        return diff < reltol || diff < abstol;
     }
 
     //facade to let me swap the tested function and epsilon easily

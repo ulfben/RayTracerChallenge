@@ -12,6 +12,7 @@
 #include "tests/MatrixTests.h"
 #include "tests/MatrixTransformationTests.h"
 #include "tests/RayTests.h"
+#include "tests/SphereTests.h"
 
 //TEST(Chapter2, CanOutputPPM) {
 //    auto c = Canvas(300, 300);

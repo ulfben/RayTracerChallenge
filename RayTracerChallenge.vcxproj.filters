@@ -37,6 +37,10 @@
     <ClInclude Include="tests\RayTests.h">
       <Filter>tests</Filter>
     </ClInclude>
+    <ClInclude Include="Sphere.h" />
+    <ClInclude Include="tests\SphereTests.h">
+      <Filter>tests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

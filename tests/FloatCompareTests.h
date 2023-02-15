@@ -92,11 +92,12 @@ TEST(float_cmp, SmallDiffs) {
 }
 
 // Comparisons involving zero 
-TEST(float_cmp, Zero) {
+TEST(float_cmp, Zero) {    
     EXPECT_TRUE(float_cmp(0.0f, -4.37114e-08f)); //seen in my app (from matrix rotations)
     EXPECT_TRUE(float_cmp(0.0f, -2.18557e-07f)); //seen in my app (from matrix rotations)
     EXPECT_TRUE(float_cmp(0.0f, -0.0000000437114f)); //seen in my app (from matrix rotations)
-
+    EXPECT_TRUE(float_cmp(0.0f, -0.000000020444226f)); //-2.0444226e-08f, seen in my app (from matrix inverse + transpose)                                
+    
     EXPECT_TRUE(float_cmp(0.0f, 0.0f));
     EXPECT_TRUE(float_cmp(0.0f, -0.0f));
     EXPECT_TRUE(float_cmp(-0.0f, -0.0f));

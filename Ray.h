@@ -1,25 +1,9 @@
 #pragma once
 #include "pch.h"
 #include "Tuple.h"
+#include "Sphere.h"
 struct Ray;
 constexpr Point position(const Ray& r, Real time) noexcept;
-
-struct Sphere {
-    Point position; 
-    Real radius;
-    Matrix4 transform{ Matrix4Identity };
-
-    constexpr bool operator==(const Sphere& that) const noexcept {
-        return position == that.position && math::float_cmp(radius, that.radius);
-    }
-};
-
-constexpr Sphere sphere(Point p, Real radius) noexcept {
-    return Sphere{ p, radius };
-}
-constexpr Sphere sphere() noexcept {
-    return Sphere{ point(0,0,0), 1.0f };
-}
 
 template<class Object>
 struct Intersection {            

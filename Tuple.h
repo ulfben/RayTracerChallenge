@@ -15,7 +15,7 @@ constexpr Color hadamard_product(const Color &a, const Color &b) noexcept;
 struct Tuple final {
     static const auto SIZE = 4;
   union {
-      Real data[SIZE]{};
+      Real data[4]{};
     struct {
       Real x, y, z, w;
     };
@@ -62,7 +62,7 @@ struct Tuple final {
 };
 
 std::ostream& operator<<(std::ostream& os, const Tuple&t){
-    os << t.x << ", " << t.y << ", " << t.z << ", " << t.w;
+    os << std::format("{}, {}, {}, {}", t.r, t.g, t.b, t.w);
     return os;
 }
 
@@ -77,11 +77,6 @@ constexpr Tuple color(Real r, Real g, Real b, Real a = 1.0f) noexcept {
 }
 
 constexpr Color to_byte_values(Color c) noexcept {
-  // TODO: implement expects(), requires() etc.
-  // assert(c.r >= 0 && c.r < 1.0f && "to_rgb(): red channel is out of range");
-  // assert(c.g >= 0 && c.g < 1.0f && "to_rgb(): green channel is out of
-  // range"); assert(c.b >= 0 && c.b < 1.0f && "to_rgb(): blue channel is out of
-  // range");
   const float MAX = PPM_MAX;
   return color(std::clamp(std::round(c.r * PPM_MAX), 0.0f, MAX),
                std::clamp(std::round(c.g * PPM_MAX), 0.0f, MAX),

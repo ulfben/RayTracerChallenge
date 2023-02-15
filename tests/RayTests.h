@@ -1,7 +1,7 @@
 #pragma once
 #include "../pch.h"
 #include "../Ray.h"
-
+#include "../Sphere.h"
 TEST(Ray, canBeConstructed) {
     const auto origin = point(1, 2, 3);
     const auto direction = vector(4,5,6);
@@ -161,11 +161,6 @@ TEST(Ray, canBeScaled) {
     const auto r2 = transform(r, m);    
     EXPECT_EQ(r2.origin, point(2, 6, 12));
     EXPECT_EQ(r2.direction, vector(0,3,0));
-}
-
-TEST(Sphere, hasTransform) {
-    auto s = sphere(point(0,0,0), 1.0f);
-    EXPECT_EQ(s.transform, Matrix4Identity);    
 }
 
 TEST(intersect, aScaledSphere) {    
