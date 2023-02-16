@@ -9,7 +9,7 @@ TEST(Canvas, hasWidthHeightAndColor) {
   EXPECT_EQ(canvas.width(), (uint32_t)10);
   EXPECT_EQ(canvas.height(), (uint32_t)20);
   for (const auto &pixel : canvas) {
-    EXPECT_EQ(pixel, color(.0f, .0f, .0f, 1.0f));
+    EXPECT_EQ(pixel, color(.0f, .0f, .0f));
   }
 }
 

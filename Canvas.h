@@ -26,7 +26,7 @@ public:
     _height = h;
   }
 
-  constexpr void clear(const Color &col = Color{.0f, .0f, .0f, 1.0f}) noexcept {
+  constexpr void clear(const Color &col = Color{.0f, .0f, .0f}) noexcept {
     std::ranges::fill(bitmap, col);
   }
 

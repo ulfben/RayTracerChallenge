@@ -4,19 +4,17 @@
 #include "../Lights.h"
 
 TEST(Color, canBeDefaultConstructed) {
-  const Tuple a;
+  const Color a;
   EXPECT_FLOAT_EQ(a.r, .0f);
   EXPECT_FLOAT_EQ(a.g, .0f);
-  EXPECT_FLOAT_EQ(a.b, .0f);
-  EXPECT_FLOAT_EQ(a.a, .0f);
+  EXPECT_FLOAT_EQ(a.b, .0f);  
 }
 
 TEST(Color, canBeConstructed) {
   const auto a = color(-0.5f, 0.4f, 1.7f);
   EXPECT_FLOAT_EQ(a.r, -0.5f);
   EXPECT_FLOAT_EQ(a.g, 0.4f);
-  EXPECT_FLOAT_EQ(a.b, 1.7f);
-  EXPECT_FLOAT_EQ(a.a, 1.0f);
+  EXPECT_FLOAT_EQ(a.b, 1.7f);  
 }
 
 TEST(Color, canBeMultiplied) {
@@ -27,6 +25,5 @@ TEST(Color, canBeMultiplied) {
   EXPECT_EQ(result, resultHadamard);
   EXPECT_FLOAT_EQ(result.r, 0.9f);
   EXPECT_FLOAT_EQ(result.g, 0.2f);
-  EXPECT_FLOAT_EQ(result.b, 0.04f);
-  EXPECT_FLOAT_EQ(result.a, 1.0f);
+  EXPECT_FLOAT_EQ(result.b, 0.04f);  
 }

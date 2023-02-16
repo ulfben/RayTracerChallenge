@@ -30,8 +30,8 @@ constexpr Color lighting(const Material& surface, const Light& light, const Poin
     const auto effective_color = surface.col * light.intensity;
     const auto light_v = normalize(light.position - p); //find the direction to the light source    
     const Color ambient = effective_color * surface.ambient;
-    Color diffuse; //black by default
-    Color specular;     
+    Color diffuse{}; //black by default
+    Color specular{};
     //light_dot_normal is the cosine of the angle between the light vector and the normal vector. 
     //a negative number means the light is on the opposite side of the surface.
     if (const auto light_dot_normal = dot(light_v, normal); light_dot_normal >= 0) {
