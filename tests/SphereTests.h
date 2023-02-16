@@ -63,3 +63,25 @@ TEST(Sphere, normalOnTransformedSphere) {
     const auto expected = vector(0.0f, 0.97014254f, -0.24253564f); //actual
     EXPECT_EQ(result, expected);
 }
+
+TEST(Matrial, canBeDefaultConstructed) {    
+    const auto m = material();
+    EXPECT_EQ(m.col, color(1, 1, 1));
+    EXPECT_EQ(m.ambient, 0.1f);
+    EXPECT_EQ(m.diffuse, 0.9f);
+    EXPECT_EQ(m.specular, 0.9f);
+    EXPECT_EQ(m.shininess, 200.0f);
+}
+
+TEST(Sphere, hasADefaultMaterial) {    
+    auto s = sphere();    
+    EXPECT_EQ(s.mat, material());
+}
+
+TEST(Sphere, canBeAssignedMaterial) {    
+    auto s = sphere();    
+    auto mat = material();
+    mat.ambient = 1.0f;
+    s.mat = mat;
+    EXPECT_EQ(s.mat, mat);
+}

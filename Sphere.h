@@ -2,11 +2,16 @@
 #include "pch.h"
 #include "Tuple.h"
 #include "Matrix.h"
+#include "Lights.h"
 
 struct Sphere {
-    Point position; 
-    Real radius;
-    Matrix4 transform{ Matrix4Identity };
+    Matrix4 transform{ Matrix4Identity }; 
+    Material mat{ material() }; 
+    Point position{0,0,0};
+    Real radius{0};
+    constexpr Sphere() noexcept = default;
+    constexpr Sphere(Point p, Real rad) noexcept : position(p), radius(rad)
+    {}
 
     constexpr bool operator==(const Sphere& that) const noexcept {
         return position == that.position && math::float_cmp(radius, that.radius);

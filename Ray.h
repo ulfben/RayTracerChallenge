@@ -94,7 +94,16 @@ struct Ray {
     constexpr Point position(Real time) const noexcept {    
         return ::position(*this, time);
     }
+    friend constexpr bool operator==(const Ray& lhs, const Ray& rhs) noexcept;
 };
+constexpr bool operator==(const Ray& lhs, const Ray& rhs) noexcept = default;
+
+constexpr Ray operator*(const Matrix4& m, const Ray& r) noexcept {    
+    return Ray{ m * r.origin, m * r.direction };
+}
+constexpr Ray operator*(const Ray& r, const Matrix4& m) noexcept {    
+    return m * r;
+}
 
 constexpr Ray ray(Point p, Vector dir) noexcept {
     assert(is_point(p) && is_vector(dir));
@@ -103,17 +112,6 @@ constexpr Ray ray(Point p, Vector dir) noexcept {
 
 constexpr Point position(const Ray& r, Real time) noexcept {    
     return r.origin + r.direction * time;
-}
-
-constexpr bool operator==(const Ray& lhs, const Ray& rhs) noexcept {    
-    return lhs.origin == rhs.origin && lhs.direction == rhs.direction;
-}
-
-constexpr Ray operator*(const Matrix4& m, const Ray& r) noexcept {    
-    return Ray{ m * r.origin, m * r.direction };
-}
-constexpr Ray operator*(const Ray& r, const Matrix4& m) noexcept {    
-    return m * r;
 }
 
 constexpr Ray transform(const Ray& r, Matrix4 m) noexcept {    
@@ -127,8 +125,8 @@ constexpr auto intersect(const Sphere& s, const Ray& r) noexcept {
     const Vector sphere_to_ray = ray2.origin - s.position;
     const auto a = dot(ray2.direction, ray2.direction);
     const auto b = 2 * dot(ray2.direction, sphere_to_ray);
-    const auto c = dot(sphere_to_ray, sphere_to_ray) - SPHERE_RADIUS;
-    const auto discriminant = (b * b) - (4.0f * a * c);
+    const auto col = dot(sphere_to_ray, sphere_to_ray) - SPHERE_RADIUS;
+    const auto discriminant = (b * b) - (4.0f * a * col);
     if (discriminant < 0) {
         return intersections<Sphere>();
     }

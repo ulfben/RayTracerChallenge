@@ -43,10 +43,10 @@ TEST(Matrix, isEqualityComparable) {
     EXPECT_TRUE(a == b);
     EXPECT_FALSE(a != b);
 
-    Matrix2 c = { 1.0f, 2.0f, 3.0f, 4.0f };
+    Matrix2 col = { 1.0f, 2.0f, 3.0f, 4.0f };
     Matrix2 d = { 1.1f, 2.1f, 3.0f, 4.0f };    
-    EXPECT_FALSE(c == d);
-    EXPECT_TRUE(c != d);
+    EXPECT_FALSE(col == d);
+    EXPECT_TRUE(col != d);
 }
 
 TEST(Matrix, canBeMultiplied) {    
@@ -99,8 +99,8 @@ TEST(Matrix, canBeTransposed) {
     };
     const Matrix4 b = transpose(a);    
     EXPECT_TRUE(b == expected);
-    const Matrix4 c = transpose(b);
-    EXPECT_TRUE(a == c); //2x transpose = back to original
+    const Matrix4 col = transpose(b);
+    EXPECT_TRUE(a == col); //2x transpose = back to original
     const Matrix4 identity = Matrix4::identity();
     EXPECT_TRUE(identity == transpose(identity));
 }
@@ -142,9 +142,9 @@ TEST(Matrix, canExtractSubmatrix) {
         0, 6
     };
     const auto b = submatrix(a, 0, 2);
-    const auto c = a.submatrix(0, 2);
+    const auto col = a.submatrix(0, 2);
     EXPECT_TRUE(b == expected);
-    EXPECT_TRUE(c == expected);
+    EXPECT_TRUE(col == expected);
 }
 
 TEST(Matrix, canCalculateMinor) {

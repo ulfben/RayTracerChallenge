@@ -26,19 +26,19 @@ public:
     _height = h;
   }
 
-  constexpr void clear(const Color &c = Color{.0f, .0f, .0f, 1.0f}) noexcept {
-    std::ranges::fill(bitmap, c);
+  constexpr void clear(const Color &col = Color{.0f, .0f, .0f, 1.0f}) noexcept {
+    std::ranges::fill(bitmap, col);
   }
 
-  constexpr void set(size_type x, size_type y, const Color &c) noexcept {
+  constexpr void set(size_type x, size_type y, const Color &col) noexcept {
     if (x < _width && y < _height) {
-      bitmap[y * _width + x] = c;
+      bitmap[y * _width + x] = col;
     }
   }
-  constexpr void set(const Point& p, const Color &c) noexcept { 
+  constexpr void set(const Point& p, const Color &col) noexcept { 
     assert(p.x < std::numeric_limits<size_type>::max());
     assert(p.y < std::numeric_limits<size_type>::max());
-    set(static_cast<size_type>(std::lroundf(p.x)), static_cast<size_type>(std::lroundf(p.y)), c);
+    set(static_cast<size_type>(std::lroundf(p.x)), static_cast<size_type>(std::lroundf(p.y)), col);
   }
   constexpr Color get(size_type x, size_type y) const noexcept {    
       assert(x <= _width && "Buffer::get called with invalid x position");

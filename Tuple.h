@@ -76,15 +76,15 @@ constexpr Color color(Real r, Real g, Real b, Real a = 1.0f) noexcept {
   return Color{r, g, b, a};
 }
 
-constexpr Color to_byte_values(Color c) noexcept {
+constexpr Color to_byte_values(Color col) noexcept {
   const float MAX = PPM_MAX;
-  return color(std::clamp(std::round(c.r * PPM_MAX), 0.0f, MAX),
-               std::clamp(std::round(c.g * PPM_MAX), 0.0f, MAX),
-               std::clamp(std::round(c.b * PPM_MAX), 0.0f, MAX));
+  return color(std::clamp(std::round(col.r * PPM_MAX), 0.0f, MAX),
+               std::clamp(std::round(col.g * PPM_MAX), 0.0f, MAX),
+               std::clamp(std::round(col.b * PPM_MAX), 0.0f, MAX));
 }
 
-std::string to_rgb_bytes(Color c) {
-  const auto out = to_byte_values(c);
+std::string to_rgb_bytes(Color col) {
+  const auto out = to_byte_values(col);
   return std::format("{} {} {}", out.r, out.g, out.b);
 }
 
