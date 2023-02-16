@@ -162,12 +162,12 @@ TEST(Chapter6, CanRenderPhongShading) {
             if (const auto closest = hit(xs)) {
                 const auto point = position(r , closest.t); 
                 const auto normal = normal_at(closest.obj, point);
-                const auto eye = normalize(r.direction); 
+                const auto eye = -r.direction; 
                 const auto color = lighting(closest.obj.surface, light, point, eye, normal);
                 c.set(x, y, color);
             }
         }
     }
-    std::ofstream ofs("output/chapter6_1.ppm", std::ofstream::out);
+    std::ofstream ofs("output/chapter6_0.ppm", std::ofstream::out);
     ofs << c.to_ppm();  
 }
