@@ -1,6 +1,7 @@
 #pragma once
 #include "../pch.h"
 #include "../Tuple.h"
+#include "../Lights.h"
 
 TEST(Color, canBeDefaultConstructed) {
   const Tuple a;

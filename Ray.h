@@ -6,7 +6,7 @@ struct Ray;
 constexpr Point position(const Ray& r, Real time) noexcept;
 
 template<class Object>
-struct Intersection {            
+struct Intersection final {            
     Object obj;
     Real t{0};
 
@@ -28,7 +28,7 @@ struct Intersection {
 };
 
 template<class Object>
-struct Intersections {
+struct Intersections final {
     using size_type = uint8_t;
     using value_type = Intersection<Object>;
     using container = std::vector<value_type>;
@@ -87,7 +87,7 @@ constexpr auto intersections(std::initializer_list<InterSection> is) noexcept {
     return Intersections(is);
 }
 
-struct Ray {
+struct Ray final {
     Point origin;
     Vector direction;
 

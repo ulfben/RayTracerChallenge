@@ -4,9 +4,9 @@
 #include "Matrix.h"
 #include "Lights.h"
 
-struct Sphere {
+struct Sphere final {
     Matrix4 transform{ Matrix4Identity }; 
-    Material mat{ material() }; 
+    Material surface{ material() }; 
     Point position{0,0,0};
     Real radius{0};
     constexpr Sphere() noexcept = default;

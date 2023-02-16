@@ -42,6 +42,9 @@
       <Filter>tests</Filter>
     </ClInclude>
     <ClInclude Include="Lights.h" />
+    <ClInclude Include="tests\PhongReflectionTests.h">
+      <Filter>tests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

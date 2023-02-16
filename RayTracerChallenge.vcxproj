@@ -50,6 +50,7 @@
     <ClInclude Include="tests\FloatCompareTests.h" />
     <ClInclude Include="tests\MatrixTests.h" />
     <ClInclude Include="tests\MatrixTransformationTests.h" />
+    <ClInclude Include="tests\PhongReflectionTests.h" />
     <ClInclude Include="tests\RayTests.h" />
     <ClInclude Include="tests\SphereTests.h" />
     <ClInclude Include="tests\VectorTests.h" />

@@ -75,13 +75,13 @@ TEST(Matrial, canBeDefaultConstructed) {
 
 TEST(Sphere, hasADefaultMaterial) {    
     auto s = sphere();    
-    EXPECT_EQ(s.mat, material());
+    EXPECT_EQ(s.surface, material());
 }
 
 TEST(Sphere, canBeAssignedMaterial) {    
     auto s = sphere();    
-    auto mat = material();
-    mat.ambient = 1.0f;
-    s.mat = mat;
-    EXPECT_EQ(s.mat, mat);
+    auto surface = material();
+    surface.ambient = 1.0f;
+    s.surface = surface;
+    EXPECT_EQ(s.surface, surface);
 }
