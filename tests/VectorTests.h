@@ -38,3 +38,15 @@ TEST(Vector, hasCrossProduct) {
   EXPECT_EQ(cross(a, b), vector(-1, 2, -1));
   EXPECT_EQ(cross(b, a), vector(1, -2, 1));
 }
+TEST(Vector, canBeReflectedAt45DegAngle) {
+  const auto v = vector(1, -1, 0);
+  const auto n = vector(0, 1, 0);
+  const auto result = reflect(v, n); //reflecting a vector approaching at 45 degrees angle
+  EXPECT_EQ(result,vector(1, 1, 0));
+}
+TEST(Vector, canBeReflectedAtSlantedAngle) {
+  const auto v = vector(0, -1, 0);
+  const auto n = vector(math::sqrt(2)/2, math::sqrt(2)/2, 0);
+  const auto result = reflect(v, n); //reflecting a vector approaching at 45 degrees angle
+  EXPECT_EQ(result,vector(1, 0, 0));
+}

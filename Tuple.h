@@ -66,14 +66,14 @@ std::ostream& operator<<(std::ostream& os, const Tuple&t){
     return os;
 }
 
-constexpr Tuple vector(Real x, Real y, Real z) noexcept {
-  return Tuple{x, y, z, 0.0f};
+constexpr Vector vector(Real x, Real y, Real z) noexcept {
+  return Vector{x, y, z, 0.0f};
 }
-constexpr Tuple point(Real x, Real y, Real z) noexcept {
-  return Tuple{x, y, z, 1.0f};
+constexpr Point point(Real x, Real y, Real z) noexcept {
+  return Point{x, y, z, 1.0f};
 }
-constexpr Tuple color(Real r, Real g, Real b, Real a = 1.0f) noexcept {
-  return Tuple{r, g, b, a};
+constexpr Color color(Real r, Real g, Real b, Real a = 1.0f) noexcept {
+  return Color{r, g, b, a};
 }
 
 constexpr Color to_byte_values(Color c) noexcept {
@@ -91,13 +91,13 @@ std::string to_rgb_bytes(Color c) {
 constexpr bool is_vector(Tuple t) noexcept { return t.w == 0; }
 constexpr bool is_point(Tuple t) noexcept { return t.w == 1; }
 
-constexpr Real magnitudeSq(const Tuple &t) noexcept {
+constexpr Real magnitudeSq(const Vector &t) noexcept {
   return ((t.x * t.x) + (t.y * t.y) + (t.z * t.z));
 }
-constexpr Real magnitude(const Tuple &t) noexcept {
+constexpr Real magnitude(const Vector &t) noexcept {
   return math::sqrt((t.x * t.x) + (t.y * t.y) + (t.z * t.z));
 }
-constexpr Tuple normalize(const Tuple &t) noexcept {
+constexpr Vector normalize(const Vector &t) noexcept {
   const auto length = magnitude(t);
   assert(length != 0.0f);
   return t / length;
@@ -110,11 +110,15 @@ constexpr Real dot(const Vector &a, const Vector &b) noexcept {
  */
   return a.x * b.x + a.y * b.y + a.z * b.z;
 }
-constexpr Tuple cross(const Tuple &a, const Tuple &b) noexcept {
+constexpr Vector cross(const Vector &a, const Vector &b) noexcept {
   return vector(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z,
                 a.x * b.y - a.y * b.x);
 }
 
 constexpr Tuple hadamard_product(const Color &a, const Color &b) noexcept {
   return Color{a.r * b.r, a.g * b.g, a.b * b.b, a.a * b.a};
+}
+
+constexpr Vector reflect(const Vector &v, const Vector& normal) noexcept {  
+  return v - normal * 2 * dot(v, normal);
 }
