@@ -12,7 +12,7 @@ constexpr Light point_light(Point p, Color i) noexcept {
 }
 
 struct Material final {
-    Color col = color(1, 1, 1);
+    Color color{ 1, 1, 1 };
     Real ambient = 0.1f;
     Real diffuse = 0.9f; 
     Real specular = 0.9f;
@@ -27,7 +27,7 @@ constexpr Material material() noexcept {
 }
 
 constexpr Color lighting(const Material& surface, const Light& light, const Point& p, const Vector& eye, const Vector& normal) noexcept {    
-    const auto effective_color = surface.col * light.intensity;
+    const auto effective_color = surface.color * light.intensity;
     const auto light_v = normalize(light.position - p); //find the direction to the light source    
     const Color ambient = effective_color * surface.ambient;
     Color diffuse{}; //black by default
@@ -40,10 +40,10 @@ constexpr Color lighting(const Material& surface, const Light& light, const Poin
         //a negative number means the light reflects away from the eye.
         const auto reflectv = reflect(-light_v, normal);
         const auto reflect_dot_eye = dot(reflectv, eye);
-        if (reflect_dot_eye >= 0) { //compute specular
-            const auto factor = std::pow(reflect_dot_eye, surface.shininess);
-            specular = light.intensity * surface.specular * factor;
-        } /*else: specular is black*/
+        
+        const auto factor = std::pow(reflect_dot_eye, surface.shininess);
+        specular = light.intensity * surface.specular * factor;
+        
     } /*else: diffuse and specular are both black*/
     return ambient + diffuse + specular;
 }

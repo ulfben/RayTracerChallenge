@@ -66,7 +66,7 @@ TEST(Sphere, normalOnTransformedSphere) {
 
 TEST(Matrial, canBeDefaultConstructed) {    
     const auto m = material();
-    EXPECT_EQ(m.col, color(1, 1, 1));
+    EXPECT_EQ(m.color, color(1, 1, 1));
     EXPECT_EQ(m.ambient, 0.1f);
     EXPECT_EQ(m.diffuse, 0.9f);
     EXPECT_EQ(m.specular, 0.9f);
