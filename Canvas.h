@@ -3,9 +3,7 @@
 #include "Tuple.h"
 #include "StringHelpers.h"
 
-
-// application.hpp
-// lippuu: https://gist.github.com/lippuu/cbf4fa62fe8eed408159a558ff5c96ee
+//A neat API example by lippuu: https://gist.github.com/lippuu/cbf4fa62fe8eed408159a558ff5c96ee
 using Bitmap = std::vector<Color>;
 class Canvas final {    
  public:
@@ -66,19 +64,16 @@ class Canvas final {
     
     std::string to_ppm() const {        
         std::string ppm = ppm_header();        
-        size_t char_count = 0;
-        size_type pixel_count = 0;
+        line_state state(width());
         for (const auto& color : bitmap) {
             const std::string rgb = to_rgb_bytes(color);            
-            if(should_wrap(char_count+rgb.size(), pixel_count)){
-                wrap_line(ppm);
-                char_count = pixel_count = 0;                
+            if(state.should_wrap(rgb.size())){
+                state.wrap(ppm);                
             }
-            std::format_to(std::back_inserter(ppm), "{} ", rgb);
-            char_count += rgb.size()+1;
-            pixel_count++;
+            ppm.append(std::format("{} ", rgb));
+            state.added(rgb.size() + 1);            
         }       
-        wrap_line(ppm); //PPM always ends on a newline.
+        state.wrap(ppm); //PPM always ends on a newline.
         return ppm;
     }
 
@@ -89,15 +84,28 @@ private:
 
     std::string ppm_header() const noexcept {
         return std::format("{}\n{} {}\n{}\n", PPM_VERSION, _width, _height, PPM_MAX_BYTE_VALUE);
-    }
-    size_type max_length() const noexcept {
-        return static_cast<size_type>(std::min(width()*CHARS_PER_PIXEL, 70));
-    }
-    bool should_wrap(size_t newchars, size_type pixelcount) const noexcept {        
-        return (pixelcount == width() || newchars >= max_length());        
-    }
-    void wrap_line(std::string& s) const {
-        s.pop_back(); //remove trailing whitespace
-        s.append(NEWLINE);
-    }
+    }   
+
+    struct line_state {
+        size_type bitmap_width;
+        size_t char_count = 0;
+        size_type pixel_count = 0;
+        explicit constexpr line_state(size_type bmp_width) noexcept : bitmap_width(bmp_width){};
+        constexpr size_type max_length(size_type width) const noexcept {            
+            return std::min(static_cast<size_type>(width*CHARS_PER_PIXEL), PPM_MAX_LINE_LENGTH);
+        }
+        constexpr bool should_wrap(size_t newchars) const noexcept {       
+            return (pixel_count == bitmap_width || char_count+newchars >= max_length(bitmap_width));        
+        }
+        constexpr void wrap(std::string& s) {
+            s.pop_back(); //remove trailing whitespace
+            s.append(NEWLINE);
+            char_count = 0; 
+            pixel_count = 0;
+        }
+        constexpr void added(size_t newchars) noexcept {
+            char_count += newchars;
+            pixel_count++;
+        }
+    };
 };
