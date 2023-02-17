@@ -7,17 +7,15 @@
 // application.hpp
 // lippuu: https://gist.github.com/lippuu/cbf4fa62fe8eed408159a558ff5c96ee
 using Bitmap = std::vector<Color>;
-class Canvas final {
-    Bitmap bitmap;
-    size_t _width = 0;
-    size_t _height = 0;
-    static constexpr auto CHANNELS = 3; // RGB
-    static constexpr auto CHARS = 4;    //"255 "
-    static constexpr auto PIXEL_CHAR_COUNT = CHANNELS * CHARS;
-    static constexpr auto LINE_WRAP = 70 - PIXEL_CHAR_COUNT;
-
-public:
+class Canvas final {    
+ public:
     using size_type = uint16_t;
+    static constexpr auto PPM_VERSION = "P3"sv;
+    static constexpr size_type PPM_MAX_LINE_LENGTH = 70;
+    static constexpr size_type PPM_MAX_BYTE_VALUE = 255; //max value of color components in PPM file. 
+    static constexpr size_type CHANNELS = 3; //RGB
+    static constexpr size_type CHARS = 4;    //"255 "
+    static constexpr size_type CHARS_PER_PIXEL = CHANNELS * CHARS;    
 
     Canvas(size_type width, size_type height) {
         resize(width, height);
@@ -36,7 +34,8 @@ public:
 
     constexpr void set(size_type x, size_type y, const Color& col) noexcept {
         if (x < _width && y < _height) {
-            bitmap[y * _width + x] = col;
+            const auto row = static_cast<size_t>(y) * _width;
+            bitmap[row + x] = col;
         }
     }
     constexpr void set(const Point& p, const Color& col) noexcept {
@@ -47,13 +46,14 @@ public:
     constexpr Color get(size_type x, size_type y) const noexcept {
         assert(x <= _width && "Canvas::get called with invalid x position");
         assert(y <= _height && "Canvas::get called with invalid y position");
-        return bitmap[y * _width + x];
+        const auto row = static_cast<size_t>(y) * _width;
+        return bitmap[row + x];
     }
     constexpr size_type width() const noexcept {
-        return static_cast<size_type>(_width);
+        return _width;
     }
     constexpr size_type height() const noexcept {
-        return static_cast<size_type>(_height);
+        return _height;
     }
     constexpr Real widthf() const noexcept {
         return static_cast<Real>(_width);
@@ -64,37 +64,40 @@ public:
     constexpr auto begin() const noexcept { return bitmap.begin(); }
     constexpr auto end() const noexcept { return bitmap.end(); }
     
-    std::string to_ppm() const {
-        const size_type MAX_LINE_LENGTH = std::min(size_type(70), size_type(width()*PIXEL_CHAR_COUNT));
-        std::string ppm = ppm_header();
-        ppm.reserve(ppm.size() + (bitmap.size() * PIXEL_CHAR_COUNT));
-        size_t line_length = 0;
-        size_type pixelcount = 0;
+    std::string to_ppm() const {        
+        std::string ppm = ppm_header();        
+        size_t char_count = 0;
+        size_type pixel_count = 0;
         for (const auto& color : bitmap) {
-            const std::string rgb = to_rgb_bytes(color);
-            if (pixelcount == width() || line_length + rgb.size() >= MAX_LINE_LENGTH) {
-                ppm.pop_back(); //remove trailing whitespace
-                ppm.append(NEWLINE);
-                line_length = 0;
-                pixelcount = 0;
+            const std::string rgb = to_rgb_bytes(color);            
+            if(should_wrap(char_count+rgb.size(), pixel_count)){
+                wrap_line(ppm);
+                char_count = pixel_count = 0;                
             }
             std::format_to(std::back_inserter(ppm), "{} ", rgb);
-            line_length += rgb.size()+1;
-            pixelcount++;
-        }      
-        ppm.pop_back(); //remove trailing whitespace
-        ppm.append(NEWLINE); //always end with empty line
+            char_count += rgb.size()+1;
+            pixel_count++;
+        }       
+        wrap_line(ppm); //PPM always ends on a newline.
         return ppm;
     }
 
 private:
+    Bitmap bitmap;
+    size_type _width = 0;
+    size_type _height = 0;
+
     std::string ppm_header() const noexcept {
-        return std::format("{}\n{} {}\n{}\n", PPM_VERSION, _width, _height, PPM_MAX);
+        return std::format("{}\n{} {}\n{}\n", PPM_VERSION, _width, _height, PPM_MAX_BYTE_VALUE);
     }
-    bool must_wrap(auto fl, auto ls, auto pixelcount) const noexcept {
-        const auto linelength = fl - ls;
-        //const auto width_in_characters = width() * PIXEL_CHAR_COUNT;
-        //linelength >= LINE_WRAP 
-        return pixelcount >= width()-1 || pixelcount % width() == 0;
+    size_type max_length() const noexcept {
+        return static_cast<size_type>(std::min(width()*CHARS_PER_PIXEL, 70));
+    }
+    bool should_wrap(size_t newchars, size_type pixelcount) const noexcept {        
+        return (pixelcount == width() || newchars >= max_length());        
+    }
+    void wrap_line(std::string& s) const {
+        s.pop_back(); //remove trailing whitespace
+        s.append(NEWLINE);
     }
 };

@@ -106,10 +106,10 @@ constexpr Color color(Real r, Real g, Real b) noexcept {
 }
 
 constexpr Color to_byte_values(Color col) noexcept {
-  const float MAX = PPM_MAX;
-  return color(std::clamp(std::round(col.r * PPM_MAX), 0.0f, MAX),
-               std::clamp(std::round(col.g * PPM_MAX), 0.0f, MAX),
-               std::clamp(std::round(col.b * PPM_MAX), 0.0f, MAX));
+  const float MAX = 255;
+  return color(std::clamp(std::round(col.r * MAX), 0.0f, MAX),
+               std::clamp(std::round(col.g * MAX), 0.0f, MAX),
+               std::clamp(std::round(col.b * MAX), 0.0f, MAX));
 }
 
 std::string to_rgb_bytes(Color col) {

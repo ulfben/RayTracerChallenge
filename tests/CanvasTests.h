@@ -6,8 +6,8 @@
 
 TEST(Canvas, hasWidthHeightAndColor) {
   const auto canvas = Canvas(10, 20);
-  EXPECT_EQ(canvas.width(), (uint32_t)10);
-  EXPECT_EQ(canvas.height(), (uint32_t)20);
+  EXPECT_EQ(canvas.width(), (Canvas::size_type)10);
+  EXPECT_EQ(canvas.height(), (Canvas::size_type)20);
   for (const auto &pixel : canvas) {
     EXPECT_EQ(pixel, color(.0f, .0f, .0f));
   }
