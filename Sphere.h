@@ -12,14 +12,19 @@ struct Sphere final {
     constexpr Sphere() noexcept = default;
     constexpr Sphere(Point p, Real rad) noexcept : position(p), radius(rad)
     {}
-
+    constexpr Sphere(Point p, Real rad, Material m) noexcept : surface(m), position(p), radius(rad)
+    {}
     constexpr bool operator==(const Sphere& that) const noexcept {
-        return position == that.position && math::float_cmp(radius, that.radius);
+        return position == that.position && math::float_cmp(radius, that.radius)
+            && surface == that.surface && transform == that.transform;
     }
 };
 
 constexpr Sphere sphere(Point p, Real radius) noexcept {
     return Sphere{ p, radius };
+}
+constexpr Sphere sphere(Material m) noexcept {
+    return Sphere{ point(0,0,0), 1.0f, std::move(m) };    
 }
 constexpr Sphere sphere() noexcept {
     return Sphere{ point(0,0,0), 1.0f };

@@ -54,7 +54,9 @@
     <ClInclude Include="tests\RayTests.h" />
     <ClInclude Include="tests\SphereTests.h" />
     <ClInclude Include="tests\VectorTests.h" />
+    <ClInclude Include="tests\WorldTests.h" />
     <ClInclude Include="Tuple.h" />
+    <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test.cpp" />

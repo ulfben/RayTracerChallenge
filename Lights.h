@@ -25,6 +25,9 @@ constexpr bool operator==(const Material& lhs, const Material& rhs) noexcept = d
 constexpr Material material() noexcept {
     return {};
 }
+constexpr Material material(Color c, Real ambient = 0.9f, Real diffuse = 0.9f, Real specular = 0.9f, Real shininess = 200.0f) noexcept {
+    return Material{c, ambient, diffuse, specular, shininess};    
+}
 
 constexpr Color lighting(const Material& surface, const Light& light, const Point& p, const Vector& eye, const Vector& normal) noexcept {    
     const auto effective_color = surface.color * light.intensity;

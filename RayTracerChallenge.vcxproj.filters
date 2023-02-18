@@ -45,6 +45,10 @@
     <ClInclude Include="tests\PhongReflectionTests.h">
       <Filter>tests</Filter>
     </ClInclude>
+    <ClInclude Include="World.h" />
+    <ClInclude Include="tests\WorldTests.h">
+      <Filter>tests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
