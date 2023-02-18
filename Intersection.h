@@ -2,16 +2,16 @@
 #include "pch.h"
 #include "Ray.h"
 
-template<class Object>
+template<class T>
 struct Intersection final {
-    Object obj;
+    const T* objPtr;
     Real t{ 0 };
 
     explicit constexpr operator bool() const noexcept {
         return t != 0;
     }
     constexpr bool operator==(const Intersection& that) const noexcept {
-        return obj == that.obj && math::float_cmp(t, that.t);
+        return *objPtr == *that.objPtr && math::float_cmp(t, that.t);
     }
     constexpr bool operator==(const Real that) const noexcept {
         return math::float_cmp(t, that);
@@ -24,10 +24,10 @@ struct Intersection final {
     }
 };
 
-template<class Object>
+template<class T>
 struct Intersections final {
     using size_type = uint8_t;
-    using value_type = Intersection<Object>;
+    using value_type = Intersection<T>;
     using container = std::vector<value_type>;
     using reference = container::reference;
     using pointer = container::pointer;
@@ -69,23 +69,19 @@ struct Intersections final {
     constexpr iterator end() noexcept { return xs.end(); }
     constexpr const_iterator begin() const noexcept { return xs.begin(); }
     constexpr const_iterator end() const noexcept { return xs.end(); }
-    constexpr bool operator==(const Intersections& that) const noexcept {
-        using std::ranges::equal;
-        return size() == that.size() && equal(*this, that,
-            [](auto a, auto b) noexcept { return math::float_cmp(a, b); });
+    constexpr bool operator==(const Intersections& that) const noexcept {        
+        return size() == that.size() && std::ranges::equal(*this, that);
     }
 };
 
-template<class Object>
-constexpr auto intersection(Real t, Object obj) noexcept {
-    return Intersection{ std::move(obj), t };
+template<class T>
+constexpr auto intersection(Real t, const T& obj) noexcept {
+    return Intersection<T>{ &obj, t };
 }
-
-template<class Object>
+template<class T>
 constexpr auto intersections() noexcept {
-    return Intersections<Object>{};
+    return Intersections<T>{};
 }
-
 template<class InterSection>
 constexpr auto intersections(InterSection i1, InterSection i2) noexcept {
     return Intersections{ std::move(i1), std::move(i2) };
@@ -114,7 +110,7 @@ constexpr auto intersect(const Sphere& s, const Ray& r) noexcept {
 };
 
 constexpr auto intersect(const World& world, const Ray& r) noexcept {
-    Intersections result = intersections<World::value_type>();
+    Intersections result = intersections<World::value_type>(); //will have to be rethought once we have different shapes.
     for (const auto& obj : world) {
         result.push_back(intersect(obj, r));
     }
@@ -142,9 +138,9 @@ constexpr auto hit(const Intersections& xs) noexcept {
     return *iter;
 };
 
-template<class Object>
+template<class T>
 struct Comps final { //"prepared computations", name to be figured out. 
-    Object object; //the object we hit    
+    const T* objectPtr; //the object we hit    
     Point point; //the point in world-space where the intersection occurs
     Vector eye; //inverted, pointing back towards the camera
     Vector normal; //the normal of the point 
@@ -155,14 +151,14 @@ struct Comps final { //"prepared computations", name to be figured out.
     }
 };
 
-template<class Object>
-Comps<Object> prepare_computations(const Intersection<Object>& i, const Ray& r) {
-    Comps<Object> comp{};
-    comp.object = i.obj;
+template<class T>
+Comps<T> prepare_computations(const Intersection<T>& i, const Ray& r) {
+    Comps<T> comp{};
+    comp.objectPtr = i.objPtr;
     comp.t = i.t;
     comp.point = position(r, i.t);
     comp.eye = -r.direction;
-    comp.normal = normal_at(comp.object, comp.point);
+    comp.normal = normal_at(*comp.objectPtr, comp.point);
     if (dot(comp.normal, comp.eye) < 0.0f) {
         comp.inside = true;
         comp.normal = -comp.normal;

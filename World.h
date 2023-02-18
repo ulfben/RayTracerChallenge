@@ -25,8 +25,8 @@ struct World {
         objects.push_back(s1); 
         objects.push_back(s2);
     }
-    constexpr bool contains(const Sphere& object) const noexcept {        
-        return std::ranges::find(objects, object) != std::end(objects);
+    constexpr bool contains(const Sphere& objectPtr) const noexcept {        
+        return std::ranges::find(objects, objectPtr) != std::end(objects);
     }
     constexpr const_reference operator[](size_type i) const noexcept {
         assert(i < size() && "World::operator[i] index is out of bounds");

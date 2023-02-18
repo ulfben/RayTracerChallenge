@@ -162,9 +162,9 @@
 //            const auto xs = intersect(shape, r);            
 //            if (const auto closest = hit(xs)) {
 //                const auto point = position(r , closest.t); 
-//                const auto normal = normal_at(closest.obj, point);
+//                const auto normal = normal_at(closest.objPtr, point);
 //                const auto eye = -r.direction; 
-//                const auto color = lighting(closest.obj.surface, light, point, eye, normal);
+//                const auto color = lighting(closest.objPtr->surface, light, point, eye, normal);
 //                c.set(x, y, color);
 //            }
 //        }

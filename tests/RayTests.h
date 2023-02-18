@@ -75,7 +75,7 @@ TEST(Intersection, encapsulatesTandObject) {
     EXPECT_TRUE(i);
     EXPECT_EQ(i, i);    
     EXPECT_FLOAT_EQ(i.t, 3.5f);    
-    EXPECT_EQ(i.obj, s);
+    EXPECT_EQ(*i.objPtr, s);
 }
 
 TEST(Intersections, aggregatesIntersection) {    
@@ -97,8 +97,8 @@ TEST(intersect, setsTheObjectOnTheIntersections) {
     EXPECT_FLOAT_EQ(xs[0].t, 4.0f);
     EXPECT_FLOAT_EQ(xs[1].t, 6.0f);
     EXPECT_TRUE(xs[0]);
-    EXPECT_EQ(xs[0].obj, s);
-    EXPECT_EQ(xs[1].obj, s);
+    EXPECT_EQ(*xs[0].objPtr, s);
+    EXPECT_EQ(*xs[1].objPtr, s);
 }
 
 TEST(hit, returnsClosestIntersection) {    
@@ -175,7 +175,7 @@ TEST(Intersections, precomputeIntersectionState) {
     const auto i1 = intersection(4, s);
     const auto comps = prepare_computations(i1, r);
     EXPECT_FLOAT_EQ(i1.t, comps.t);    
-    EXPECT_EQ(comps.object, s);
+    EXPECT_EQ(*comps.objectPtr, s);
     EXPECT_EQ(comps.point, point(0, 0, -1));
     EXPECT_EQ(comps.eye, vector(0, 0, -1));
     EXPECT_EQ(comps.normal, vector(0, 0, -1));
