@@ -176,3 +176,31 @@ constexpr auto hit(const Intersections& xs) noexcept {
     }
     return *iter;    
 };
+
+template<class Object>
+struct Comps final { //"prepared computations", name to be figured out. 
+    Object object; //the object we hit    
+    Point point; //the point in world-space where the intersection occurs
+    Vector eye; //inverted, pointing back towards the camera
+    Vector normal; //the normal of the point 
+    Real t{0}; //distance to hit
+    bool inside = false;
+    explicit constexpr operator bool() const noexcept {
+        return t != 0;
+    }    
+};
+
+template<class Object>
+Comps<Object> prepare_computations(const Intersection<Object>& i, const Ray& r) {
+    Comps<Object> comp{}; 
+    comp.object = i.obj;
+    comp.t = i.t;
+    comp.point = position(r, i.t);
+    comp.eye = -r.direction;
+    comp.normal = normal_at(comp.object, comp.point);
+    if (dot(comp.normal, comp.eye) < 0.0f) {
+        comp.inside = true;
+        comp.normal = -comp.normal;
+    }    
+    return comp;
+}

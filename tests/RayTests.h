@@ -172,3 +172,34 @@ TEST(intersect, aScaledSphere) {
     EXPECT_FLOAT_EQ(xs[0].t, 3.0f);
     EXPECT_FLOAT_EQ(xs[1].t, 7.0f);    
 }
+
+TEST(Intersections, precomputeIntersectionState) {    
+    const auto r = ray(point(0,0,-5), vector(0,0,1));
+    const auto s = sphere(point(0,0,0), 1.0f);
+    const auto i1 = intersection(4, s);
+    const auto comps = prepare_computations(i1, r);
+    EXPECT_FLOAT_EQ(i1.t, comps.t);    
+    EXPECT_EQ(comps.object, s);
+    EXPECT_EQ(comps.point, point(0, 0, -1));
+    EXPECT_EQ(comps.eye, vector(0, 0, -1));
+    EXPECT_EQ(comps.normal, vector(0, 0, -1));
+}
+
+TEST(Intersections, stateIncludesInside) {    
+    const auto r = ray(point(0,0,-5), vector(0,0,1));
+    const auto s = sphere(point(0,0,0), 1.0f);
+    const auto i1 = intersection(4, s);
+    const auto comps = prepare_computations(i1, r);
+    EXPECT_FALSE(comps.inside);        
+}
+
+TEST(Intersections, stateIncludesInside2) {    
+    const auto r = ray(point(0,0, 0), vector(0,0,1));
+    const auto s = sphere(point(0,0,0), 1.0f);
+    const auto i1 = intersection(1, s);
+    const auto comps = prepare_computations(i1, r);
+    EXPECT_TRUE(comps.inside);
+    EXPECT_EQ(comps.point, point(0, 0, 1));
+    EXPECT_EQ(comps.eye, vector(0, 0, -1));
+    EXPECT_EQ(comps.normal, vector(0, 0, -1));
+}

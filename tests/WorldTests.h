@@ -25,3 +25,5 @@ TEST(World, canIntersectWithRay) {
   EXPECT_EQ(xs[2].t, 5.5f);
   EXPECT_EQ(xs[3].t, 6.0f);
 }
+
+
