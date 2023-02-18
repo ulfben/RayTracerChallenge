@@ -1,6 +1,7 @@
 #pragma once
 #include "../pch.h"
 #include "../Ray.h"
+#include "../Intersection.h"
 #include "../Sphere.h"
 TEST(Ray, canBeConstructed) {
     const auto origin = point(1, 2, 3);
@@ -16,12 +17,7 @@ TEST(Ray, canComputePointFromDistance) {
     EXPECT_EQ(position(r, 0), point(2,3,4));
     EXPECT_EQ(position(r, 1), point(3,3,4));
     EXPECT_EQ(position(r, -1), point(1,3,4));
-    EXPECT_EQ(position(r, 2.5f), point(4.5,3,4));
-
-    EXPECT_EQ(r.position(0), point(2,3,4));
-    EXPECT_EQ(r.position(1), point(3,3,4));
-    EXPECT_EQ(r.position(-1), point(1,3,4));
-    EXPECT_EQ(r.position(2.5f), point(4.5,3,4));
+    EXPECT_EQ(position(r, 2.5f), point(4.5,3,4));     
 }
 
 TEST(Ray, intersectSphereAtTwoPoints) {

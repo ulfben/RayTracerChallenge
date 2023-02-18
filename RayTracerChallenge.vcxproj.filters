@@ -49,6 +49,7 @@
     <ClInclude Include="tests\WorldTests.h">
       <Filter>tests</Filter>
     </ClInclude>
+    <ClInclude Include="Intersection.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
