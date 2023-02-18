@@ -10,7 +10,7 @@ struct Intersection final {
     explicit constexpr operator bool() const noexcept {
         return t != 0;
     }
-    constexpr const T& object() const noexcept{
+    constexpr const T& object() const noexcept {
         return *objPtr;
     }
     constexpr bool operator==(const Intersection& that) const noexcept {
@@ -122,15 +122,15 @@ constexpr auto intersect(const World& world, const Ray& r) noexcept {
 //TODO: limit template argument to Interactions-struct
 //TODO: consider an alternative algo: remove + min_element
 template <class Intersections>
-constexpr auto hit(const Intersections& xs) noexcept {
+constexpr auto closest(const Intersections& xs) noexcept {
     using value_type = Intersections::value_type;
     const auto iter = std::ranges::min_element(xs,
         // This comparison function allows us to find the smallest positive number 
         // by considering negative numbers as larger than positive numbers. 
         [](const value_type& i1, const value_type& i2) noexcept {
             if (i1.t < 0.0f) { return false; }
-    if (i2.t < 0.0f) { return true; }
-    return i1.t < i2.t;
+            if (i2.t < 0.0f) { return true; }
+            return i1.t < i2.t;
         }
     );
     if (iter == std::end(xs) || *iter < 0.0f) {
@@ -140,18 +140,18 @@ constexpr auto hit(const Intersections& xs) noexcept {
 };
 
 template<class T>
-struct IntersectionState final { //"prepared computations", name to be figured out. 
+struct HitState final { //"prepared computations", name to be figured out. 
     const T* objectPtr = nullptr; //the object we hit    
     Point point{}; //the point in world-space where the intersection occurs
-    Vector eye{}; //inverted, pointing back towards the camera
+    Vector eye_v{}; //inverted, pointing back towards the camera
     Vector normal{}; //the normal of the point 
     Real t{ 0 }; //distance to hit
     bool inside = false;
 
-    IntersectionState(const Intersection<T>& i, const Ray& r) noexcept 
-        : objectPtr{ i.objPtr }, t{ i.t }, point{ position(r, i.t) }, eye{-r.direction}{
+    constexpr HitState(const Intersection<T>& i, const Ray& r) noexcept
+        : objectPtr{ i.objPtr }, t{ i.t }, point{ position(r, i.t) }, eye_v{ -r.direction } {
         normal = normal_at(object(), point);
-        if (dot(normal, eye) < 0.0f) {
+        if (dot(normal, eye_v) < 0.0f) {
             inside = true;
             normal = -normal;
         }
@@ -161,7 +161,7 @@ struct IntersectionState final { //"prepared computations", name to be figured o
         return t != 0;
     }
     const Material& surface() const noexcept {
-        return objectPtr->surface;
+        return object().surface;
     }
     const T& object() const noexcept {
         return *objectPtr;
@@ -169,12 +169,21 @@ struct IntersectionState final { //"prepared computations", name to be figured o
 };
 
 template<class T>
-IntersectionState<T> prepare_computations(const Intersection<T>& i, const Ray& r) noexcept {    
-    return IntersectionState(i, r);
+constexpr HitState<T> prepare_computations(const Intersection<T>& i, const Ray& r) noexcept {
+    return HitState(i, r);
 }
 
 template<class T>
-constexpr Color shade_hit(const World& w, const IntersectionState<T>& comps) noexcept {
-    return lighting(comps.surface(), w.light, comps.point, comps.eye, comps.normal);
+constexpr Color shade_hit(const World& w, const HitState<T>& hit) noexcept {
+    return lighting(hit.surface(), w.light, hit.point, hit.eye_v, hit.normal);
+}
+
+constexpr Color color_at(const World& w, const Ray& r) noexcept {
+    const auto closestHit = closest(intersect(w, r));
+    if (closestHit) {
+        const auto prep = prepare_computations(closestHit, r);
+        return shade_hit(w, prep);
+    }
+    return color(0, 0, 0);
 }
 

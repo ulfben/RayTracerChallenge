@@ -28,6 +28,7 @@ TEST(World, canIntersectWithRay) {
 
 TEST(World, shadeAnIntersection) {
     const auto w = World();
+    //w.light = point_light(point(-10, -10, -10), color(1, 1, 1));
     const auto r = ray(point(0, 0, -5), vector(0, 0, 1));    
     const auto i = intersection(4, w[0]);
     const auto comps = prepare_computations(i, r);
@@ -44,3 +45,27 @@ TEST(World, shadeAnIntersectionFromInside) {
     const auto col = shade_hit(w, comps);
     EXPECT_EQ(col, color(0.90498f, 0.90498f, 0.90498f));
 }
+
+TEST(World, colorWhenRayMisses) {
+    const auto w = World();
+    const auto r = ray(point(0, 0, -5), vector(0, 1, 0));
+    const auto col = color_at(w, r);
+    EXPECT_EQ(col, color(0, 0, 0));
+}
+
+TEST(World, colorWhenRayHit) {
+    const auto w = World();    
+    const auto r = ray(point(0, 0, -5), vector(0, 0, 1));
+    const auto col = color_at(w, r);
+    EXPECT_EQ(col, color(0.38066f, 0.47583f, 0.2855f));
+}
+
+TEST(World, colorWhenHitBehindRay) {
+    auto w = World();
+    w[0].surface.ambient = 1.0f; //inner sphere
+    w[1].surface.ambient = 1.0f; //outer sphere
+    const auto r = ray(point(0, 0, 0.75f), vector(0, 0, -1));
+    const auto col = color_at(w, r);
+    EXPECT_EQ(col, w[0].surface.color);
+}
+

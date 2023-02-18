@@ -101,36 +101,36 @@ TEST(intersect, setsTheObjectOnTheIntersections) {
     EXPECT_EQ(*xs[1].objPtr, s);
 }
 
-TEST(hit, returnsClosestIntersection) {    
+TEST(closest, returnsClosestIntersection) {    
     const auto s = sphere(point(0,0,0), 1.0f);
     const auto i1 = intersection(1, s);
     const auto i2 = intersection(2, s);
     const auto xs = intersections(i1, i2);
     EXPECT_TRUE(xs);
-    const auto i = hit(xs);    
+    const auto i = closest(xs);    
     EXPECT_EQ(i, i1);
 }
 
-TEST(hit, returnsClosestPositiveIntersection) {    
+TEST(closest, returnsClosestPositiveIntersection) {    
     const auto s = sphere(point(0,0,0), 1.0f);
     const auto i1 = intersection(-1, s);
     const auto i2 = intersection(1, s);
     const auto xs = intersections(i1, i2);
-    const auto i = hit(xs);    
+    const auto i = closest(xs);    
     EXPECT_EQ(i, i2);
 }
 
-TEST(hit, returnsEmptyIntersectionIfAllAreNegative) {    
+TEST(closest, returnsEmptyIntersectionIfAllAreNegative) {    
     const auto s = sphere(point(0,0,0), 1.0f);
     const auto i1 = intersection(-2, s);
     const auto i2 = intersection(-1, s);
     const auto xs = intersections(i1, i2);
-    const auto i = hit(xs);    
+    const auto i = closest(xs);    
     EXPECT_FLOAT_EQ(i.t, 0.0f);
     EXPECT_FALSE(i);
 }
 
-TEST(hit, canHandleMultipleIntersections) {    
+TEST(closest, canHandleMultipleIntersections) {    
     const auto s = sphere(point(0,0,0), 1.0f);
     const auto i1 = intersection(5, s);
     const auto i2 = intersection(7, s);
@@ -138,7 +138,7 @@ TEST(hit, canHandleMultipleIntersections) {
     const auto i4 = intersection(2, s);
     const auto i5 = intersection(-4, s);
     const auto xs = intersections({ i1, i2, i3, i4, i5 });
-    const auto i = hit(xs);    
+    const auto i = closest(xs);    
     EXPECT_EQ(i, i4);    
 }
 
@@ -173,29 +173,29 @@ TEST(Intersections, precomputeIntersectionState) {
     const auto r = ray(point(0,0,-5), vector(0,0,1));
     const auto s = sphere(point(0,0,0), 1.0f);
     const auto i1 = intersection(4, s);
-    const auto comps = prepare_computations(i1, r);
-    EXPECT_FLOAT_EQ(i1.t, comps.t);    
-    EXPECT_EQ(*comps.objectPtr, s);
-    EXPECT_EQ(comps.point, point(0, 0, -1));
-    EXPECT_EQ(comps.eye, vector(0, 0, -1));
-    EXPECT_EQ(comps.normal, vector(0, 0, -1));
+    const auto hit = prepare_computations(i1, r);
+    EXPECT_FLOAT_EQ(i1.t, hit.t);    
+    EXPECT_EQ(hit.object(), s);
+    EXPECT_EQ(hit.point, point(0, 0, -1));
+    EXPECT_EQ(hit.eye_v, vector(0, 0, -1));
+    EXPECT_EQ(hit.normal, vector(0, 0, -1));
 }
 
 TEST(Intersections, stateIncludesInside) {    
     const auto r = ray(point(0,0,-5), vector(0,0,1));
     const auto s = sphere(point(0,0,0), 1.0f);
     const auto i1 = intersection(4, s);
-    const auto comps = prepare_computations(i1, r);
-    EXPECT_FALSE(comps.inside);        
+    const auto hit = prepare_computations(i1, r);
+    EXPECT_FALSE(hit.inside);        
 }
 
 TEST(Intersections, stateIncludesInside2) {    
     const auto r = ray(point(0,0, 0), vector(0,0,1));
     const auto s = sphere(point(0,0,0), 1.0f);
     const auto i1 = intersection(1, s);
-    const auto comps = prepare_computations(i1, r);
-    EXPECT_TRUE(comps.inside);
-    EXPECT_EQ(comps.point, point(0, 0, 1));
-    EXPECT_EQ(comps.eye, vector(0, 0, -1));
-    EXPECT_EQ(comps.normal, vector(0, 0, -1));
+    const auto hit = prepare_computations(i1, r);
+    EXPECT_TRUE(hit.inside);
+    EXPECT_EQ(hit.point, point(0, 0, 1));
+    EXPECT_EQ(hit.eye_v, vector(0, 0, -1));
+    EXPECT_EQ(hit.normal, vector(0, 0, -1));
 }
