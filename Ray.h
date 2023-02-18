@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "Tuple.h"
 #include "Sphere.h"
+#include "World.h"
 struct Ray;
 constexpr Point position(const Ray& r, Real time) noexcept;
 
@@ -52,6 +53,17 @@ struct Intersections final {
     explicit constexpr operator bool() const noexcept {
         return !empty();
     }
+    constexpr void push_back(value_type val) {
+        xs.push_back(val);
+    }
+    constexpr void push_back(Intersections val) {
+        xs.append_range(val);
+    }
+
+    constexpr void sort() {
+        std::ranges::sort(xs, std::less<value_type>{});
+    }
+
     constexpr pointer data() noexcept { return xs.data(); }
     constexpr const_pointer data() const noexcept { return xs.data(); }
     constexpr size_type size() const noexcept { return static_cast<size_type>(xs.size()); }
@@ -114,7 +126,7 @@ constexpr Point position(const Ray& r, Real time) noexcept {
     return r.origin + r.direction * time;
 }
 
-constexpr Ray transform(const Ray& r, Matrix4 m) noexcept {    
+constexpr Ray transform(const Ray& r, const Matrix4& m) noexcept {    
     return m * r;
 }
 
@@ -134,6 +146,15 @@ constexpr auto intersect(const Sphere& s, const Ray& r) noexcept {
     const auto t1 = (-b - sqrtOfDiscriminant) / (2*a);
     const auto t2 = (-b + sqrtOfDiscriminant) / (2*a);
     return intersections({ intersection(t1, s), intersection(t2, s) });
+};
+
+constexpr auto intersect(const World& world, const Ray& r) noexcept {
+    Intersections result = intersections<World::value_type>();
+    for (const auto& obj : world) {
+        result.push_back(intersect(obj, r));
+    }
+    result.sort();
+    return result;
 };
 
 //TODO: limit template argument to Interactions-struct
