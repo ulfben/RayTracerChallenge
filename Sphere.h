@@ -14,7 +14,7 @@ struct Sphere final {
     {}
     constexpr Sphere(Point p, Real rad, Material m) noexcept : surface(m), position(p), radius(rad)
     {}
-    constexpr bool operator==(const Sphere& that) const noexcept {
+    constexpr auto operator==(const Sphere& that) const noexcept {
         return position == that.position && math::float_cmp(radius, that.radius)
             && surface == that.surface && transform == that.transform;
     }

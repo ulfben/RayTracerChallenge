@@ -26,4 +26,21 @@ TEST(World, canIntersectWithRay) {
   EXPECT_EQ(xs[3].t, 6.0f);
 }
 
+TEST(World, shadeAnIntersection) {
+    const auto w = World();
+    const auto r = ray(point(0, 0, -5), vector(0, 0, 1));    
+    const auto i = intersection(4, w[0]);
+    const auto comps = prepare_computations(i, r);
+    const auto c = shade_hit(w, comps);    
+    EXPECT_EQ(c, color(0.38066f, 0.47583f, 0.2855f));    
+}
 
+TEST(World, shadeAnIntersectionFromInside) {
+    auto w = World();
+    w.light = point_light(point(0, 0.25f, 0), color(1, 1, 1));
+    const auto r = ray(point(0, 0, 0), vector(0, 0, 1));    
+    const auto i = intersection(0.5f, w[1]);
+    const auto comps = prepare_computations(i, r);
+    const auto col = shade_hit(w, comps);
+    EXPECT_EQ(col, color(0.90498f, 0.90498f, 0.90498f));
+}

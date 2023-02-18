@@ -138,19 +138,22 @@ constexpr auto hit(const Intersections& xs) noexcept {
 
 template<class T>
 struct Comps final { //"prepared computations", name to be figured out. 
-    const T* objectPtr; //the object we hit    
-    Point point; //the point in world-space where the intersection occurs
-    Vector eye; //inverted, pointing back towards the camera
-    Vector normal; //the normal of the point 
+    const T* objectPtr = nullptr; //the object we hit    
+    Point point{}; //the point in world-space where the intersection occurs
+    Vector eye{}; //inverted, pointing back towards the camera
+    Vector normal{}; //the normal of the point 
     Real t{ 0 }; //distance to hit
     bool inside = false;
     explicit constexpr operator bool() const noexcept {
         return t != 0;
     }
+    const Material& surface() const noexcept{
+        return objectPtr->surface;
+    }
 };
 
 template<class T>
-Comps<T> prepare_computations(const Intersection<T>& i, const Ray& r) {
+Comps<T> prepare_computations(const Intersection<T>& i, const Ray& r) noexcept{
     Comps<T> comp{};
     comp.objectPtr = i.objPtr;
     comp.t = i.t;
@@ -163,3 +166,9 @@ Comps<T> prepare_computations(const Intersection<T>& i, const Ray& r) {
     }
     return comp;
 }
+
+template<class T>
+constexpr Color shade_hit(const World& w, const Comps<T>& comps) noexcept{
+    return lighting(comps.surface(), w.light, comps.point, comps.eye, comps.normal);    
+}
+

@@ -3,7 +3,7 @@
 #include "Lights.h"
 #include "Sphere.h"
 
-struct World {
+struct World final {
     static constexpr auto DEFAULT_WORLD_MATERIAL = material(color(0.8f, 1.0f, 0.6f), 0.9f, 0.7f, 0.2f);   
     using value_type = Sphere;    
     using container = std::vector<value_type>;
@@ -25,8 +25,8 @@ struct World {
         objects.push_back(s1); 
         objects.push_back(s2);
     }
-    constexpr bool contains(const Sphere& objectPtr) const noexcept {        
-        return std::ranges::find(objects, objectPtr) != std::end(objects);
+    constexpr bool contains(const value_type& object) const noexcept {        
+        return std::ranges::find(objects, object) != std::end(objects);
     }
     constexpr const_reference operator[](size_type i) const noexcept {
         assert(i < size() && "World::operator[i] index is out of bounds");
