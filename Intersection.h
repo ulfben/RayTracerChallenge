@@ -15,13 +15,13 @@ struct Intersection final {
     }
     constexpr bool operator==(const Real that) const noexcept {
         return math::float_cmp(t, that);
+    } 
+    constexpr auto operator<=>(const Intersection& that) const noexcept { 
+        return t <=> that.t;
     }
-    constexpr bool operator<(const Intersection& that) const noexcept {
-        return this->t < that.t;
-    }
-    constexpr bool operator<(Real that) const noexcept {
-        return t < that;
-    }
+    constexpr auto operator<=>(Real time) const noexcept{
+        return t <=> time;
+    }    
 };
 
 template<class T>
@@ -69,9 +69,7 @@ struct Intersections final {
     constexpr iterator end() noexcept { return xs.end(); }
     constexpr const_iterator begin() const noexcept { return xs.begin(); }
     constexpr const_iterator end() const noexcept { return xs.end(); }
-    constexpr bool operator==(const Intersections& that) const noexcept {        
-        return size() == that.size() && std::ranges::equal(*this, that);
-    }
+    constexpr auto operator<=>(const Intersections& that) const noexcept = default;
 };
 
 template<class T>
