@@ -10,18 +10,21 @@ struct Intersection final {
     explicit constexpr operator bool() const noexcept {
         return t != 0;
     }
+    constexpr const T& object() const noexcept{
+        return *objPtr;
+    }
     constexpr bool operator==(const Intersection& that) const noexcept {
         return *objPtr == *that.objPtr && math::float_cmp(t, that.t);
     }
     constexpr bool operator==(const Real that) const noexcept {
         return math::float_cmp(t, that);
-    } 
-    constexpr auto operator<=>(const Intersection& that) const noexcept { 
+    }
+    constexpr auto operator<=>(const Intersection& that) const noexcept {
         return t <=> that.t;
     }
-    constexpr auto operator<=>(Real time) const noexcept{
+    constexpr auto operator<=>(Real time) const noexcept {
         return t <=> time;
-    }    
+    }
 };
 
 template<class T>
@@ -137,38 +140,41 @@ constexpr auto hit(const Intersections& xs) noexcept {
 };
 
 template<class T>
-struct Comps final { //"prepared computations", name to be figured out. 
+struct IntersectionState final { //"prepared computations", name to be figured out. 
     const T* objectPtr = nullptr; //the object we hit    
     Point point{}; //the point in world-space where the intersection occurs
     Vector eye{}; //inverted, pointing back towards the camera
     Vector normal{}; //the normal of the point 
     Real t{ 0 }; //distance to hit
     bool inside = false;
+
+    IntersectionState(const Intersection<T>& i, const Ray& r) noexcept 
+        : objectPtr{ i.objPtr }, t{ i.t }, point{ position(r, i.t) }, eye{-r.direction}{
+        normal = normal_at(object(), point);
+        if (dot(normal, eye) < 0.0f) {
+            inside = true;
+            normal = -normal;
+        }
+    }
+
     explicit constexpr operator bool() const noexcept {
         return t != 0;
     }
-    const Material& surface() const noexcept{
+    const Material& surface() const noexcept {
         return objectPtr->surface;
+    }
+    const T& object() const noexcept {
+        return *objectPtr;
     }
 };
 
 template<class T>
-Comps<T> prepare_computations(const Intersection<T>& i, const Ray& r) noexcept{
-    Comps<T> comp{};
-    comp.objectPtr = i.objPtr;
-    comp.t = i.t;
-    comp.point = position(r, i.t);
-    comp.eye = -r.direction;
-    comp.normal = normal_at(*comp.objectPtr, comp.point);
-    if (dot(comp.normal, comp.eye) < 0.0f) {
-        comp.inside = true;
-        comp.normal = -comp.normal;
-    }
-    return comp;
+IntersectionState<T> prepare_computations(const Intersection<T>& i, const Ray& r) noexcept {    
+    return IntersectionState(i, r);
 }
 
 template<class T>
-constexpr Color shade_hit(const World& w, const Comps<T>& comps) noexcept{
-    return lighting(comps.surface(), w.light, comps.point, comps.eye, comps.normal);    
+constexpr Color shade_hit(const World& w, const IntersectionState<T>& comps) noexcept {
+    return lighting(comps.surface(), w.light, comps.point, comps.eye, comps.normal);
 }
 
