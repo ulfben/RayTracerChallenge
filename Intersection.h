@@ -13,6 +13,9 @@ struct Intersection final {
     constexpr const T& object() const noexcept {
         return *objPtr;
     }
+    constexpr const Material& surface() const noexcept {
+        return object().surface;
+    }
     constexpr bool operator==(const Intersection& that) const noexcept {
         return *objPtr == *that.objPtr && math::float_cmp(t, that.t);
     }
@@ -164,6 +167,7 @@ struct HitState final { //"prepared computations", name to be figured out.
         return object().surface;
     }
     const T& object() const noexcept {
+        assert(objectPtr && "HitState::object() called on empty HitState.");
         return *objectPtr;
     }
 };
@@ -180,10 +184,9 @@ constexpr Color shade_hit(const World& w, const HitState<T>& hit) noexcept {
 
 constexpr Color color_at(const World& w, const Ray& r) noexcept {
     const auto closestHit = closest(intersect(w, r));
-    if (closestHit) {
-        const auto prep = prepare_computations(closestHit, r);
-        return shade_hit(w, prep);
+    if (closestHit) {        
+        return shade_hit(w, prepare_computations(closestHit, r));
     }
-    return color(0, 0, 0);
+    return BLACK;
 }
 

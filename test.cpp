@@ -75,7 +75,7 @@
 //TEST(Chapter4, CanDraw12_3_6_9Dynamically) {
 //    const auto RED = color(1, 0, 0);    
 //    const auto GREEN = color(0, 1, 0);
-//    const auto WHITE = color(1, 1, 1);
+//    const auto WHITE = WHITE;
 //    auto c = Canvas(200, 200);
 //    const auto origo = point(c.widthf() / 2, c.heightf() / 2, 0);        
 //    c.set(origo, GREEN);        
@@ -100,7 +100,7 @@
 //}
 
 //TEST(Chapter4, CanDrawClock) {       
-//    const auto WHITE = color(1, 1, 1);
+//    const auto WHITE = WHITE;
 //    auto c = Canvas(200, 200);
 //    const auto origo = point(c.widthf() / 2, c.heightf() / 2, 0);                 
 //    const auto dist = c.widthf()*0.375f; 
@@ -147,7 +147,7 @@
 //    auto c = Canvas(100, 100);
 //    auto shape = sphere();
 //    shape.surface.color = color(1, 0.2f, 1);        
-//    const auto light = point_light(point(10, 10, -10), color(1, 1, 1));
+//    const auto light = point_light(point(10, 10, -10), WHITE);
 //    const auto ray_origin = point(0, 0, -5);    
 //    const auto wall_z = 10.0f;
 //    const auto wall_size = 7.0f;
@@ -160,15 +160,15 @@
 //            const auto target_pos = point(world_x, world_y, wall_z);
 //            const auto r = ray(ray_origin, normalize(target_pos - ray_origin));
 //            const auto xs = intersect(shape, r);            
-//            if (const auto closest = hit(xs)) {
-//                const auto point = position(r , closest.t); 
-//                const auto normal = normal_at(closest.objPtr, point);
+//            if (const auto hit = closest(xs)) {
+//                const auto point = position(r , hit.t); 
+//                const auto normal = normal_at(hit.object(), point);
 //                const auto eye = -r.direction; 
-//                const auto color = lighting(closest.objPtr->surface, light, point, eye, normal);
+//                const auto color = lighting(hit.surface(), light, point, eye, normal);
 //                c.set(x, y, color);
 //            }
 //        }
 //    }
-//    std::ofstream ofs("output/chapter6_0.ppm", std::ofstream::out);
+//    std::ofstream ofs("output/chapter6_2.ppm", std::ofstream::out);
 //    ofs << c.to_ppm();  
 //}

@@ -32,6 +32,12 @@ struct Color final {
             float_cmp(b, rhs.b);
     };
 };
+constexpr Color color(Real r, Real g, Real b) noexcept {
+    return Color{ r, g, b };
+}
+static constexpr Color BLACK = color(0, 0, 0);
+static constexpr Color WHITE = color(1, 1, 1);
+
 
 #pragma warning(push)
 #pragma warning( disable : 4201 )
@@ -93,9 +99,6 @@ constexpr Vector vector(Real x, Real y, Real z) noexcept {
 }
 constexpr Point point(Real x, Real y, Real z) noexcept {
     return Point{ x, y, z, 1.0f };
-}
-constexpr Color color(Real r, Real g, Real b) noexcept {
-    return Color{ r, g, b };
 }
 
 constexpr Color to_byte_values(Color col) noexcept {

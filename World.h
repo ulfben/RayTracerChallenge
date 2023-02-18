@@ -4,7 +4,7 @@
 #include "Sphere.h"
 
 struct World final {
-    static constexpr auto DEFAULT_WORLD_MATERIAL = material(color(0.8f, 1.0f, 0.6f), 0.9f, 0.7f, 0.2f);   
+    static constexpr auto DEFAULT_WORLD_MATERIAL = material(color(0.8f, 1.0f, 0.6f), 0.1f, 0.7f, 0.2f);   
     using value_type = Sphere;    
     using container = std::vector<value_type>;
     using reference = container::reference;
@@ -16,7 +16,7 @@ struct World final {
     using size_type = container::size_type;
     
     container objects;    
-    Light light = point_light(point(-10, 10, -10), color(1, 1, 1));    
+    Light light = point_light(point(-10, 10, -10), WHITE);    
     
     constexpr World() noexcept {                
         auto s1 = sphere(DEFAULT_WORLD_MATERIAL); 
