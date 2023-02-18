@@ -3,7 +3,6 @@
 #include "Lights.h"
 #include "Sphere.h"
 
-
 struct World {
     static constexpr auto DEFAULT_WORLD_MATERIAL = material(color(0.8f, 1.0f, 0.6f), 0.9f, 0.7f, 0.2f);   
     using value_type = Sphere;    
