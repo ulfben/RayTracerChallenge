@@ -27,6 +27,12 @@ struct World final {
         }
         catch (...) {/*swallow. default world will be empty.*/}
     }
+    constexpr World(std::initializer_list<Sphere> list) noexcept {
+        try {
+            objects.append_range(list);
+        }
+        catch (...) {/*swallow. default world will be empty.*/ }
+    }
     constexpr bool contains(const value_type& object) const noexcept {        
         return std::ranges::find(objects, object) != std::end(objects);
     }

@@ -173,3 +173,51 @@
 //    std::ofstream ofs("output/chapter6_2.ppm", std::ofstream::out);
 //    ofs << c.to_ppm();  
 //}
+
+TEST(Chapter7, CanRenderScene) {
+    using size_type = Canvas::size_type;
+    auto c = Camera(400, 200, math::PI / 3);
+    c.transform = view_transform(point(0.0f, 1.5f, -5.0f), point(0, 1, 0), vector(0, 1, 0));
+
+    auto floor = sphere();
+    floor.transform = scaling(10, 0.01f, 10);
+    floor.surface = material();
+    floor.surface.color = color(1, 0.9f, 0.9f);    
+    floor.surface.specular = 0;
+
+    auto left_wall = sphere();
+    left_wall.transform = translation(0, 0, 5) * rotation_y(-math::PI / 4.0f) * rotation_x(math::PI / 2) * scaling(10.0f, 0.01f, 10.0f);    
+    left_wall.surface = floor.surface;    
+
+    auto right_wall = sphere();
+    right_wall.transform = translation(0, 0, 5) * rotation_y(math::PI / 4.0f) * rotation_x(math::PI / 2) * scaling(10.0f, 0.01f, 10.0f);
+    right_wall.surface = floor.surface;    
+
+    auto middle = sphere();
+    middle.transform = translation(-0.5f, 1, 0.5f);
+    middle.surface = material();
+    middle.surface.color = color(0.1f, 1, 0.5f);
+    middle.surface.diffuse = 0.7f;
+    middle.surface.specular = 0.4f;
+
+    auto right = sphere();
+    right.transform = translation(1.5f, 0.5f, -0.5f) * scaling(0.5f, 0.5f, 0.5f);
+    right.surface = material();
+    right.surface.color = color(0.5f, 1, 0.1f);
+    right.surface.diffuse = 0.7f;
+    right.surface.specular = 0.3f;
+
+    auto left = sphere();
+    left.transform = translation(-1.5f, 0.33f, -0.75f) * scaling(0.33f, 0.33f, 0.33f);
+    left.surface = material();
+    left.surface.color = color(1.0f, 0.8f, 0.1f);
+    left.surface.diffuse = 0.7f;
+    left.surface.specular = 0.3f;
+
+    auto world = World({floor, left_wall, right_wall, left, middle, right});
+    world.light = point_light(point(-10, 10, -10), color(1,1,1));
+    
+    const auto img = render(c, world);    
+    std::ofstream ofs("output/chapter7_1.ppm", std::ofstream::out);
+    ofs << img.to_ppm();  
+}

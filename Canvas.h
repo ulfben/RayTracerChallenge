@@ -12,7 +12,7 @@ public:
     static constexpr size_type CHARS = 4;    //"255 "
     static constexpr size_type CHARS_PER_PIXEL = CHANNELS * CHARS;
 
-    Canvas(size_type width, size_type height) {
+    constexpr Canvas(size_type width, size_type height) {
         resize(width, height);
         clear();
     }
@@ -26,7 +26,7 @@ public:
 
     constexpr void clear(const Color& col = Color{ .0f, .0f, .0f }) noexcept {
         std::ranges::fill(bitmap, col);
-    }
+    }       
 
     constexpr void set(size_type x, size_type y, const Color& col) noexcept {
         if (x < _width && y < _height) {

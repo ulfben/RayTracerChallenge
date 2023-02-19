@@ -16,7 +16,7 @@ TEST(Canvas, hasWidthHeightAndColor) {
 }
 
 TEST(Canvas, canSetAndGetPixel) {
-  auto canvas = Canvas(10, 20);
+  auto canvas = Canvas(10u, 20u);
   const auto red = color(1, 0, 0);
   canvas.set(2, 3, red);
   EXPECT_EQ(canvas.get(2, 3), red);

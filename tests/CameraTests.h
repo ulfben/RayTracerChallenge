@@ -50,4 +50,17 @@ TEST(Camera, constructRayWithCameraTransformed) {
     EXPECT_EQ(r.direction, vector(sqr, 0, -sqr));
 }
 
+TEST(Camera, renderWorldWithCamera) {
+    const auto w = World();    
+    auto c = Camera(11, 11, math::PI / 2.0f);
+    const auto from = point(0, 0, -5);
+    const auto to = point(0, 0, 0);
+    const auto up = point(0, 1, 0);
+    c.transform = view_transform(from, to, up);    
+    const auto img = render(c, w);
+    EXPECT_EQ(img.width(), c.vsize);
+    EXPECT_EQ(img.height(), c.hsize);
+    EXPECT_EQ(img.get(5,5), color(0.38066f, 0.47583f, 0.2855f));    
+}
+
 RESTORE_WARNINGS

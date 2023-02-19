@@ -4,6 +4,8 @@
 #include "Matrix.h"
 #include "Ray.h"
 #include "World.h"
+#include "Canvas.h"
+
 struct Camera final{
     Matrix4 transform = Matrix4Identity;        
     Real hsize = 160; 
@@ -42,4 +44,16 @@ constexpr Ray ray_for_pixel(const Camera& c, Real px, Real py) noexcept{
     const auto origin = inv * point(0,0,0);
     const auto direction = normalize(pixel - origin);
     return ray(origin, direction);
+}
+
+constexpr Canvas render(const Camera& camera, const World& w) {
+    using size_type = Canvas::size_type;
+    Canvas img(narrow_cast<size_type>(camera.hsize), narrow_cast<size_type>(camera.vsize));
+    for(size_type y = 0; y < img.height(); ++y){
+        for (size_type x = 0; x < img.width(); ++x) {
+            const auto color = color_at(w, ray_for_pixel(camera, x, y));
+            img.set(x, y, color);
+        }
+    }
+    return img;
 }
