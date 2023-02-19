@@ -401,6 +401,16 @@ constexpr Matrix4 view_transform(const Point& from, const Point& to, const Vecto
     const auto forward = normalize(to - from);   //TODO: figure out why Point operator- isn't constexpr! 
     const auto left = cross(forward, normalize(up));
     const auto true_up = cross(left, forward);
+    //TODO: see if we can inline the translation calculations
+    //const auto tx = -dot(left, from); 
+    //const auto ty = -dot(true_up, from);
+    //const auto tz = dot(forward, from);
+    //return Matrix4{
+    //    left.x,      left.y,      left.z,      tx,
+    //    true_up.x,   true_up.y,   true_up.z,   ty,
+    //    -forward.x,  -forward.y,  -forward.z,  tz,
+    //    0,           0,           0,           1
+    //};
     const auto orientation = Matrix4{
         left.x,     left.y,     left.z,     0,
         true_up.x,  true_up.y,  true_up.z,  0,
