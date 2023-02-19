@@ -186,4 +186,48 @@ TEST(RotationMatrix, aroundAllAxis) {
     EXPECT_EQ(result, expected);    
 }
 
+TEST(view_transform, defaultOrientation) {
+    //Describes the world's default orientation, when nothing needs to be scaled, rotated or moved.     
+    constexpr auto from = point(0,0,0);
+    constexpr auto to = point(0, 0, -1); //The default orientation looks from the origin along the negative z-axis.
+    constexpr auto up = vector(0, 1, 0); //Up is in the positive Y direction
+    const auto t = view_transform(from, to, up); 
+    EXPECT_EQ(t, Matrix4Identity);    
+}
+
+TEST(view_transform, lookingBackwardsMirrorsXAndZ) {
+    //turning around and looking in the positive Z-direction is like looking in a mirror
+    //front and back is swapped, left and right is swapped. In other words; z and x are reflected.
+    //reflection is the same as scaling by a negative number, so that's what the test is. 
+    constexpr auto from = point(0,0,0);
+    constexpr auto to = point(0, 0, 1); //looking "backwards", along positive Z axis
+    constexpr auto up = vector(0, 1, 0); 
+    const auto t = view_transform(from, to, up); 
+    EXPECT_EQ(t, scaling(-1, 1, -1));    
+}
+
+TEST(view_transform, movesWorldRelativeToTheEye) {    
+    constexpr auto from = point(0,0,8);//"place" eye 8 units out on Z
+    constexpr auto to = point(0, 0, 0); //look back at origin
+    constexpr auto up = vector(0, 1, 0); 
+    const auto t = view_transform(from, to, up); 
+    EXPECT_EQ(t, translation(0, 0, -8)); //the transform translates everything backwards 8 units 
+    //thus pushing the world away from the eye position at the origin.
+}
+
+TEST(view_transform, arbitraryViewTransform) {    
+    constexpr auto from = point(1,3,2);
+    constexpr auto to = point(4, -2, 8);
+    constexpr auto up = vector(1, 1, 0); 
+    const auto t = view_transform(from, to, up);
+    constexpr auto expected = Matrix4{ //book oracle
+        -0.50709f,  0.50709f,   0.67612f,   -2.36643f,
+        0.76772f,   0.60609f,   0.12122f,   -2.82843f,
+        -0.35857f,  0.59761f,   -0.71714f,  0.0f,
+        0.0f,       0.0f,       0.0f,       1.0f
+    };
+    EXPECT_EQ(t, expected); 
+}
+
+
 RESTORE_WARNINGS

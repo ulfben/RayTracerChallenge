@@ -17,7 +17,7 @@
 #include <gtest/gtest.h>
 #pragma warning(pop)
 
-#pragma warning( disable : 26446 ) //avoid subscript opterator, prefer gsl::at 
+#pragma warning( disable : 26446 ) //"global" disabling of 'avoid subscript opterator, prefer gsl::at'
 
 #define DISABLE_WARNINGS_FROM_GTEST \
     __pragma(warning(push))\
@@ -40,7 +40,6 @@ static constexpr uint16_t PPM_MAX_BYTE_VALUE = 255; //max value of color compone
 
 // narrow_cast(): a searchable way to do narrowing casts of values
 template <class T, class U>
-[[nodiscard]] constexpr T narrow_cast(U&& u) noexcept
-{
+[[nodiscard]] constexpr T narrow_cast(U&& u) noexcept{
     return static_cast<T>(std::forward<U>(u));
 }
