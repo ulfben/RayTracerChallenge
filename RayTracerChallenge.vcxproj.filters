@@ -50,6 +50,10 @@
       <Filter>tests</Filter>
     </ClInclude>
     <ClInclude Include="Intersection.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="tests\CameraTests.h">
+      <Filter>tests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

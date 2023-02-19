@@ -15,6 +15,7 @@
 #include "tests/SphereTests.h"
 #include "tests/PhongReflectionTests.h"
 #include "tests/WorldTests.h"
+#include "tests/CameraTests.h"
 
 //TEST(Chapter2, CanOutputPPM) {
 //    auto c = Canvas(300, 300);

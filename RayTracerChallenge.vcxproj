@@ -65,6 +65,7 @@
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Canvas.h" />
     <ClInclude Include="Intersection.h" />
     <ClInclude Include="Lights.h" />
@@ -75,6 +76,7 @@
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="StringHelpers.h" />
+    <ClInclude Include="tests\CameraTests.h" />
     <ClInclude Include="tests\CanvasTests.h" />
     <ClInclude Include="tests\ColorTests.h" />
     <ClInclude Include="tests\FloatCompareTests.h" />
