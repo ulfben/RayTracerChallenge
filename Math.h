@@ -106,8 +106,8 @@ namespace math {
         if (a == b) {
             return true;
         }
-        float diff = std::fabs(a - b);
-        float reltol = std::max(std::fabs(a), std::fabs(b)) * epsilon;
+        const float diff = std::fabs(a - b);
+        const float reltol = std::max(std::fabs(a), std::fabs(b)) * epsilon;
         return diff < reltol || diff < abstol;
     }
 

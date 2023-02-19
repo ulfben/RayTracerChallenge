@@ -2,6 +2,9 @@
 #include "../pch.h"
 #include "../Tuple.h"
 #include "../Math.h"
+
+DISABLE_WARNINGS_FROM_GTEST
+
 TEST(Vector, hasMagnitude) {
   auto v = vector(1, 0, 0);
   EXPECT_FLOAT_EQ(magnitude(v), 1.0f);
@@ -50,3 +53,5 @@ TEST(Vector, canBeReflectedAtSlantedAngle) {
   const auto result = reflect(v, n);
   EXPECT_EQ(result,vector(1, 0, 0));
 }
+
+RESTORE_WARNINGS

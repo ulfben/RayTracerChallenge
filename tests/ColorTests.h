@@ -2,6 +2,7 @@
 #include "../pch.h"
 #include "../Tuple.h"
 #include "../Lights.h"
+DISABLE_WARNINGS_FROM_GTEST
 
 TEST(Color, canBeDefaultConstructed) {
   const Color a;
@@ -27,3 +28,5 @@ TEST(Color, canBeMultiplied) {
   EXPECT_FLOAT_EQ(result.g, 0.2f);
   EXPECT_FLOAT_EQ(result.b, 0.04f);  
 }
+
+RESTORE_WARNINGS

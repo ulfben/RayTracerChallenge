@@ -1,16 +1,16 @@
 #pragma once
 #include "Canvas.h"
 #include "Tuple.h"
-static const Vector gravity = vector(0, 0.1f, 0);
-static const Vector wind = vector(-0.01f, 0, 0);
-static const Color myColor = color(1.0f, 0, 0);
-static const float friction = 0.98f;
+static constexpr Vector gravity = vector(0, 0.1f, 0);
+static constexpr Vector wind = vector(-0.01f, 0, 0);
+static constexpr Color myColor = color(1.0f, 0, 0);
+static constexpr float friction = 0.98f;
 class Projectile {
   Point position;
   Vector velocity;
 
 public:
-  Projectile(Point pos, Vector vel) : position(pos), velocity(vel){};
+  constexpr Projectile(Point pos, Vector vel) noexcept : position(pos), velocity(vel){};
 
   void update() noexcept {
     position += velocity;

@@ -3,6 +3,9 @@
 #include "../Ray.h"
 #include "../Intersection.h"
 #include "../Sphere.h"
+
+DISABLE_WARNINGS_FROM_GTEST
+
 TEST(Ray, canBeConstructed) {
     const auto origin = point(1, 2, 3);
     const auto direction = vector(4,5,6);
@@ -199,3 +202,5 @@ TEST(Intersections, stateIncludesInside2) {
     EXPECT_EQ(hit.eye_v, vector(0, 0, -1));
     EXPECT_EQ(hit.normal, vector(0, 0, -1));
 }
+
+RESTORE_WARNINGS

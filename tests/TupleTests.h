@@ -2,6 +2,8 @@
 #include "../pch.h"
 #include "../Tuple.h"
 
+DISABLE_WARNINGS_FROM_GTEST
+
 TEST(Tuple, canBeDefaultConstructed) {
   const Tuple a;
   EXPECT_FLOAT_EQ(a.x, .0f);
@@ -112,3 +114,5 @@ TEST(Tuples, canBeDividedByScalar) {
   const auto expected = Tuple{0.5, -1, 1.5, -2};
   EXPECT_EQ(t1 / 2, expected);
 }
+
+RESTORE_WARNINGS

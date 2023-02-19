@@ -84,15 +84,22 @@ struct Tuple final {
     };
 };
 
+#pragma warning(push)
+#pragma warning( disable : 26481 ) //spurious warning; "don't use pointer arithmetic" 
 std::ostream& operator<<(std::ostream& os, const Tuple& t) {
-    os << std::format("{}, {}, {}, {}", t.x, t.y, t.z, t.w);
+    os << std::format("{}, {}, {}, {}"sv, t.x, t.y, t.z, t.w);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const Color& t) {
-    os << std::format("{}, {}, {}", t.r, t.g, t.b);
+    os << std::format("{}, {}, {}"sv, t.r, t.g, t.b);
     return os;
 }
+
+std::string to_string(Color c) {    
+    return std::format("{} {} {}"sv, c.r, c.g, c.b);
+}
+#pragma warning(pop)
 
 constexpr Vector vector(Real x, Real y, Real z) noexcept {
     return Vector{ x, y, z, 0.0f };
@@ -102,15 +109,10 @@ constexpr Point point(Real x, Real y, Real z) noexcept {
 }
 
 constexpr Color to_byte_values(Color col) noexcept {
-    const float MAX = 255;
+    constexpr float MAX = PPM_MAX_BYTE_VALUE;
     return color(std::clamp(std::round(col.r * MAX), 0.0f, MAX),
         std::clamp(std::round(col.g * MAX), 0.0f, MAX),
         std::clamp(std::round(col.b * MAX), 0.0f, MAX));
-}
-
-std::string to_rgb_bytes(Color col) {
-    const auto out = to_byte_values(col);
-    return std::format("{} {} {}", out.r, out.g, out.b);
 }
 
 constexpr bool is_vector(Tuple t) noexcept { return t.w == 0; }

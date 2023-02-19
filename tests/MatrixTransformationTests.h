@@ -3,6 +3,8 @@
 #include "../Matrix.h"
 #include "../Tuple.h"
 
+DISABLE_WARNINGS_FROM_GTEST
+
 TEST(TransformationMatrix, translation) {    
     const Matrix4 transform = translation(5,-3,2);
     const auto p = point(-3, 4, 5);
@@ -155,31 +157,33 @@ TEST(TransformationMatrix, chainedTransformsAreAppliedInReverse) {
     EXPECT_EQ(result, point(15.0f, 0.0f, 7.0f));    
 }
 TEST(RotationMatrix, aroundX) {
-    const auto radians = math::PI / 4.0f;
+    constexpr auto radians = math::PI / 4.0f;
     const auto result = rotation(radians, 0.0f, 0.0f);
     const auto expected = rotation_x(radians);
     EXPECT_EQ(result, expected);    
 }
 
 TEST(RotationMatrix, aroundY) {
-    const auto radians = math::PI / 4.0f;
+    constexpr auto radians = math::PI / 4.0f;
     const auto result = rotation(0.0f, radians, 0.0f);
     const auto expected = rotation_y(radians);
     EXPECT_EQ(result, expected);    
 }
 
 TEST(RotationMatrix, aroundZ) {
-    const auto radians = math::PI / 4.0f;
+    constexpr auto radians = math::PI / 4.0f;
     const auto result = rotation(0.0f, 0.0f, radians);
     const auto expected = rotation_z(radians);
     EXPECT_EQ(result, expected);    
 }
 
 TEST(RotationMatrix, aroundAllAxis) {
-    const auto radians_x = math::PI / 4.0f;
-    const auto radians_y = math::PI / 3.0f;
-    const auto radians_z = math::PI / 6.0f;
+    constexpr auto radians_x = math::PI / 4.0f;
+    constexpr auto radians_y = math::PI / 3.0f;
+    constexpr auto radians_z = math::PI / 6.0f;
     const auto result = rotation(radians_x, radians_y, radians_z);    
     const auto expected = rotation_x(radians_x) * rotation_y(radians_y) * rotation_z(radians_z);
     EXPECT_EQ(result, expected);    
 }
+
+RESTORE_WARNINGS

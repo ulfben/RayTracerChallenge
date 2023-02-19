@@ -18,12 +18,14 @@ struct World final {
     container objects;    
     Light light = point_light(point(-10, 10, -10), WHITE);    
     
-    constexpr World() noexcept {                
-        auto s1 = sphere(DEFAULT_WORLD_MATERIAL); 
+    constexpr World() noexcept {                        
         auto s2 = sphere();
         s2.transform = scaling(0.5f, 0.5f, 0.5f);
-        objects.push_back(s1); 
-        objects.push_back(s2);
+        try {
+            objects.push_back(sphere(DEFAULT_WORLD_MATERIAL));
+            objects.push_back(s2);
+        }
+        catch (...) {/*swallow. default world will be empty.*/}
     }
     constexpr bool contains(const value_type& object) const noexcept {        
         return std::ranges::find(objects, object) != std::end(objects);

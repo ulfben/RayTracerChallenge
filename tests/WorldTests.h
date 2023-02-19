@@ -3,10 +3,12 @@
 #include "../World.h"
 #include "../Ray.h"
 
+DISABLE_WARNINGS_FROM_GTEST
+
 TEST(World, hasDefaultWorld) {
   const auto w = World();
-  auto s0 = sphere();
-  auto s1 = sphere(World::DEFAULT_WORLD_MATERIAL); 
+  constexpr auto s0 = sphere();
+  constexpr auto s1 = sphere(World::DEFAULT_WORLD_MATERIAL); 
   auto s2 = sphere();
   s2.transform = scaling(0.5f, 0.5f, 0.5f);    
   EXPECT_FALSE(w.contains(s0));
@@ -69,3 +71,4 @@ TEST(World, colorWhenHitBehindRay) {
     EXPECT_EQ(col, w[1].surface.color);
 }
 
+RESTORE_WARNINGS

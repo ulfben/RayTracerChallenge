@@ -4,41 +4,43 @@
 #include "../Matrix.h"
 #include "../Sphere.h"
 
+DISABLE_WARNINGS_FROM_GTEST
+
 TEST(Sphere, hasTransform) {
-    auto s = sphere(point(0, 0, 0), 1.0f);
+    constexpr auto s = sphere(point(0, 0, 0), 1.0f);
     EXPECT_EQ(s.transform, Matrix4Identity);
 }
 
 TEST(Sphere, normalAtAPointOnXAxis) {
-    auto s = sphere(point(0, 0, 0), 1.0f);
+    constexpr auto s = sphere(point(0, 0, 0), 1.0f);
     const auto result = normal_at(s, point(1, 0, 0));
     const auto expected = vector(1, 0, 0);
     EXPECT_EQ(result, expected);
 }
 
 TEST(Sphere, normalAtAPointOnYAxis) {
-    auto s = sphere(point(0, 0, 0), 1.0f);
+    constexpr auto s = sphere(point(0, 0, 0), 1.0f);
     const auto result = normal_at(s, point(0, 1, 0));
     const auto expected = vector(0, 1, 0);
     EXPECT_EQ(result, expected);
 }
 
 TEST(Sphere, normalAtAPointOnZAxis) {
-    auto s = sphere(point(0, 0, 0), 1.0f);
+    constexpr auto s = sphere(point(0, 0, 0), 1.0f);
     const auto result = normal_at(s, point(0, 0, 1));
     const auto expected = vector(0, 0, 1);
     EXPECT_EQ(result, expected);
 }
 
 TEST(Sphere, normalAtANonAxialPoint) {
-    auto s = sphere(point(0, 0, 0), 1.0f);
+    constexpr auto s = sphere(point(0, 0, 0), 1.0f);
     constexpr auto v = math::sqrt(3.0f) / 3.0f;
     const auto result = normal_at(s, point(v, v, v));
     const auto expected = vector(v, v, v);
     EXPECT_EQ(result, expected);
 }
 TEST(Sphere, normalIsANormalizedVector) {
-    auto s = sphere(point(0, 0, 0), 1.0f);
+    constexpr auto s = sphere(point(0, 0, 0), 1.0f);
     constexpr auto v = math::sqrt(3) / 3.0f;
     const auto result = normal_at(s, point(v, v, v));
     const auto expected = normalize(result);
@@ -74,7 +76,7 @@ TEST(Matrial, canBeDefaultConstructed) {
 }
 
 TEST(Sphere, hasADefaultMaterial) {    
-    auto s = sphere();    
+    constexpr auto s = sphere();    
     EXPECT_EQ(s.surface, material());
 }
 
@@ -85,3 +87,5 @@ TEST(Sphere, canBeAssignedMaterial) {
     s.surface = surface;
     EXPECT_EQ(s.surface, surface);
 }
+
+RESTORE_WARNINGS

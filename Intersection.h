@@ -68,7 +68,7 @@ struct Intersections final {
 
     constexpr pointer data() noexcept { return xs.data(); }
     constexpr const_pointer data() const noexcept { return xs.data(); }
-    constexpr size_type size() const noexcept { return static_cast<size_type>(xs.size()); }
+    constexpr size_type size() const noexcept { return narrow_cast<size_type>(xs.size()); }
     constexpr size_type count() const noexcept { return size(); }
     constexpr bool empty() const noexcept { return xs.empty(); }
     constexpr iterator begin() noexcept { return xs.begin(); }

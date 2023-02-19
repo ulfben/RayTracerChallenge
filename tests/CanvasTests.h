@@ -4,6 +4,8 @@
 #include "../Canvas.h"
 #include "../StringHelpers.h"
 
+DISABLE_WARNINGS_FROM_GTEST
+
 TEST(Canvas, hasWidthHeightAndColor) {
   const auto canvas = Canvas(10, 20);
   EXPECT_EQ(canvas.width(), (Canvas::size_type)10);
@@ -82,3 +84,5 @@ TEST(Canvas, PPMIsTerminatedByNewline) {
   const auto output = canvas.to_ppm();
   EXPECT_EQ('\n', output.back());
 }
+
+RESTORE_WARNINGS

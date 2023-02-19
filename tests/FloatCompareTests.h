@@ -36,6 +36,7 @@ static constexpr auto NEG_INF = -INF;
 static constexpr Real QNAN = std::numeric_limits<Real>::quiet_NaN();
 using math::float_cmp;
 
+DISABLE_WARNINGS_FROM_GTEST
 
  // Regular large numbers - generally not problematic 
 TEST(float_cmp, big) {
@@ -185,3 +186,5 @@ TEST(float_cmp, ulp) {
     EXPECT_FALSE(float_cmp(MIN, 0.000000001f));
     EXPECT_FALSE(float_cmp(-MIN, 0.000000001f));
 }
+
+RESTORE_WARNINGS

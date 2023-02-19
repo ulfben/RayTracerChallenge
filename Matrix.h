@@ -5,6 +5,8 @@
 
 template <uint8_t ROWS_, uint8_t COLUMNS_> 
 struct Matrix final {
+    #pragma warning(push)
+    #pragma warning(disable: 26481 26482) //"bounds.2: only index arays with constant expressions". 
     static_assert(ROWS_ > 0 && COLUMNS_ > 0 && "Matrix dimensions must be non-zero.");
     static_assert((uint16_t(ROWS_) * COLUMNS_) < std::numeric_limits<uint8_t>::max(), "Matrix is limited to 255 elements.");
     using value_type = Real;
@@ -63,9 +65,9 @@ struct Matrix final {
     constexpr const_pointer data() const noexcept { return &_data[0]; }
     constexpr size_type size() const noexcept { return columns() * rows(); }
     constexpr iterator begin() noexcept { return data(); }
-    constexpr iterator end() noexcept { return begin() + size(); }
+    constexpr iterator end() noexcept { return std::end(_data); }
     constexpr const_iterator begin() const noexcept { return data(); }
-    constexpr const_iterator end() const noexcept { return begin() + size(); }   
+    constexpr const_iterator end() const noexcept { return std::end(_data); }   
 
     static constexpr auto identity() noexcept {
         static_assert(ROWS_ == COLUMNS_, "Matrix::identity only supports square matrixes");
@@ -75,6 +77,7 @@ struct Matrix final {
         }
         return result;
     }
+    #pragma warning(pop)
 };
 template<typename> constexpr bool is_matrix = false;
 template <std::size_t ROWS, std::size_t COLUMNS>

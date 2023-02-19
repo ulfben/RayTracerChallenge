@@ -11,6 +11,8 @@ class Phong : public ::testing::Test {
      Vector normal = vector(0, 0, -1);
 };
 
+DISABLE_WARNINGS_FROM_GTEST
+
 TEST_F(Phong, lightingWithEyeBetweenLightAndSurface) {
     const Vector eye = vector(0, 0, -1);    
     const auto light = point_light(point(0, 0, -10), WHITE);
@@ -47,3 +49,5 @@ TEST_F(Phong, lightingWithEyeBehindTheSurface) {
     const auto result = lighting(surface, light, position, eye, normal);
     EXPECT_EQ(result, color(0.1f, 0.1f, 0.1f)); //only the ambient component remains
 }
+
+RESTORE_WARNINGS
