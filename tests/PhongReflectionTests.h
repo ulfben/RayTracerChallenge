@@ -65,19 +65,19 @@ TEST_F(Phong, noShadowWhenNothingIsCollinearWithPointAndLight) {
 }
 
 TEST_F(Phong, inShadowWhenObjectIsBetweenPointAndLight) {
-    const auto w = World(); //default world puts light at point(-10, 10, -10) and unit spheres at origo.
+    const auto w = World(); 
     const auto p = point(10, -10, 10);  //our point is opposite the light, with spheres in between 
     EXPECT_TRUE(is_shadowed(w, p));
 }
 
 TEST_F(Phong, noShadowWhenObjectIsBehindTheLight) {
-    const auto w = World(); //default world puts light at point(-10, 10, -10) and unit spheres at origo.
+    const auto w = World(); 
     const auto p = point(-20, 20, -20);  //our point far behind the light
     EXPECT_FALSE(is_shadowed(w, p));
 }
 
 TEST_F(Phong, noShadowWhenObjectIsBehindThePoint) {
-    const auto w = World(); //default world puts light at point(-10, 10, -10) and unit spheres at origo.
+    const auto w = World(); 
     const auto p = point(-2, 2, -2);  //our point far behind the light
     EXPECT_FALSE(is_shadowed(w, p));
 }

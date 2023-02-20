@@ -147,6 +147,7 @@ template<class T>
 struct HitState final { //"prepared computations", name to be figured out. 
     const T* objectPtr = nullptr; //the object we hit    
     Point point{}; //the point in world-space where the intersection occurs
+    Point over_point{}; //slightly nudged point to avoid intersection precision errors causing "acne"
     Vector eye_v{}; //inverted, pointing back towards the camera
     Vector normal{}; //the normal of the point 
     Real t{ 0 }; //distance to hit
@@ -159,6 +160,8 @@ struct HitState final { //"prepared computations", name to be figured out.
             inside = true;
             normal = -normal;
         }
+        //move the point VERY SLIGHTLY along the normal, to help with shading
+        over_point = point + normal * std::numeric_limits<Real>::epsilon();
     }
 
     explicit constexpr operator bool() const noexcept {
@@ -189,10 +192,10 @@ constexpr bool is_shadowed(const World& w, const Point& p){
 
 template<class T>
 constexpr Color shade_hit(const World& w, const HitState<T>& hit) noexcept {
-    /*if (is_shadowed(w, hit.point)) {
+    if (is_shadowed(w, hit.over_point)) {
         return lighting_shadow(hit.surface(), w.light);
-    }*/
-    return lighting(hit.surface(), w.light, hit.point, hit.eye_v, hit.normal);
+    }
+    return lighting(hit.surface(), w.light, hit.over_point, hit.eye_v, hit.normal);
 }
 
 constexpr Color color_at(const World& w, const Ray& r) noexcept {

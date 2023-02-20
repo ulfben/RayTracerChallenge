@@ -203,4 +203,15 @@ TEST(Intersections, stateIncludesInside2) {
     EXPECT_EQ(hit.normal, vector(0, 0, -1));
 }
 
+TEST(Intersections, stateIncludesOffsetPoint) {
+    const auto r = ray(point(0, 0, -5), vector(0, 0, 1));
+    auto s = sphere(point(0, 0, 0), 1.0f);
+    s.transform = translation(0,0,1);
+    const auto i1 = intersection(5, s);
+    const auto hit = prepare_computations(i1, r);
+    EXPECT_TRUE(hit);
+    EXPECT_LT(hit.over_point.z, -std::numeric_limits<Real>::epsilon()/2); //half of -EPSILON, to make sure over_point has been adjusted in the correction direction
+    EXPECT_GT(hit.point.z, hit.over_point.z); 
+}
+
 RESTORE_WARNINGS
