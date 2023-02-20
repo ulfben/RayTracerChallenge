@@ -4,13 +4,14 @@
 
 template<class T>
 struct Intersection final {
-    const T* objPtr;
+    const T* objPtr = nullptr;
     Real t{ 0 };
 
     explicit constexpr operator bool() const noexcept {
-        return t != 0;
+        return objPtr != nullptr;
     }
     constexpr const T& object() const noexcept {
+        assert(objPtr != nullptr);
         return *objPtr;
     }
     constexpr const Material& surface() const noexcept {
@@ -123,7 +124,7 @@ constexpr auto intersect(const World& world, const Ray& r) noexcept {
 };
 
 //TODO: limit template argument to Interactions-struct
-//TODO: consider an alternative algo: remove + min_element
+//TODO: consider an alternative algorithm: remove + min_element
 template <class Intersections>
 constexpr auto closest(const Intersections& xs) noexcept {
     using value_type = Intersections::value_type;
@@ -177,8 +178,20 @@ constexpr HitState<T> prepare_computations(const Intersection<T>& i, const Ray& 
     return HitState(i, r);
 }
 
+constexpr bool is_shadowed(const World& w, const Point& p){
+    const auto v = w.light.position - p;
+    const auto distance = magnitude(v);
+    const auto direction = normalize(v);
+    const auto r = ray(p, direction); //ray from point towards light source
+    const auto hit = closest(intersect(w, r));
+    return (hit && hit.t < distance); //something is between us and the light.
+}
+
 template<class T>
 constexpr Color shade_hit(const World& w, const HitState<T>& hit) noexcept {
+    /*if (is_shadowed(w, hit.point)) {
+        return lighting_shadow(hit.surface(), w.light);
+    }*/
     return lighting(hit.surface(), w.light, hit.point, hit.eye_v, hit.normal);
 }
 

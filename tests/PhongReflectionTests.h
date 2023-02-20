@@ -54,8 +54,31 @@ TEST_F(Phong, lightingWithSurfaceInShadow) {
     const Vector eyev = vector(0, 0, -1);
     const Vector normalv = vector(0, 0, -1);
     const auto light = point_light(point(0, 0, -10), WHITE);
-    const auto result = lighting_shadow(surface, light, position, eyev, normalv);
+    const auto result = lighting_shadow(surface, light);
     EXPECT_EQ(result, color(0.1f, 0.1f, 0.1f)); //only the ambient component remains
 }
 
+TEST_F(Phong, noShadowWhenNothingIsCollinearWithPointAndLight) {
+    const auto w = World(); //default world puts light at point(-10, 10, -10) and unit spheres at origo.
+    const auto p = point(0, 10, 0);  //our point is well above the sphere.      
+    EXPECT_FALSE(is_shadowed(w, p));
+}
+
+TEST_F(Phong, inShadowWhenObjectIsBetweenPointAndLight) {
+    const auto w = World(); //default world puts light at point(-10, 10, -10) and unit spheres at origo.
+    const auto p = point(10, -10, 10);  //our point is opposite the light, with spheres in between 
+    EXPECT_TRUE(is_shadowed(w, p));
+}
+
+TEST_F(Phong, noShadowWhenObjectIsBehindTheLight) {
+    const auto w = World(); //default world puts light at point(-10, 10, -10) and unit spheres at origo.
+    const auto p = point(-20, 20, -20);  //our point far behind the light
+    EXPECT_FALSE(is_shadowed(w, p));
+}
+
+TEST_F(Phong, noShadowWhenObjectIsBehindThePoint) {
+    const auto w = World(); //default world puts light at point(-10, 10, -10) and unit spheres at origo.
+    const auto p = point(-2, 2, -2);  //our point far behind the light
+    EXPECT_FALSE(is_shadowed(w, p));
+}
 RESTORE_WARNINGS
