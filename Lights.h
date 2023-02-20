@@ -27,23 +27,24 @@ constexpr Material material(Color c, Real ambient = 0.1f, Real diffuse = 0.9f, R
     return Material{c, ambient, diffuse, specular, shininess};    
 }
 
-constexpr Color lighting(const Material& surface, const Light& light, const Point& p, const Vector& eye, const Vector& normal) noexcept {    
+constexpr Color lighting(const Material& surface, const Light& light, const Point& p, const Vector& eye, const Vector& normal, bool in_shadow = false) noexcept {
     const auto effective_color = surface.color * light.intensity;
     const auto direction_to_light = normalize(light.position - p);
-    const Color ambient = effective_color * surface.ambient;
-    Color diffuse{}; //black by default
-    Color specular{};
-    //light dot normal, if negative, means the light is on the opposide side of the surface, so the diffuse and specular component will be 0
-    if (const auto light_dot_normal = dot(direction_to_light, normal); light_dot_normal >= 0) {
-        diffuse = effective_color * surface.diffuse * light_dot_normal;
-        //reflection dot eye, if negative, means the light reflects away from the eye, so the specular component will be 0.
-        const auto reflection_v = reflect(-direction_to_light, normal);
-        if (const auto reflect_dot_eye = dot(reflection_v, eye); reflect_dot_eye > 0.0f) {
-            const auto factor = std::pow(reflect_dot_eye, surface.shininess);
-            specular = light.intensity * surface.specular * factor;
-        } /*else: specular is 0*/
-
-    } /*else: diffuse and specular are both 0*/
+    const auto ambient = effective_color * surface.ambient;
+    const auto light_dot_normal = dot(direction_to_light, normal);
+    if (light_dot_normal <= 0 || in_shadow) {
+        return ambient; //light dot normal, if negative, means the light is on the opposite side of the surface, so both the diffuse and specular component will be 0
+    }
+    const auto diffuse = effective_color * surface.diffuse * light_dot_normal;
+    const auto reflection_v = reflect(-direction_to_light, normal);
+    //reflection vector dot eye vector, if negative, means the light reflects away from the eye, so the specular component will be 0.
+    const auto specular = light.intensity * surface.specular * std::pow(std::max(dot(reflection_v, eye), 0.0f), surface.shininess);
     return ambient + diffuse + specular;
+}
+
+constexpr Color lighting_shadow(const Material& surface, const Light& light) noexcept {    
+    const auto effective_color = surface.color * light.intensity;    
+    const auto ambient = effective_color * surface.ambient;
+    return ambient; //we're in shadow, so no diffuse or specular contribution needed.
 }
 

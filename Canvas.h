@@ -108,3 +108,8 @@ private:
         }
     };
 };
+
+void save_to_file(const Canvas& img, std::string_view path) {
+    std::ofstream ofs(path.data(), std::ofstream::out);
+    ofs << img.to_ppm();
+}

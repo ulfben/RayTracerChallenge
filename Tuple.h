@@ -37,7 +37,9 @@ constexpr Color color(Real r, Real g, Real b) noexcept {
 }
 static constexpr Color BLACK = color(0, 0, 0);
 static constexpr Color WHITE = color(1, 1, 1);
-
+static constexpr Color RED = color(1, 0, 0);
+static constexpr Color GREEN = color(0, 1, 0);
+static constexpr Color BLUE = color(0, 0, 1);
 
 #pragma warning(push)
 #pragma warning( disable : 4201 )

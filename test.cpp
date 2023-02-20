@@ -17,164 +17,105 @@
 #include "tests/WorldTests.h"
 #include "tests/CameraTests.h"
 
-//TEST(Chapter2, CanOutputPPM) {
-//    auto c = Canvas(300, 300);
-//    const auto bottomEdge = static_cast<Real>(c.height());
-//    const auto vel = normalize(vector(1, -1.8f, 0)) * 11.25f;
-//    auto p = Projectile(point(0, bottomEdge, 0), vel);
-//    while (p.y() <= bottomEdge) {
-//        p.update();
-//        p.render(c);
-//    }
-//    std::ofstream ofs("output/chapter2.ppm", std::ofstream::out);
-//    ofs << c.to_ppm();
-//    EXPECT_TRUE(true);
-//}
+TEST(DISABLED_Chapter2, CanOutputPPM) {    
+    auto c = Canvas(300, 300);
+    const auto bottomEdge = static_cast<Real>(c.height());
+    const auto vel = normalize(vector(1, -1.8f, 0)) * 11.25f;
+    auto p = Projectile(point(0, bottomEdge, 0), vel);
+    while (p.y() <= bottomEdge) {
+        p.update();
+        p.render(c);
+    }
+    save_to_file(c, "output/chapter2.ppm"sv);    
+}
 
+TEST(DISABLED_Chapter4, CanCenterOrigo) {    
+    auto c = Canvas(200, 200);
+    const auto origo = point(c.widthf() / 2, c.heightf() / 2, 0);        
+    c.set(origo, GREEN); 
+    save_to_file(c, "output/chapter4_0.ppm"sv);          
+}
 
-//TEST(Chapter4, CanCenterOrigo) {
-//    const auto GREEN = color(0, 1, 0);
-//    auto c = Canvas(200, 200);
-//    const auto origo = point(c.widthf() / 2, c.heightf() / 2, 0);        
-//    c.set(origo, GREEN);    
-//    std::ofstream ofs("output/chapter4_0.ppm", std::ofstream::out);
-//    ofs << c.to_ppm();   
-//}
-//
-//TEST(Chapter4, CanDrawTwelveOClock) {
-//    const auto RED = color(1, 0, 0);
-//    const auto GREEN = color(0, 1, 0);    
-//    auto c = Canvas(200, 200);
-//    const auto origo = point(c.widthf() / 2, c.heightf() / 2, 0);        
-//    c.set(origo, GREEN);        
-//    const auto dist = c.widthf() * 0.375f;        
-//    const auto twelve = point(0, -dist, 0);
-//    c.set(twelve+origo, RED);    
-//    std::ofstream ofs("output/chapter4_1.ppm", std::ofstream::out);
-//    ofs << c.to_ppm();   
-//}
-//
-//TEST(Chapter4, CanDraw12_3_6_9) {
-//    const auto RED = color(1, 0, 0);    
-//    const auto GREEN = color(0, 1, 0);
-//    auto c = Canvas(200, 200);
-//    const auto origo = point(c.widthf() / 2, c.heightf() / 2, 0);        
-//    c.set(origo, GREEN);        
-//    const auto dist = c.widthf() * 0.375f;        
-//    const auto twelve = translation(0, -dist, 0);
-//    const auto three = translation(dist, 0, 0);
-//    const auto six = translation(0, dist, 0);
-//    const auto nine = translation(-dist, 0, 0);
-//    c.set(twelve*origo, RED);  
-//    c.set(three*origo, RED);  
-//    c.set(six*origo, RED);  
-//    c.set(nine*origo, RED);             
-//    std::ofstream ofs("output/chapter4_2.ppm", std::ofstream::out);
-//    ofs << c.to_ppm();  
-//}
+TEST(DISABLED_Chapter4, CanDrawTwelveOClock) {    
+    auto c = Canvas(200, 200);
+    const auto origo = point(c.widthf() / 2, c.heightf() / 2, 0);        
+    c.set(origo, GREEN);        
+    const auto dist = c.widthf() * 0.375f;        
+    const auto twelve = point(0, -dist, 0);
+    c.set(twelve+origo, RED);        
+    save_to_file(c, "output/chapter4_1.ppm"sv);      
+}
 
-//TEST(Chapter4, CanDraw12_3_6_9Dynamically) {
-//    const auto RED = color(1, 0, 0);    
-//    const auto GREEN = color(0, 1, 0);
-//    const auto WHITE = WHITE;
-//    auto c = Canvas(200, 200);
-//    const auto origo = point(c.widthf() / 2, c.heightf() / 2, 0);        
-//    c.set(origo, GREEN);        
-//    const auto dist = c.widthf()*0.375f;        
-//    const auto twelve = point(0, -dist, 0);
-//    const auto three = point(dist, 0, 0);
-//    const auto six = point(0, dist, 0);
-//    const auto nine = point(-dist, 0, 0);
-//    c.set(twelve+origo, RED);  
-//    c.set(three+origo, RED);  
-//    c.set(six+origo, RED);  
-//    c.set(nine+origo, RED); 
-//        
-//    const auto angle = (math::TWO_PI / 4.0f);//full circle is 2xPI, divide by the four cardinal directions
-//    for (auto i = 0; i < 4; ++i) {
-//        const auto rot = rotation_z(static_cast<float>(i) * angle);//full cirle is 2*PI. 12 slices = 2*PI/12 = PI/6.
-//        const auto p = rot * twelve;        
-//        c.set(p + origo, WHITE);
-//    }
-//    std::ofstream ofs("output/chapter4_3.ppm", std::ofstream::out);
-//    ofs << c.to_ppm();  
-//}
+TEST(DISABLED_Chapter4, CanDrawClock) {
+    auto c = Canvas(200, 200);
+    const auto origo = point(c.widthf() / 2, c.heightf() / 2, 0);                 
+    const auto dist = c.widthf()*0.375f; 
+    const auto trans = translation(origo);
+    const auto twelve = point(0, -dist, 0);
+    const auto angle = (math::TWO_PI / 12.0f);//full circle is 2xPI, clock face has 12 positions. 
+    for (auto i = 0; i < 12; ++i) {
+        const auto rot = rotation_z(static_cast<float>(i) * angle);         
+        const auto p = trans * rot * twelve;
+        c.set(p, WHITE);
+    }
+    save_to_file(c, "output/chapter4_4.ppm"sv);    
+}
 
-//TEST(Chapter4, CanDrawClock) {       
-//    const auto WHITE = WHITE;
-//    auto c = Canvas(200, 200);
-//    const auto origo = point(c.widthf() / 2, c.heightf() / 2, 0);                 
-//    const auto dist = c.widthf()*0.375f; 
-//    const auto trans = translation(origo);
-//    const auto twelve = point(0, -dist, 0);
-//    const auto angle = (math::TWO_PI / 12.0f);//full circle is 2xPI, clock face has 12 positions. 
-//    for (auto i = 0; i < 12; ++i) {
-//        const auto rot = rotation_z(static_cast<float>(i) * angle);         
-//        const auto p = trans * rot * twelve;
-//        c.set(p, WHITE);
-//    }
-//    std::ofstream ofs("output/chapter4_4.ppm", std::ofstream::out);
-//    ofs << c.to_ppm();  
-//}
+TEST(DISABLED_Chapter5, CanRenderSilhouetteOfASphere) {       
+    using size_type = Canvas::size_type;
+    auto c = Canvas(100, 100);
+    const auto shape = sphere();    
+    const auto ray_origin = point(0, 0, -5);    
+    const auto wall_z = 10.0f;
+    const auto wall_size = 7.0f;
+    const auto wall_center = wall_size / 2.0f;    
+    const auto pixel_size = wall_size / c.widthf(); //assuming canvas is square
+    for (size_type y = 0; y < c.width(); ++y) {
+        const auto world_y = wall_center - pixel_size * y;
+        for (size_type x = 0; x < c.height(); ++x) {
+            const auto world_x = wall_center - pixel_size * x;
+            const auto target_pos = point(world_x, world_y, wall_z);
+            const auto r = ray(ray_origin, normalize(target_pos - ray_origin));
+            const auto xs = intersect(shape, r);
+            if (closest(xs)) {
+                c.set(x, y, RED);
+            }
+        }
+    }
+    save_to_file(c, "output/chapter5_0.ppm"sv);    
+}
 
-//TEST(Chapter5, CanRenderSilhouetteOfASphere) {       
-//    using size_type = Canvas::size_type;
-//    auto c = Canvas(100, 100);
-//    const auto shape = sphere();
-//    const auto RED = color(1, 0, 0);
-//    const auto ray_origin = point(0, 0, -5);    
-//    const auto wall_z = 10.0f;
-//    const auto wall_size = 7.0f;
-//    const auto wall_center = wall_size / 2.0f;    
-//    const auto pixel_size = wall_size / c.widthf(); //assuming canvas is square
-//    for (size_type y = 0; y < c.width(); ++y) {
-//        const auto world_y = wall_center - pixel_size * y;
-//        for (size_type x = 0; x < c.height(); ++x) {
-//            const auto world_x = wall_center - pixel_size * x;
-//            const auto target_pos = point(world_x, world_y, wall_z);
-//            const auto r = ray(ray_origin, normalize(target_pos - ray_origin));
-//            const auto xs = intersect(shape, r);
-//            if (hit(xs)) {
-//                c.set(x, y, RED);
-//            }
-//        }
-//    }
-//    std::ofstream ofs("output/chapter5_0.ppm", std::ofstream::out);
-//    ofs << c.to_ppm();  
-//}
+TEST(DISABLED_Chapter6, CanRenderPhongShadedSphere) {       
+    using size_type = Canvas::size_type;
+    auto c = Canvas(100, 100);
+    auto shape = sphere();
+    shape.surface.color = color(1, 0.2f, 1);        
+    const auto light = point_light(point(10, 10, -10), WHITE);
+    const auto ray_origin = point(0, 0, -5);    
+    const auto wall_z = 10.0f;
+    const auto wall_size = 7.0f;
+    const auto wall_center = wall_size / 2.0f;    
+    const auto pixel_size = wall_size / c.widthf(); //assuming canvas is square
+    for (size_type y = 0; y < c.width(); ++y) {
+        const auto world_y = wall_center - pixel_size * y;
+        for (size_type x = 0; x < c.height(); ++x) {
+            const auto world_x = wall_center - pixel_size * x;
+            const auto target_pos = point(world_x, world_y, wall_z);
+            const auto r = ray(ray_origin, normalize(target_pos - ray_origin));
+            const auto xs = intersect(shape, r);            
+            if (const auto hit = closest(xs)) {
+                const auto point = position(r , hit.t); 
+                const auto normal = normal_at(hit.object(), point);
+                const auto eye = -r.direction; 
+                const auto color = lighting(hit.surface(), light, point, eye, normal);
+                c.set(x, y, color);
+            }
+        }
+    }
+    save_to_file(c, "output/chapter6_2.ppm"sv);    
+}
 
-//TEST(Chapter6, CanRenderPhongShading) {       
-//    using size_type = Canvas::size_type;
-//    auto c = Canvas(100, 100);
-//    auto shape = sphere();
-//    shape.surface.color = color(1, 0.2f, 1);        
-//    const auto light = point_light(point(10, 10, -10), WHITE);
-//    const auto ray_origin = point(0, 0, -5);    
-//    const auto wall_z = 10.0f;
-//    const auto wall_size = 7.0f;
-//    const auto wall_center = wall_size / 2.0f;    
-//    const auto pixel_size = wall_size / c.widthf(); //assuming canvas is square
-//    for (size_type y = 0; y < c.width(); ++y) {
-//        const auto world_y = wall_center - pixel_size * y;
-//        for (size_type x = 0; x < c.height(); ++x) {
-//            const auto world_x = wall_center - pixel_size * x;
-//            const auto target_pos = point(world_x, world_y, wall_z);
-//            const auto r = ray(ray_origin, normalize(target_pos - ray_origin));
-//            const auto xs = intersect(shape, r);            
-//            if (const auto hit = closest(xs)) {
-//                const auto point = position(r , hit.t); 
-//                const auto normal = normal_at(hit.object(), point);
-//                const auto eye = -r.direction; 
-//                const auto color = lighting(hit.surface(), light, point, eye, normal);
-//                c.set(x, y, color);
-//            }
-//        }
-//    }
-//    std::ofstream ofs("output/chapter6_2.ppm", std::ofstream::out);
-//    ofs << c.to_ppm();  
-//}
-
-TEST(Chapter7, CanRenderScene) {
+TEST(DISABLED_Chapter7, CanRenderScene) {
     using size_type = Canvas::size_type;
     auto c = Camera(400, 200, math::PI / 3);
     c.transform = view_transform(point(0.0f, 1.5f, -5.0f), point(0, 1, 0), vector(0, 1, 0));
@@ -218,6 +159,5 @@ TEST(Chapter7, CanRenderScene) {
     world.light = point_light(point(-10, 10, -10), color(1,1,1));
     
     const auto img = render(c, world);    
-    std::ofstream ofs("output/chapter7_1.ppm", std::ofstream::out);
-    ofs << img.to_ppm();  
+    save_to_file(img, "output/chapter7_1.ppm"sv);    
 }
