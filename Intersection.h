@@ -160,8 +160,8 @@ struct HitState final { //"prepared computations", name to be figured out.
             inside = true;
             normal = -normal;
         }
-        //move the point VERY SLIGHTLY along the normal, to help with shading
-        over_point = point + (normal * 0.005f);
+        //move the point VERY SLIGHTLY along the normal, to avoid the shadow ray intersecting with our own surface
+        over_point = point + (normal * math::SHADOW_BIAS);
     }
 
     explicit constexpr operator bool() const noexcept {
@@ -195,7 +195,7 @@ constexpr Color shade_hit(const World& w, const HitState<T>& hit) noexcept {
     if (is_shadowed(w, hit.over_point)) {
         return lighting_shadow(hit.surface(), w.light);
     }
-    return lighting(hit.surface(), w.light, hit.over_point, hit.eye_v, hit.normal);
+    return lighting(hit.surface(), w.light, hit.point, hit.eye_v, hit.normal);
 }
 
 constexpr Color color_at(const World& w, const Ray& r) noexcept {

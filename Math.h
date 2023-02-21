@@ -44,6 +44,7 @@ namespace math {
             : std::numeric_limits<Real>::quiet_NaN();
     }
 
+    static constexpr auto SHADOW_BIAS = 0.005f; //to avoid shadow acne due to spurious self-intersections
     static constexpr auto BOOK_EPSILON = 0.0001f; //1.0e-4f, value suggested as "good enough" by the book.
     static constexpr auto BRAZZY_EPSILON = 0.00001f; //1.0e-5f, https://github.com/brazzy/floating-point-gui.de    
     static constexpr auto GTEST_EPSILON = 0.000001f;// 1.0e-6f; //from Google Test

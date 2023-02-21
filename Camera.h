@@ -63,7 +63,7 @@ Canvas render(const Camera& camera, const World& world) {
     using size_type = Canvas::size_type;
     Canvas canvas(narrow_cast<size_type>(camera.hsize), narrow_cast<size_type>(camera.vsize));
     auto worker = WorkQue();           
-    const size_type partition_size = canvas.height() / worker.thread_count();    
+    const size_type partition_size = canvas.height() / narrow_cast<size_type>(worker.thread_count());    
     for (size_type i = 0; i < worker.thread_count(); ++i) {
         const size_type start = i * partition_size;
         const size_type end = (i + 1) * partition_size;
