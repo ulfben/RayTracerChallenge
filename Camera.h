@@ -8,25 +8,26 @@
 #include "WorkQue.h"
 
 struct Camera final{
+    using size_type = Canvas::size_type;
     Matrix4 transform = Matrix4Identity;        
-    Real hsize = 160; 
-    Real vsize = 120; 
     Real field_of_view = math::PI;
     Real half_width = 0; 
     Real half_height = 0;
     Real pixel_size = 0; 
-
-    /*constexpr*/ Camera(Real hsize_, Real vsize_, Real field_of_view_) noexcept 
-        : hsize(hsize_), vsize(vsize_), field_of_view(field_of_view_) {
-        const Real half_view = std::tan(field_of_view / 2.0f); //TODO: constexpr tan
-        if(const Real aspect = hsize / vsize; aspect >= 1){
+    size_type width = 160; //horizontal size, in pixels
+    size_type height = 120; //vertical size, in pixels
+   
+    /*constexpr*/ Camera(size_type hsize_, size_type vsize_, Real field_of_view_) noexcept 
+        : field_of_view(field_of_view_), width(hsize_), height(vsize_) {
+        const auto half_view = narrow_cast<size_type>(std::tan(field_of_view / 2.0f)); //TODO: constexpr tan
+        if(const Real aspect = float(width) / height; aspect >= 1){
             half_width = half_view;
             half_height = half_view / aspect;
         }else{
             half_width = half_view * aspect;
             half_height = half_view;
         }
-        pixel_size = (half_width * 2) / hsize;
+        pixel_size = half_width * 2 / width;
     }
 };
 
@@ -49,7 +50,7 @@ constexpr Ray ray_for_pixel(const Camera& c, Real px, Real py) noexcept{
 
 constexpr Canvas render_single_threaded(const Camera& camera, const World& w) {
     using size_type = Canvas::size_type;
-    Canvas img(narrow_cast<size_type>(camera.hsize), narrow_cast<size_type>(camera.vsize));
+    Canvas img(camera.width, camera.height);
     for(size_type y = 0; y < img.height(); ++y){
         for (size_type x = 0; x < img.width(); ++x) {
             const auto color = color_at(w, ray_for_pixel(camera, x, y));
@@ -59,11 +60,12 @@ constexpr Canvas render_single_threaded(const Camera& camera, const World& w) {
     return img;
 }
 
+//TODO: ensure we deal with the case canvas.height() not being evenly divisible by thread_count.
 Canvas render(const Camera& camera, const World& world) {
     using size_type = Canvas::size_type;
-    Canvas canvas(narrow_cast<size_type>(camera.hsize), narrow_cast<size_type>(camera.vsize));
-    auto worker = WorkQue();           
-    const size_type partition_size = canvas.height() / narrow_cast<size_type>(worker.thread_count());    
+    Canvas canvas(camera.width, camera.height);
+    WorkQue worker;           
+    const size_type partition_size = canvas.height() / worker.thread_count();    
     for (size_type i = 0; i < worker.thread_count(); ++i) {
         const size_type start = i * partition_size;
         const size_type end = (i + 1) * partition_size;
