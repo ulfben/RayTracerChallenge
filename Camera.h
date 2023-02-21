@@ -5,6 +5,7 @@
 #include "Ray.h"
 #include "World.h"
 #include "Canvas.h"
+#include "WorkQue.h"
 
 struct Camera final{
     Matrix4 transform = Matrix4Identity;        
@@ -46,7 +47,7 @@ constexpr Ray ray_for_pixel(const Camera& c, Real px, Real py) noexcept{
     return ray(origin, direction);
 }
 
-constexpr Canvas render(const Camera& camera, const World& w) {
+constexpr Canvas render_single_threaded(const Camera& camera, const World& w) {
     using size_type = Canvas::size_type;
     Canvas img(narrow_cast<size_type>(camera.hsize), narrow_cast<size_type>(camera.vsize));
     for(size_type y = 0; y < img.height(); ++y){
@@ -56,4 +57,25 @@ constexpr Canvas render(const Camera& camera, const World& w) {
         }
     }
     return img;
+}
+
+Canvas render(const Camera& camera, const World& world) {
+    using size_type = Canvas::size_type;
+    Canvas canvas(narrow_cast<size_type>(camera.hsize), narrow_cast<size_type>(camera.vsize));
+    auto worker = WorkQue();           
+    const size_type partition_size = canvas.height() / worker.thread_count();    
+    for (size_type i = 0; i < worker.thread_count(); ++i) {
+        const size_type start = i * partition_size;
+        const size_type end = (i + 1) * partition_size;
+        worker.push_back([&world, &camera, &canvas, start, end]() noexcept {
+            for (size_type y = start; y < end; ++y) {
+                for (size_type x = 0; x < canvas.width(); ++x) {
+                    const auto color = color_at(world, ray_for_pixel(camera, x, y));
+                    canvas.set(x, y, color);
+                }
+            }
+        });        
+    }
+    worker.run_in_parallel();    
+    return canvas;
 }

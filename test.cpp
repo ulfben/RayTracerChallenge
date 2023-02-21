@@ -164,7 +164,7 @@ TEST(DISABLED_Chapter6, CanRenderPhongShadedSphere) {
 
 TEST(Chapter8, CanRenderSceneWithShadows) {
     using size_type = Canvas::size_type;
-    auto c = Camera(400, 200, math::PI / 3);
+    auto c = Camera(800, 400, math::PI / 3);
     c.transform = view_transform(point(0.0f, 1.5f, -5.0f), point(0, 1, 0), vector(0, 1, 0));
 
     auto floor = sphere();
@@ -206,5 +206,5 @@ TEST(Chapter8, CanRenderSceneWithShadows) {
     world.light = point_light(point(-10, 10, -10), color(1, 1, 1));
 
     const auto img = render(c, world);
-    save_to_file(img, "output/chapter8_0.ppm"sv);
+    save_to_file(img, "output/chapter8_3_parallel.ppm"sv);
 }

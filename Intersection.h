@@ -161,7 +161,7 @@ struct HitState final { //"prepared computations", name to be figured out.
             normal = -normal;
         }
         //move the point VERY SLIGHTLY along the normal, to help with shading
-        over_point = point + normal * std::numeric_limits<Real>::epsilon();
+        over_point = point + (normal * 0.005f);
     }
 
     explicit constexpr operator bool() const noexcept {
@@ -183,11 +183,11 @@ constexpr HitState<T> prepare_computations(const Intersection<T>& i, const Ray& 
 
 constexpr bool is_shadowed(const World& w, const Point& p){
     const auto v = w.light.position - p;
-    const auto distance = magnitude(v);
+    const auto distanceSq = magnitudeSq(v);
     const auto direction = normalize(v);
     const auto r = ray(p, direction); //ray from point towards light source
     const auto hit = closest(intersect(w, r));
-    return (hit && hit.t < distance); //something is between us and the light.
+    return (hit && (hit.t*hit.t) < distanceSq); //something is between us and the light.
 }
 
 template<class T>

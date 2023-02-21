@@ -9,6 +9,8 @@
 #include <fstream>
 #include <cstdint>
 #include <cmath>
+#include <execution>
+#include <functional>
 #include <codeanalysis\warnings.h>
 
 #pragma warning(push)
