@@ -160,7 +160,8 @@ struct HitState final { //"prepared computations", name to be figured out.
             inside = true;
             normal = -normal;
         }
-        //move the point VERY SLIGHTLY along the normal, to avoid the shadow ray intersecting with our own surface
+        //move the point out slightly along the normal to ensure that the shadow ray 
+        // originates in front of the surface and not behind it (causing spurious self-shading)
         over_point = point + (normal * math::SHADOW_BIAS);
     }
 

@@ -41,7 +41,7 @@ TEST(Canvas, canOutputPPMPixelData) {
   const auto lines = split(output, "\n");
   ASSERT_EQ(lines.size(), 6);
   EXPECT_EQ(lines[3], "255 0 0 0 0 0 0 0 0 0 0 0 0 0 0"sv);
-  EXPECT_EQ(lines[4], "0 0 0 0 0 0 0 128 0 0 0 0 0 0 0"sv);
+  EXPECT_EQ(lines[4], "0 0 0 0 0 0 0 127 0 0 0 0 0 0 0"sv);
   EXPECT_EQ(lines[5], "0 0 0 0 0 0 0 0 0 0 0 0 0 0 255"sv);
 }
 

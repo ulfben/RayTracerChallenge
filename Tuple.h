@@ -36,21 +36,24 @@ constexpr Color color(Real r, Real g, Real b) noexcept {
     return Color{ r, g, b };
 }
 
+
+
 //bytecolor is an optimization to help us speed up writing the image to files. 
 //the idea is to bulk-convert the image-buffer into a smaller integer buffer, 
 //which we can then split across threads to make strings out of.
 struct ByteColor final {
     using value_type = uint8_t;
-    static constexpr float MAX = PPM_MAX_BYTE_VALUE;
-    static constexpr float MIN = 0;
+    static constexpr float MAX = PPM_MAX_BYTE_VALUE;    
     value_type r{};
     value_type g{};
     value_type b{};
     constexpr ByteColor() noexcept = default;
     constexpr explicit ByteColor(const Color& c) noexcept {
-        r = to_byte(c.r >= 1.0f ? MAX : (c.r <= 0.0f ? MIN : floor(c.r * 256.0f)));
-        g = to_byte(c.g >= 1.0f ? MAX : (c.g <= 0.0f ? MIN : floor(c.g * 256.0f)));
-        b = to_byte(c.b >= 1.0f ? MAX : (c.b <= 0.0f ? MIN : floor(c.b * 256.0f)));
+        r = map_to<value_type>(c.r);
+        g = map_to<value_type>(c.g);
+        b = map_to<value_type>(c.b);
+        assert(r <= MAX && g <= MAX && b <= MAX);
+        assert(r >= 0 && g >= 0 && b >= 0);
     };
 };
 

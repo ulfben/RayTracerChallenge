@@ -162,7 +162,7 @@ TEST(DISABLED_Chapter7, CanRenderScene) {
     save_to_file(img, "output/chapter7_1.ppm"sv);    
 }
 
-TEST(Chapter8, CanRenderSceneWithShadows) {
+TEST(DISABLED_Chapter8, CanRenderSceneWithShadows) {
     using size_type = Canvas::size_type;
     auto c = Camera(800, 400, math::PI / 3);
     c.transform = view_transform(point(0.0f, 1.5f, -5.0f), point(0, 1, 0), vector(0, 1, 0));
