@@ -206,5 +206,5 @@ TEST(Chapter8, CanRenderSceneWithShadows) {
     world.light = point_light(point(-10, 10, -10), color(1, 1, 1));
 
     const auto img = render(c, world);
-    save_to_file(img, "output/chapter8_3_parallel.ppm"sv);
+    save_to_file(img, "output/chapter8_5.ppm"sv);
 }

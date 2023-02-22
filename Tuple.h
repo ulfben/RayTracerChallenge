@@ -7,7 +7,7 @@ struct Color final {
     Real g{};
     Real b{};
     constexpr Color operator*(const Color& that) const noexcept {
-        return { r * that.r, g * that.g, b * that.b };  
+        return { r * that.r, g * that.g, b * that.b };
     }
     constexpr Color operator*(Real scalar) const noexcept {
         return Color{ r * scalar, g * scalar, b * scalar };
@@ -35,6 +35,25 @@ struct Color final {
 constexpr Color color(Real r, Real g, Real b) noexcept {
     return Color{ r, g, b };
 }
+
+//bytecolor is an optimization to help us speed up writing the image to files. 
+//the idea is to bulk-convert the image-buffer into a smaller integer buffer, 
+//which we can then split across threads to make strings out of.
+struct ByteColor final {
+    using value_type = uint8_t;
+    static constexpr float MAX = PPM_MAX_BYTE_VALUE;
+    static constexpr float MIN = 0;
+    value_type r{};
+    value_type g{};
+    value_type b{};
+    constexpr ByteColor() noexcept = default;
+    constexpr explicit ByteColor(const Color& c) noexcept {
+        r = to_byte(c.r >= 1.0f ? MAX : (c.r <= 0.0f ? MIN : floor(c.r * 256.0f)));
+        g = to_byte(c.g >= 1.0f ? MAX : (c.g <= 0.0f ? MIN : floor(c.g * 256.0f)));
+        b = to_byte(c.b >= 1.0f ? MAX : (c.b <= 0.0f ? MIN : floor(c.b * 256.0f)));
+    };
+};
+
 static constexpr Color BLACK = color(0, 0, 0);
 static constexpr Color WHITE = color(1, 1, 1);
 static constexpr Color RED = color(1, 0, 0);
@@ -98,7 +117,10 @@ std::ostream& operator<<(std::ostream& os, const Color& t) {
     return os;
 }
 
-std::string to_string(Color c) {    
+std::string to_string(Color c) {
+    return std::format("{} {} {}"sv, c.r, c.g, c.b);
+}
+std::string to_string(ByteColor c) {
     return std::format("{} {} {}"sv, c.r, c.g, c.b);
 }
 #pragma warning(pop)
@@ -110,11 +132,8 @@ constexpr Point point(Real x, Real y, Real z) noexcept {
     return Point{ x, y, z, 1.0f };
 }
 
-constexpr Color to_byte_values(Color col) noexcept {
-    constexpr float MAX = PPM_MAX_BYTE_VALUE;
-    return color(std::clamp(std::round(col.r * MAX), 0.0f, MAX),
-        std::clamp(std::round(col.g * MAX), 0.0f, MAX),
-        std::clamp(std::round(col.b * MAX), 0.0f, MAX));
+constexpr ByteColor to_byte_color(Color col) noexcept {
+    return ByteColor(col);
 }
 
 constexpr bool is_vector(Tuple t) noexcept { return t.w == 0; }
@@ -132,8 +151,8 @@ constexpr Vector normalize(const Vector& t) noexcept {
     return t / length;
 }
 constexpr Real dot(const Vector& a, const Vector& b) noexcept {
-/* the smaller the dot product, the larger the angle between the vector. if the two 
-vectors are unit vectors, the dot product is the cosine of the angle between them */
+    /* the smaller the dot product, the larger the angle between the vector. if the two
+    vectors are unit vectors, the dot product is the cosine of the angle between them */
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 constexpr Vector cross(const Vector& a, const Vector& b) noexcept {

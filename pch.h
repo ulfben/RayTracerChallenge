@@ -45,3 +45,7 @@ template <class T, class U>
 [[nodiscard]] constexpr T narrow_cast(U&& u) noexcept{
     return static_cast<T>(std::forward<U>(u));
 }
+
+[[nodiscard]] constexpr uint8_t to_byte(Real v) noexcept {
+    return static_cast<uint8_t>(v);
+}

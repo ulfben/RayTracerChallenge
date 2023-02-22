@@ -70,7 +70,25 @@ public:
         std::string ppm = ppm_header();
         line_state state(width());
         for (const auto& color : bitmap) {
-            const std::string rgb = to_string(to_byte_values(color));
+            const std::string rgb = to_string(to_byte_color(color));
+            if (state.should_wrap(rgb.size())) {
+                state.wrap(ppm);
+            }
+            #pragma warning( suppress : 26481 ) //spurious warning; "don't use pointer arithmetic" 
+            ppm.append(std::format("{} "sv, rgb));
+            state.added(rgb.size() + 1);
+        }
+        state.wrap(ppm); //PPM always ends on a newline.
+        return ppm;
+    }
+    
+    //optimized path, under construction
+    std::string to_ppm2() const {
+        const std::vector<ByteColor> buffer(bitmap.begin(), bitmap.end());    
+        std::string ppm = ppm_header();
+        line_state state(width());
+        for (const auto& color : buffer) {
+            const std::string rgb = to_string(color);
             if (state.should_wrap(rgb.size())) {
                 state.wrap(ppm);
             }
@@ -117,5 +135,5 @@ private:
 
 void save_to_file(const Canvas& img, std::string_view path) {
     std::ofstream ofs(path.data(), std::ofstream::out);
-    ofs << img.to_ppm();
+    ofs << img.to_ppm2();
 }

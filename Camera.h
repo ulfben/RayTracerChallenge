@@ -19,7 +19,7 @@ struct Camera final{
    
     /*constexpr*/ Camera(size_type hsize_, size_type vsize_, Real field_of_view_) noexcept 
         : field_of_view(field_of_view_), width(hsize_), height(vsize_) {
-        const auto half_view = narrow_cast<size_type>(std::tan(field_of_view / 2.0f)); //TODO: constexpr tan
+        const auto half_view = std::tan(field_of_view / 2.0f); //TODO: constexpr tan
         if(const Real aspect = float(width) / height; aspect >= 1){
             half_width = half_view;
             half_height = half_view / aspect;
@@ -65,7 +65,7 @@ Canvas render(const Camera& camera, const World& world) {
     using size_type = Canvas::size_type;
     Canvas canvas(camera.width, camera.height);
     WorkQue worker;           
-    const size_type partition_size = canvas.height() / worker.thread_count();    
+    const size_type partition_size = canvas.height() / worker.thread_count();
     for (size_type i = 0; i < worker.thread_count(); ++i) {
         const size_type start = i * partition_size;
         const size_type end = (i + 1) * partition_size;
