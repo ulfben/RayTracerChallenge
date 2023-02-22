@@ -126,6 +126,9 @@ std::string to_string(Color c) {
 std::string to_string(ByteColor c) {
     return std::format("{} {} {}"sv, c.r, c.g, c.b);
 }
+std::string to_string_with_trailing_space(ByteColor c) {
+    return std::format("{} {} {} "sv, c.r, c.g, c.b);
+}
 #pragma warning(pop)
 
 constexpr Vector vector(Real x, Real y, Real z) noexcept {
