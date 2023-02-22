@@ -5,12 +5,18 @@
 #include "WorkQue.h"
 //A neat API example by lippuu: https://gist.github.com/lippuu/cbf4fa62fe8eed408159a558ff5c96ee
 using Bitmap = std::vector<Color>;
+static constexpr uint16_t CHANNELS = 3; //RGB
+static constexpr uint16_t CHARS_PER_CHANNEL = 4; //"255 "
+static constexpr uint16_t CHARS_PER_PIXEL = CHANNELS * CHARS_PER_CHANNEL; //"255 255 255 ".size() == 12
+static constexpr uint16_t MAX_PIXELS_PER_LINE = (PPM_MAX_LINE_LENGTH / CHARS_PER_PIXEL); //(70/12) == 5
+static constexpr uint16_t SPACES_PER_PIXEL = 3; //"255 255 255 "
+static constexpr uint16_t MAX_SPACES_PER_LINE = MAX_PIXELS_PER_LINE * SPACES_PER_PIXEL; //5*3 == 15. 15*MAX_CHARACTERS_PER_PIXEL = 60 (a safe value <70) 
+constexpr void ppm_add_linebreaks(std::string& str) noexcept;
+std::string to_ppm_parallelized(const Bitmap& bitmap, size_t width, size_t height);
+
 class Canvas final {
 public:
     using size_type = uint16_t;
-    static constexpr size_type CHANNELS = 3; //RGB
-    static constexpr size_type CHARS = 4;    //"255 "
-    static constexpr size_type CHARS_PER_PIXEL = CHANNELS * CHARS;   
 
     constexpr Canvas(size_type width, size_type height) {
         resize(width, height);
@@ -68,78 +74,66 @@ public:
     constexpr auto size() const noexcept { return bitmap.size(); }
 
     std::string to_ppm() const {
-        std::string ppm = ppm_header();
-        line_state state(width());
-        for (const auto& color : bitmap) {
-            const std::string rgb = to_string(to_byte_color(color));
-            if (state.should_wrap(rgb.size())) {
-                state.wrap(ppm);
-            }
-            #pragma warning( suppress : 26481 ) //spurious warning; "don't use pointer arithmetic" 
-            ppm.append(std::format("{} "sv, rgb));
-            state.added(rgb.size() + 1);
+        std::string ppm = to_ppm_parallelized(bitmap, _width, _height);
+        if (width() < MAX_PIXELS_PER_LINE) {
+            ppm_add_linebreaks(ppm); //TODO: simplified linebreak when we can fit entire width() into the output file. 
+        } else {
+            ppm_add_linebreaks(ppm);
         }
-        state.wrap(ppm); //PPM always ends on a newline.
-        return ppm;
-    }
-        
-    //optimized, but doesn't follow the PPM spec (according to the book): line length and trailing newlines are ignored. 
-    std::string to_ppm_parallelized() const {
-        std::vector<ByteColor> buffer(bitmap.begin(), bitmap.end()); //bulk-convert our pixels from 0.0f-1.0f to 0-255
-        WorkQue worker;
-        const auto partition_size = buffer.size() / worker.thread_count(); //TODO: assumes buffer is evenly divisible.
-        std::vector<std::string> out(worker.thread_count());
-        std::ranges::for_each(out, [partition_size](auto& out_part) {out_part.reserve(partition_size*CHARS_PER_PIXEL); });
-        out[0].append(ppm_header());
-        for (size_type part = 0; part < worker.thread_count(); ++part) {            
-            const auto start = part * partition_size;
-            const auto end = (part + 1) * partition_size;
-            worker.push_back([&buffer, &out, part, start, end]() noexcept {
-                for (auto i = start; i < end; ++i) {                    
-                    out[part].append(to_string_with_trailing_space(buffer[i]));
-                }
-            });        
-        }
-        worker.run_in_parallel();  
-        buffer.clear();
-        worker.clear();
-        return std::accumulate(out.begin()+1, out.end(), out[0]);
-    }
-
+        return ppm;        
+    }       
+    
 private:
     Bitmap bitmap;
     size_type _width = 0;
     size_type _height = 0;
-
-    std::string ppm_header() const {
-        #pragma warning( suppress : 26481 ) //spurious warning; "don't use pointer arithmetic" 
-        return std::format("{}\n{} {}\n{}\n"sv, PPM_VERSION, _width, _height, PPM_MAX_BYTE_VALUE);
-    }
-    struct line_state {
-        size_type bitmap_width;
-        size_t char_count = 0;
-        size_type pixel_count = 0;
-        explicit constexpr line_state(size_type bmp_width) noexcept : bitmap_width(bmp_width) {};
-        constexpr size_type max_length(size_type width) const noexcept {
-            return std::min(static_cast<size_type>(width * CHARS_PER_PIXEL), PPM_MAX_LINE_LENGTH);
-        }
-        constexpr bool should_wrap(size_t newchars) const noexcept {
-            return (pixel_count == bitmap_width || char_count + newchars >= max_length(bitmap_width));
-        }
-        constexpr void wrap(std::string& s) {
-            s.pop_back(); //remove trailing whitespace
-            s.append(NEWLINE);
-            char_count = 0;
-            pixel_count = 0;
-        }
-        constexpr void added(size_t newchars) noexcept {
-            char_count += newchars;
-            pixel_count++;
-        }
-    };
 };
 
+std::string ppm_header(size_t width, size_t height) {
+    #pragma warning( suppress : 26481 ) //spurious warning; "don't use pointer arithmetic" 
+    return std::format("{}\n{} {}\n{}\n"sv, PPM_VERSION, width, height, PPM_MAX_BYTE_VALUE);
+}  
+
+//optimized, but doesn't follow the PPM spec (according to the book): line length and trailing newlines are ignored. 
+std::string to_ppm_parallelized(const Bitmap& bitmap, size_t width, size_t height) {
+    std::vector<ByteColor> buffer(bitmap.begin(), bitmap.end()); //bulk-convert our pixels from 0.0f-1.0f to 0-255
+    WorkQue worker;
+    const auto partition_size = buffer.size() / worker.thread_count(); //TODO: assumes buffer is evenly divisible
+    std::vector<std::string> out(worker.thread_count());
+    std::ranges::for_each(out, [partition_size](auto& out_part) {out_part.reserve(partition_size*CHARS_PER_PIXEL); });
+    out[0].append(ppm_header(width, height));
+    for (size_t part = 0; part < worker.thread_count(); ++part) {            
+        const auto start = part * partition_size;
+        const auto end = (part + 1) * partition_size;
+        worker.push_back([&buffer, &out, part, start, end]() noexcept {                
+            for (auto i = start; i < end; ++i) {                                        
+                out[part].append(to_string_with_trailing_space(buffer[i]));
+            }
+        });        
+    }
+    worker.run_in_parallel();  
+    buffer.clear();        
+    worker.clear();        
+    return std::accumulate(out.begin()+1, out.end(), out[0]);
+}
+
+constexpr void ppm_add_linebreaks(std::string& str) noexcept{        
+    using size_type = std::string::size_type;    
+    const size_type header_end = str.find_last_of("\n"sv);                    
+    const size_type end = str.size();
+    size_type space_count = 0;
+    for(size_type i = header_end; i < end; ++i) {
+        if(str[i] != ' ') { continue; }                
+        if (++space_count == MAX_SPACES_PER_LINE) {
+             str.replace(i, 1, "\n"sv);
+             space_count = 0;
+        }                
+    }
+    if (str.back() == ' ') { str.pop_back(); }
+    str.append("\n"sv);    
+}
+
 void save_to_file(const Canvas& img, std::string_view path) {
-    std::ofstream ofs(path.data(), std::ofstream::out);
-    ofs << img.to_ppm_parallelized();
+    std::ofstream ofs(path.data(), std::ofstream::out);    
+    ofs << img.to_ppm();
 }

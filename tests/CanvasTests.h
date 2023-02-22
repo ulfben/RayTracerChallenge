@@ -39,7 +39,7 @@ TEST(Canvas, canOutputPPMPixelData) {
   canvas.set(4, 2, color(-0.5, 0, 1.0f));
   const auto output = canvas.to_ppm();
   const auto lines = split(output, "\n");
-  ASSERT_EQ(lines.size(), 6);
+  EXPECT_EQ(lines.size(), 6);
   EXPECT_EQ(lines[3], "255 0 0 0 0 0 0 0 0 0 0 0 0 0 0"sv);
   EXPECT_EQ(lines[4], "0 0 0 0 0 0 0 127 0 0 0 0 0 0 0"sv);
   EXPECT_EQ(lines[5], "0 0 0 0 0 0 0 0 0 0 0 0 0 0 255"sv);
