@@ -76,8 +76,9 @@ public:
         }
     }
 
-    constexpr void clear() noexcept {
+    void clear() noexcept {
         tasks.clear();
+        remainder = {};
         calculate_partition_size(0);
     }    
 };
