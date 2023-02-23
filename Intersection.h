@@ -114,6 +114,7 @@ constexpr auto intersect(const Sphere& s, const Ray& r) noexcept {
     return intersections({ intersection(t1, s), intersection(t2, s) });
 };
 
+//TODO: parallelize this workhorse.
 constexpr auto intersect(const World& world, const Ray& r) noexcept {
     Intersections result = intersections<World::value_type>(); //will have to be rethought once we have different shapes.
     for (const auto& obj : world) {

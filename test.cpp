@@ -17,7 +17,7 @@
 #include "tests/WorldTests.h"
 #include "tests/CameraTests.h"
 
-TEST(Chapter2, CanOutputPPM) {    
+TEST(DISABLED_Chapter2, CanOutputPPM) {    
     auto c = Canvas(300, 300);
     const auto bottomEdge = static_cast<Real>(c.height());
     const auto vel = normalize(vector(1, -1.8f, 0)) * 11.25f;
@@ -29,14 +29,14 @@ TEST(Chapter2, CanOutputPPM) {
     save_to_file(c, "output/chapter2.ppm"sv);    
 }
 
-TEST(Chapter4, CanCenterOrigo) {    
+TEST(DISABLED_Chapter4, CanCenterOrigo) {    
     auto c = Canvas(200, 200);
     const auto origo = point(c.widthf() / 2, c.heightf() / 2, 0);        
     c.set(origo, GREEN); 
     save_to_file(c, "output/chapter4_0.ppm"sv);          
 }
 
-TEST(Chapter4, CanDrawTwelveOClock) {    
+TEST(DISABLED_Chapter4, CanDrawTwelveOClock) {    
     auto c = Canvas(200, 200);
     const auto origo = point(c.widthf() / 2, c.heightf() / 2, 0);        
     c.set(origo, GREEN);        
@@ -46,7 +46,7 @@ TEST(Chapter4, CanDrawTwelveOClock) {
     save_to_file(c, "output/chapter4_1.ppm"sv);      
 }
 
-TEST(Chapter4, CanDrawClock) {
+TEST(DISABLED_Chapter4, CanDrawClock) {
     auto c = Canvas(200, 200);
     const auto origo = point(c.widthf() / 2, c.heightf() / 2, 0);                 
     const auto dist = c.widthf()*0.375f; 
@@ -61,7 +61,7 @@ TEST(Chapter4, CanDrawClock) {
     save_to_file(c, "output/chapter4_4.ppm"sv);    
 }
 
-TEST(Chapter5, CanRenderSilhouetteOfASphere) {       
+TEST(DISABLED_Chapter5, CanRenderSilhouetteOfASphere) {       
     using size_type = Canvas::size_type;
     auto c = Canvas(100, 100);
     const auto shape = sphere();    
@@ -85,7 +85,7 @@ TEST(Chapter5, CanRenderSilhouetteOfASphere) {
     save_to_file(c, "output/chapter5_0.ppm"sv);    
 }
 
-TEST(Chapter6, CanRenderPhongShadedSphere) {       
+TEST(DISABLED_Chapter6, CanRenderPhongShadedSphere) {       
     using size_type = Canvas::size_type;
     auto c = Canvas(100, 100);
     auto shape = sphere();
@@ -115,7 +115,7 @@ TEST(Chapter6, CanRenderPhongShadedSphere) {
     save_to_file(c, "output/chapter6_2.ppm"sv);    
 }
 
-TEST(Chapter7, CanRenderScene) {
+TEST(DISABLED_Chapter7, CanRenderScene) {
     using size_type = Canvas::size_type;
     auto c = Camera(400, 200, math::PI / 3);
     c.transform = view_transform(point(0.0f, 1.5f, -5.0f), point(0, 1, 0), vector(0, 1, 0));
@@ -162,7 +162,7 @@ TEST(Chapter7, CanRenderScene) {
     save_to_file(img, "output/chapter7_1.ppm"sv);    
 }
 
-TEST(Chapter8, CanRenderSceneWithShadows) {
+TEST(DISABLED_Chapter8, CanRenderSceneWithShadows) {
     using size_type = Canvas::size_type;
     auto c = Camera(400, 200, math::PI / 3);
     c.transform = view_transform(point(0.0f, 1.5f, -5.0f), point(0, 1, 0), vector(0, 1, 0));

@@ -68,11 +68,11 @@ public:
         for (size_type part = 0; partition_size && part < thread_count(); ++part) {
             const auto start = part * partition_size;
             end = (part + 1) * partition_size;
-            schedule(std::move(process), start, end, part);
+            schedule(process, start, end, part);
         }
         if (end < itemsToProcess) {            
             size_type part = tasks.empty() ? 0 : tasks.size()-1;            
-            schedule_remainder(std::move(process), end, itemsToProcess, part);
+            schedule_remainder(process, end, itemsToProcess, part);
         }
     }
 
