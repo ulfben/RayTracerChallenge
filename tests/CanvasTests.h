@@ -39,50 +39,62 @@ TEST(Canvas, canOutputPPMPixelData) {
   canvas.set(4, 2, color(-0.5, 0, 1.0f));
   const auto output = canvas.to_ppm();
   const auto lines = split(output, "\n");
-  EXPECT_EQ(lines.size(), 6);
+  ASSERT_EQ(lines.size(), 6);
   EXPECT_EQ(lines[3], "255 0 0 0 0 0 0 0 0 0 0 0 0 0 0"sv);
   EXPECT_EQ(lines[4], "0 0 0 0 0 0 0 127 0 0 0 0 0 0 0"sv);
   EXPECT_EQ(lines[5], "0 0 0 0 0 0 0 0 0 0 0 0 0 0 255"sv);
 }
-//
-//TEST(Canvas, PPMIsMax70CharsPerLine) {
-//  auto canvas = Canvas(10, 2);
-//  canvas.clear(color(1.0f, 0.8f, 0.6f));
-//  const auto output = canvas.to_ppm();
-//  const auto lines = split(output, "\n");  
-//  for (auto i = 3; i < lines.size(); i++) { //start at 3 to skip header.
-//      EXPECT_LT(lines[i].size(), 70);     
-//  }
-//}
-//
-//TEST(Canvas, PPMLineWrapDoesntBreakPixels) {
-//  auto canvas = Canvas(10, 2);
-//  canvas.clear(color(0.0f, 0.8f, 0.6f)); //0 204 153
-//  const auto output = canvas.to_ppm();
-//  const auto lines = split(output, "\n"); 
-//  for (auto i = 3; i < lines.size(); i++) {
-//      EXPECT_LT(lines[i].size(), 70);
-//      EXPECT_TRUE(lines[i].starts_with("0 204 153"sv));
-//      EXPECT_TRUE(lines[i].ends_with("0 204 153"sv));
-//  }
-//}
-//
-//TEST(Canvas, PPMLineWrapDoesntBreakPixels2) {
-//  auto canvas = Canvas(10, 2);
-//  canvas.clear(color(0.0f, 0.2f, 0.6f)); //0 51 153
-//  const auto output = canvas.to_ppm();
-//  const auto lines = split(output, "\n");
-//  for (auto i = 3; i < lines.size(); i++) {
-//      EXPECT_LT(lines[i].size(), 70);
-//      EXPECT_TRUE(lines[i].starts_with("0 51 153"sv));
-//      EXPECT_TRUE(lines[i].ends_with("0 51 153"sv));
-//  }
-//}
-//
-//TEST(Canvas, PPMIsTerminatedByNewline) {
-//  auto canvas = Canvas(5, 3);
-//  const auto output = canvas.to_ppm();
-//  EXPECT_EQ('\n', output.back());
-//}
+
+TEST(Canvas, PPMIsMax70CharsPerLine) {
+  auto canvas = Canvas(10, 2);
+  canvas.clear(color(1.0f, 0.8f, 0.6f));
+  const auto output = canvas.to_ppm();
+  const auto lines = split(output, "\n");  
+  for (auto i = 3; i < lines.size(); i++) { //start at 3 to skip header.
+      EXPECT_LT(lines[i].size(), 70);     
+  }
+}
+
+TEST(Canvas, PPMLineWrapDoesntBreakPixels) {
+  auto canvas = Canvas(10, 2);
+  canvas.clear(color(0.0f, 0.8f, 0.6f)); //0 204 153
+  const auto output = canvas.to_ppm();
+  const auto lines = split(output, "\n"); 
+  for (auto i = 3; i < lines.size(); i++) {
+      EXPECT_LT(lines[i].size(), 70);
+      EXPECT_TRUE(lines[i].starts_with("0 204 153"sv));
+      EXPECT_TRUE(lines[i].ends_with("0 204 153"sv));
+  }
+}
+
+TEST(Canvas, PPMLineWrapDoesntBreakPixels2) {
+  auto canvas = Canvas(10, 2);
+  canvas.clear(color(0.0f, 0.2f, 0.6f)); //0 51 153
+  const auto output = canvas.to_ppm();
+  const auto lines = split(output, "\n");
+  for (auto i = 3; i < lines.size(); i++) {
+      EXPECT_LT(lines[i].size(), 70);
+      EXPECT_TRUE(lines[i].starts_with("0 51 153"sv));
+      EXPECT_TRUE(lines[i].ends_with("0 51 153"sv));
+  }
+}
+
+TEST(Canvas, PPMHandlesTinyCanvas) {
+  auto canvas = Canvas(1, 1);
+  canvas.clear(color(0.0f, 0.2f, 0.6f)); //0 51 153
+  const auto output = canvas.to_ppm();
+  const auto lines = split(output, "\n");
+  for (auto i = 3; i < lines.size(); i++) {
+      EXPECT_LT(lines[i].size(), 70);
+      EXPECT_TRUE(lines[i].starts_with("0 51 153"sv));
+      EXPECT_TRUE(lines[i].ends_with("0 51 153"sv));
+  }
+}
+
+TEST(Canvas, PPMIsTerminatedByNewline) {
+  auto canvas = Canvas(5, 3);
+  const auto output = canvas.to_ppm();
+  EXPECT_EQ('\n', output.back());
+}
 
 RESTORE_WARNINGS

@@ -60,7 +60,6 @@ constexpr Canvas render_single_threaded(const Camera& camera, const World& w) {
     return img;
 }
 
-//TODO: ensure we deal with the case canvas.height() not being evenly divisible by thread_count.
 Canvas render(const Camera& camera, const World& world) {
     using size_type = Canvas::size_type;
     Canvas canvas(camera.width, camera.height);

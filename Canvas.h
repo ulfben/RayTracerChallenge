@@ -10,7 +10,6 @@ static constexpr uint16_t CHARS_PER_PIXEL = CHANNELS * CHARS_PER_CHANNEL; //"255
 static constexpr uint16_t MAX_PIXELS_PER_LINE = (PPM_MAX_LINE_LENGTH / CHARS_PER_PIXEL); //(70/12) == 5
 static constexpr uint16_t SPACES_PER_PIXEL = 3; //"255 255 255 "
 static constexpr uint16_t MAX_SPACES_PER_LINE = MAX_PIXELS_PER_LINE * SPACES_PER_PIXEL; //5*3 == 15. 15*MAX_CHARACTERS_PER_PIXEL = 60 (a safe value <70) 
-constexpr void ppm_add_linebreaks(std::string& str) noexcept;
 
 std::string ppm_header(size_t width, size_t height) {
     #pragma warning( suppress : 26481 ) //spurious warning; "don't use pointer arithmetic" 
@@ -20,18 +19,34 @@ std::string ppm_header(size_t width, size_t height) {
 std::string to_ppm_parallelized(std::span<const Color> bitmap, size_t width, size_t height) {
     std::vector<ByteColor> buffer(bitmap.begin(), bitmap.end()); //bulk-convert pixels from 0.0f-1.0f to 0-255
     WorkQue worker;    
-    std::vector<std::string> out(worker.thread_count());
+    std::vector<std::string> out(worker.thread_count()); 
+    worker.schedule(buffer.size(), [&out, &buffer](size_t part, size_t i) noexcept {                            
+            out[part].append(to_string_with_trailing_space(buffer[i]));            
+    });
     std::ranges::for_each(out, [partition_size = worker.partition_size()](auto& out_part) {
         out_part.reserve(partition_size*CHARS_PER_PIXEL); }
     );
     out[0].append(ppm_header(width, height));
-    worker.schedule(buffer.size(), [&out, &buffer](size_t part, size_t i) noexcept {                            
-            out[part].append(to_string_with_trailing_space(buffer[i]));            
-    });  
     worker.run_in_parallel();  
     buffer.clear();         
     worker.clear();        
     return std::accumulate(out.begin()+1, out.end(), out[0]);
+}
+
+constexpr void ppm_add_linebreaks(std::string& str, size_t max_spaces_per_line) noexcept{        
+    using size_type = std::string::size_type;    
+    const size_type header_end = str.find_last_of("\n"sv);                    
+    const size_type end = str.size();
+    size_type space_count = 0;
+    for(size_type i = header_end; i < end; ++i) {
+        if(str[i] != ' ') { continue; }                
+        if (++space_count == max_spaces_per_line) {
+             str.replace(i, 1, "\n"sv);
+             space_count = 0;
+        }                
+    }
+    if (str.back() == ' ') { str.pop_back(); }
+    str.append("\n"sv);    
 }
 
 class Canvas final {
@@ -111,10 +126,10 @@ public:
 
     std::string to_ppm() const {
         std::string ppm = to_ppm_parallelized(bitmap, _width, _height);
-        if (width() < MAX_PIXELS_PER_LINE) {
-            ppm_add_linebreaks(ppm); //TODO: simplified linebreak when we can fit entire width() into the output file. 
+        if (width() <= MAX_PIXELS_PER_LINE) {
+            ppm_add_linebreaks(ppm, width()*SPACES_PER_PIXEL);
         } else {
-            ppm_add_linebreaks(ppm);
+            ppm_add_linebreaks(ppm, MAX_SPACES_PER_LINE);
         }
         return ppm;        
     }       
@@ -125,21 +140,7 @@ private:
     size_type _height = 0;
 };
 
-constexpr void ppm_add_linebreaks(std::string& str) noexcept{        
-    using size_type = std::string::size_type;    
-    const size_type header_end = str.find_last_of("\n"sv);                    
-    const size_type end = str.size();
-    size_type space_count = 0;
-    for(size_type i = header_end; i < end; ++i) {
-        if(str[i] != ' ') { continue; }                
-        if (++space_count == MAX_SPACES_PER_LINE) {
-             str.replace(i, 1, "\n"sv);
-             space_count = 0;
-        }                
-    }
-    if (str.back() == ' ') { str.pop_back(); }
-    str.append("\n"sv);    
-}
+
 
 void save_to_file(const Canvas& img, std::string_view path) {
     std::ofstream ofs(path.data(), std::ofstream::out);    
