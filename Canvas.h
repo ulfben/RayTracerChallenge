@@ -19,7 +19,7 @@ std::string ppm_header(size_t width, size_t height) {
 std::string to_ppm_parallelized(std::span<const Color> bitmap, size_t width, size_t height) {
     std::vector<ByteColor> buffer(bitmap.begin(), bitmap.end()); //bulk-convert pixels from 0.0f-1.0f to 0-255
     WorkQue worker;    
-    std::vector<std::string> out(worker.thread_count()); 
+    std::vector<std::string> out(worker.thread_count());         
     worker.schedule(buffer.size(), [&out, &buffer](size_t part, size_t i) noexcept {                            
             out[part].append(to_string_with_trailing_space(buffer[i]));            
     });

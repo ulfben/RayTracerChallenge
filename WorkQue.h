@@ -3,6 +3,7 @@
 class WorkQue {
     using size_type = size_t;
     std::vector<std::function<void()>> tasks;
+    std::function<void()> remainder;
     size_type number_of_threads = std::max(2u, std::thread::hardware_concurrency());
     size_type _partition_size = 0;
 
@@ -15,9 +16,18 @@ class WorkQue {
             }
         });       
     }
+    template<class Callable>
+    void schedule_remainder(Callable process, size_type start, size_type end, size_type part) {
+         assert(start < end && part >= 0 && part <= tasks.size()); 
+         remainder = [process, start, end, part]() noexcept {                
+            for (auto i = start; i < end; ++i) {                                        
+                std::invoke(process, part, i);                    
+            }
+        };       
+    }
 public:
-    constexpr WorkQue() noexcept = default;
-    constexpr explicit WorkQue(size_type numberOfThreads) noexcept : number_of_threads(numberOfThreads) {}
+    WorkQue() noexcept = default;
+    explicit WorkQue(size_type numberOfThreads) noexcept : number_of_threads(numberOfThreads) {}
     
     constexpr size_type calculate_partition_size(size_type itemsToProcess) noexcept {
         _partition_size = itemsToProcess / thread_count();
@@ -36,13 +46,19 @@ public:
                 std::invoke(task);
             }
         );
+        if (remainder) {
+            std::invoke(remainder);
+        }
     }
-    constexpr void run_sequentially() const noexcept {
+    void run_sequentially() const noexcept {
         std::ranges::for_each(tasks,
             [](const auto& task) {
                 std::invoke(task);
             }
         );
+        if (remainder) {
+            std::invoke(remainder);
+        }
     }          
 
     template<class Callable>
@@ -52,11 +68,11 @@ public:
         for (size_type part = 0; partition_size && part < thread_count(); ++part) {
             const auto start = part * partition_size;
             end = (part + 1) * partition_size;
-            schedule(process, start, end, part);
+            schedule(std::move(process), start, end, part);
         }
         if (end < itemsToProcess) {            
-            size_type part = tasks.empty() ? 0 : tasks.size()-1; 
-            schedule(process, end, itemsToProcess, part);
+            size_type part = tasks.empty() ? 0 : tasks.size()-1;            
+            schedule_remainder(std::move(process), end, itemsToProcess, part);
         }
     }
 
