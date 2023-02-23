@@ -58,3 +58,10 @@ static_assert(map_to<uint8_t>(0.0f) == 0);
 static_assert(map_to<uint8_t>(0.5f) == 127);
 static_assert(map_to<uint8_t>(1.0f) == 255);
 static_assert(map_to<uint8_t>(1.5f) == 255);
+
+constexpr size_t index_to_column(size_t index, size_t width) noexcept {        
+    return index % width;
+}
+constexpr size_t index_to_row(size_t index, size_t width) noexcept {        
+    return index / width;
+}

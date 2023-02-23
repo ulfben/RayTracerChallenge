@@ -31,10 +31,10 @@ struct Camera final{
     }
 };
 
-constexpr Ray ray_for_pixel(const Camera& c, Real px, Real py) noexcept{
+constexpr Ray ray_for_pixel(const Camera& c, size_t px, size_t py) noexcept{
     //offset from edge of the canvas to the pixel's center
-    const auto xoffset = (px + 0.5f) * c.pixel_size;
-    const auto yoffset = (py + 0.5f) * c.pixel_size;
+    const auto xoffset = float(px + 0.5f) * c.pixel_size;
+    const auto yoffset = float(py + 0.5f) * c.pixel_size;
     //untransformed coordinates of the pixel in world space
     //remember that the camera looks towards -z, so +x is to the *left*
     const auto world_x = c.half_width - xoffset;
@@ -65,19 +65,12 @@ Canvas render(const Camera& camera, const World& world) {
     using size_type = Canvas::size_type;
     Canvas canvas(camera.width, camera.height);
     WorkQue worker;           
-    const size_type partition_size = canvas.height() / worker.thread_count();
-    for (size_type i = 0; i < worker.thread_count(); ++i) {
-        const size_type start = i * partition_size;
-        const size_type end = (i + 1) * partition_size;
-        worker.push_back([&world, &camera, &canvas, start, end]() noexcept {
-            for (size_type y = start; y < end; ++y) {
-                for (size_type x = 0; x < canvas.width(); ++x) {
-                    const auto color = color_at(world, ray_for_pixel(camera, x, y));
-                    canvas.set(x, y, color);
-                }
-            }
-        });        
-    }
-    worker.run_in_parallel();    
+    worker.schedule(canvas.size(), [&world, &camera, &canvas]([[maybe_unused]]size_t part, size_t i) noexcept {            
+        const auto x = index_to_column(i, canvas.width());
+        const auto y = index_to_row(i, canvas.width());
+        const auto color = color_at(world, ray_for_pixel(camera, x, y));
+        canvas.set(x, y, color);                           
+    });      
+    worker.run_in_parallel();
     return canvas;
 }

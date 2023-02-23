@@ -4,7 +4,6 @@
 #include "StringHelpers.h"
 #include "WorkQue.h"
 //A neat API example by lippuu: https://gist.github.com/lippuu/cbf4fa62fe8eed408159a558ff5c96ee
-using Bitmap = std::vector<Color>;
 static constexpr uint16_t CHANNELS = 3; //RGB
 static constexpr uint16_t CHARS_PER_CHANNEL = 4; //"255 "
 static constexpr uint16_t CHARS_PER_PIXEL = CHANNELS * CHARS_PER_CHANNEL; //"255 255 255 ".size() == 12
@@ -12,11 +11,40 @@ static constexpr uint16_t MAX_PIXELS_PER_LINE = (PPM_MAX_LINE_LENGTH / CHARS_PER
 static constexpr uint16_t SPACES_PER_PIXEL = 3; //"255 255 255 "
 static constexpr uint16_t MAX_SPACES_PER_LINE = MAX_PIXELS_PER_LINE * SPACES_PER_PIXEL; //5*3 == 15. 15*MAX_CHARACTERS_PER_PIXEL = 60 (a safe value <70) 
 constexpr void ppm_add_linebreaks(std::string& str) noexcept;
-std::string to_ppm_parallelized(const Bitmap& bitmap, size_t width, size_t height);
+
+std::string ppm_header(size_t width, size_t height) {
+    #pragma warning( suppress : 26481 ) //spurious warning; "don't use pointer arithmetic" 
+    return std::format("{}\n{} {}\n{}\n"sv, PPM_VERSION, width, height, PPM_MAX_BYTE_VALUE);
+}  
+
+std::string to_ppm_parallelized(std::span<const Color> bitmap, size_t width, size_t height) {
+    std::vector<ByteColor> buffer(bitmap.begin(), bitmap.end()); //bulk-convert pixels from 0.0f-1.0f to 0-255
+    WorkQue worker;    
+    std::vector<std::string> out(worker.thread_count());
+    std::ranges::for_each(out, [partition_size = worker.partition_size()](auto& out_part) {
+        out_part.reserve(partition_size*CHARS_PER_PIXEL); }
+    );
+    out[0].append(ppm_header(width, height));
+    worker.schedule(buffer.size(), [&out, &buffer](size_t part, size_t i) noexcept {                            
+            out[part].append(to_string_with_trailing_space(buffer[i]));            
+    });  
+    worker.run_in_parallel();  
+    buffer.clear();         
+    worker.clear();        
+    return std::accumulate(out.begin()+1, out.end(), out[0]);
+}
 
 class Canvas final {
 public:
-    using size_type = uint16_t;
+    using size_type = size_t;
+    using value_type = Color;        
+    using container = std::vector<value_type>;
+    using reference = container::reference;
+    using const_reference = container::const_reference;
+    using pointer = container::pointer;
+    using const_pointer = container::const_pointer;
+    using iterator = container::iterator;
+    using const_iterator = container::const_iterator;
 
     constexpr Canvas(size_type width, size_type height) {
         resize(width, height);
@@ -25,36 +53,44 @@ public:
 
     constexpr void resize(size_type w, size_type h) {
         assert(w > 0 && h > 0 && "Canvas dimensions must be non-zero.");
-        bitmap.resize(static_cast<size_t>(w) * h);
+        bitmap.resize(w * h);
         _width = w;
         _height = h;
     }
 
-    constexpr void clear(const Color& col = Color{ .0f, .0f, .0f }) noexcept {
+    constexpr void clear(const value_type& col = value_type{ .0f, .0f, .0f }) noexcept {
         std::ranges::fill(bitmap, col);
     }       
-    constexpr void set(size_t i, const Color& col) noexcept {
+    constexpr void set(size_type i, const value_type& col) noexcept {
         if (i < bitmap.size()) {            
             bitmap[i] = col;
         }
     }
-    constexpr void set(size_type x, size_type y, const Color& col) noexcept {
+    constexpr void set(size_type x, size_type y, const value_type& col) noexcept {
         if (x < _width && y < _height) {
-            const auto row = static_cast<size_t>(y) * _width;
+            const auto row = y * _width;
             bitmap[row + x] = col;
         }
     }
-    constexpr void set(const Point& p, const Color& col) noexcept {
-        constexpr auto MAX = std::numeric_limits<size_type>::max();
-        if (p.x >= 0 && p.y >= 0 && p.x < MAX && p.y < MAX) {
+    constexpr void set(const Point& p, const value_type& col) noexcept {
+        constexpr auto MAX = narrow_cast<size_t>(std::numeric_limits<Real>::max());            
+        if (p.x >= 0 && p.y >= 0 && p.x < float(MAX) && p.y < float(MAX)) {
             set(narrow_cast<size_type>(p.x), narrow_cast<size_type>(p.y), col);
         }
     }
-    constexpr Color get(size_type x, size_type y) const noexcept {
+    constexpr const_reference get(size_type x, size_type y) const noexcept {
         assert(x <= _width && "Canvas::get called with invalid x position");
         assert(y <= _height && "Canvas::get called with invalid y position");
-        const auto row = static_cast<size_t>( y ) *_width;
+        const auto row = y *_width;
         return bitmap[row + x];
+    }
+    constexpr const_reference operator[](size_type i) const noexcept {
+        assert(size() < i); 
+        return bitmap[i];
+    }
+    constexpr reference operator[](size_type i) noexcept {        
+        assert(size() < i); 
+        return bitmap[i];
     }
     constexpr size_type width() const noexcept {
         return _width;
@@ -67,11 +103,11 @@ public:
     }
     constexpr Real heightf() const noexcept {
         return static_cast<Real>(_height);
-    }
-    constexpr auto data() const noexcept { return bitmap.data(); }
-    constexpr auto begin() const noexcept { return bitmap.begin(); }
-    constexpr auto end() const noexcept { return bitmap.end(); }
-    constexpr auto size() const noexcept { return bitmap.size(); }
+    }    
+    constexpr const_pointer data() const noexcept { return bitmap.data(); }
+    constexpr const_iterator begin() const noexcept { return bitmap.begin(); }
+    constexpr const_iterator end() const noexcept { return bitmap.end(); }
+    constexpr size_type size() const noexcept { return bitmap.size(); }
 
     std::string to_ppm() const {
         std::string ppm = to_ppm_parallelized(bitmap, _width, _height);
@@ -84,38 +120,10 @@ public:
     }       
     
 private:
-    Bitmap bitmap;
+    container bitmap;
     size_type _width = 0;
     size_type _height = 0;
 };
-
-std::string ppm_header(size_t width, size_t height) {
-    #pragma warning( suppress : 26481 ) //spurious warning; "don't use pointer arithmetic" 
-    return std::format("{}\n{} {}\n{}\n"sv, PPM_VERSION, width, height, PPM_MAX_BYTE_VALUE);
-}  
-
-//optimized, but doesn't follow the PPM spec (according to the book): line length and trailing newlines are ignored. 
-std::string to_ppm_parallelized(const Bitmap& bitmap, size_t width, size_t height) {
-    std::vector<ByteColor> buffer(bitmap.begin(), bitmap.end()); //bulk-convert our pixels from 0.0f-1.0f to 0-255
-    WorkQue worker;
-    const auto partition_size = buffer.size() / worker.thread_count(); //TODO: assumes buffer is evenly divisible
-    std::vector<std::string> out(worker.thread_count());
-    std::ranges::for_each(out, [partition_size](auto& out_part) {out_part.reserve(partition_size*CHARS_PER_PIXEL); });
-    out[0].append(ppm_header(width, height));
-    for (size_t part = 0; part < worker.thread_count(); ++part) {            
-        const auto start = part * partition_size;
-        const auto end = (part + 1) * partition_size;
-        worker.push_back([&buffer, &out, part, start, end]() noexcept {                
-            for (auto i = start; i < end; ++i) {                                        
-                out[part].append(to_string_with_trailing_space(buffer[i]));
-            }
-        });        
-    }
-    worker.run_in_parallel();  
-    buffer.clear();        
-    worker.clear();        
-    return std::accumulate(out.begin()+1, out.end(), out[0]);
-}
 
 constexpr void ppm_add_linebreaks(std::string& str) noexcept{        
     using size_type = std::string::size_type;    
