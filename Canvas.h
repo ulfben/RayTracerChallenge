@@ -4,20 +4,30 @@
 #include "StringHelpers.h"
 #include "WorkQue.h"
 //A neat API example by lippuu: https://gist.github.com/lippuu/cbf4fa62fe8eed408159a558ff5c96ee
-static constexpr uint16_t CHANNELS = 3; //RGB
-static constexpr uint16_t CHARS_PER_CHANNEL = 4; //"255 "
-static constexpr uint16_t CHARS_PER_PIXEL = CHANNELS * CHARS_PER_CHANNEL; //"255 255 255 ".size() == 12
-static constexpr uint16_t MAX_PIXELS_PER_LINE = (PPM_MAX_LINE_LENGTH / CHARS_PER_PIXEL); //(70/12) == 5
-static constexpr uint16_t SPACES_PER_PIXEL = 3; //"255 255 255 "
-static constexpr uint16_t MAX_SPACES_PER_LINE = MAX_PIXELS_PER_LINE * SPACES_PER_PIXEL; //5*3 == 15. 15*MAX_CHARACTERS_PER_PIXEL = 60 (a safe value <70) 
+static constexpr size_t CHANNELS = 3; //RGB
+static constexpr size_t CHARS_PER_CHANNEL = 4; //"255 "
+static constexpr size_t CHARS_PER_PIXEL = CHANNELS * CHARS_PER_CHANNEL; //"255 255 255 ".size() == 12
+static constexpr size_t MAX_PIXELS_PER_LINE = (PPM_MAX_LINE_LENGTH / CHARS_PER_PIXEL); //(70/12) == 5
+static constexpr size_t SPACES_PER_PIXEL = 3; //"255 255 255 "
+static constexpr size_t MAX_SPACES_PER_LINE = MAX_PIXELS_PER_LINE * SPACES_PER_PIXEL; //5*3 == 15. 15*MAX_CHARACTERS_PER_PIXEL = 60 (a safe value <70) 
 
 std::string ppm_header(size_t width, size_t height) {
     #pragma warning( suppress : 26481 ) //spurious warning; "don't use pointer arithmetic" 
     return std::format("{}\n{} {}\n{}\n"sv, PPM_VERSION, width, height, PPM_MAX_BYTE_VALUE);
 }  
 
-std::string to_ppm_parallelized(std::span<const Color> bitmap, size_t width, size_t height) {
-    std::vector<ByteColor> buffer(bitmap.begin(), bitmap.end()); //bulk-convert pixels from 0.0f-1.0f to 0-255
+std::string to_ppm_seq(std::span<const Color> bitmap, size_t width, size_t height) {
+    std::string ppm = ppm_header(width, height);
+    std::vector<ByteColor> buffer(bitmap.begin(), bitmap.end());
+    ppm.reserve(ppm.size() + (buffer.size() * CHARS_PER_PIXEL));
+    for (const auto& color : buffer) {        
+        ppm.append(to_string_with_trailing_space(color));        
+    }    
+    return ppm;
+}
+
+std::string to_ppm_par(std::span<const Color> bitmap, size_t width, size_t height) {
+    std::vector<ByteColor> buffer(bitmap.begin(), bitmap.end());
     WorkQue worker;    
     std::vector<std::string> out(worker.thread_count());         
     worker.schedule(buffer.size(), [&out, &buffer](size_t part, size_t i) noexcept {                            
@@ -100,11 +110,11 @@ public:
         return bitmap[row + x];
     }
     constexpr const_reference operator[](size_type i) const noexcept {
-        assert(size() < i); 
+        assert(i < size()); 
         return bitmap[i];
     }
     constexpr reference operator[](size_type i) noexcept {        
-        assert(size() < i); 
+        assert(i < size()); 
         return bitmap[i];
     }
     constexpr size_type width() const noexcept {
@@ -125,12 +135,15 @@ public:
     constexpr size_type size() const noexcept { return bitmap.size(); }
 
     std::string to_ppm() const {
-        std::string ppm = to_ppm_parallelized(bitmap, _width, _height);
-        if (width() <= MAX_PIXELS_PER_LINE) {
-            ppm_add_linebreaks(ppm, width()*SPACES_PER_PIXEL);
-        } else {
-            ppm_add_linebreaks(ppm, MAX_SPACES_PER_LINE);
+        std::string ppm;
+        if constexpr (RUN_SEQUENTIAL) {
+            ppm = to_ppm_seq(bitmap, _width, _height);            
         }
+        else {
+            ppm = to_ppm_par(bitmap, _width, _height);
+        }
+        const auto every_nth_space = std::min(width() * SPACES_PER_PIXEL, MAX_SPACES_PER_LINE);
+        ppm_add_linebreaks(ppm, every_nth_space);        
         return ppm;        
     }       
     

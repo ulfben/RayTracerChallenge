@@ -39,9 +39,13 @@ namespace math {
     }
 
     constexpr Real sqrt(Real x) noexcept {
-        return x >= 0.0f && x < std::numeric_limits<Real>::infinity()
-            ? Detail::sqrtNewtonRaphson(x, x, 0.0f)
-            : std::numeric_limits<Real>::quiet_NaN();
+         if (std::is_constant_evaluated()) {
+            return x >= 0.0f && x < std::numeric_limits<Real>::infinity()
+                ? Detail::sqrtNewtonRaphson(x, x, 0.0f)
+                : std::numeric_limits<Real>::quiet_NaN();
+        } else {            
+            return std::sqrt(x);
+        }        
     }
 
     static constexpr auto SHADOW_BIAS = 0.005f; //to avoid shadow acne due to spurious self-intersections

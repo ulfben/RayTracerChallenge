@@ -60,16 +60,22 @@ constexpr Canvas render_single_threaded(const Camera& camera, const World& w) {
     return img;
 }
 
-Canvas render(const Camera& camera, const World& world) {
+Canvas render_multi_threaded(const Camera& camera, const World& world) {
     using size_type = Canvas::size_type;
     Canvas canvas(camera.width, camera.height);
     WorkQue worker;           
     worker.schedule(canvas.size(), [&world, &camera, &canvas]([[maybe_unused]]size_t part, size_t i) noexcept {            
         const auto x = index_to_column(i, canvas.width());
-        const auto y = index_to_row(i, canvas.width());
-        const auto color = color_at(world, ray_for_pixel(camera, x, y));
-        canvas.set(x, y, color);                           
+        const auto y = index_to_row(i, canvas.width());        
+        canvas[i] = color_at(world, ray_for_pixel(camera, x, y));                          
     });      
     worker.run_in_parallel();
     return canvas;
+}
+
+Canvas render(const Camera& camera, const World& world) {
+    if constexpr (RUN_SEQUENTIAL) {
+        return render_single_threaded(camera, world);
+    }
+    return render_multi_threaded(camera, world);
 }

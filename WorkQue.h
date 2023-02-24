@@ -4,7 +4,7 @@ class WorkQue {
     using size_type = size_t;
     std::vector<std::function<void()>> tasks;
     std::function<void()> remainder;
-    size_type number_of_threads = std::max(2u, std::thread::hardware_concurrency());
+    size_type number_of_threads = std::min(SUGGESTED_THREAD_COUNT, std::thread::hardware_concurrency());
     size_type _partition_size = 0;
 
     template<class Callable>
@@ -42,9 +42,7 @@ public:
 
     void run_in_parallel() const noexcept {
         std::for_each(std::execution::par, tasks.begin(), tasks.end(),
-            [](const auto& task) {
-                std::invoke(task);
-            }
+            [](const auto& task) { std::invoke(task); }
         );
         if (remainder) {
             std::invoke(remainder);
@@ -52,9 +50,7 @@ public:
     }
     void run_sequentially() const noexcept {
         std::ranges::for_each(tasks,
-            [](const auto& task) {
-                std::invoke(task);
-            }
+            [](const auto& task) { std::invoke(task); }
         );
         if (remainder) {
             std::invoke(remainder);
