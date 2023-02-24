@@ -77,5 +77,7 @@ Canvas render(const Camera& camera, const World& world) {
     if constexpr (RUN_SEQUENTIAL) {
         return render_single_threaded(camera, world);
     }
-    return render_multi_threaded(camera, world);
+    else {
+        return render_multi_threaded(camera, world);
+    }
 }

@@ -31,11 +31,17 @@ namespace math {
     template<class T>
         requires std::is_arithmetic_v<T>
     constexpr T abs(T x) noexcept {
-        return x < 0 ? -x : x; //in use only until std::abs becomes constexpr...
+        if (std::is_constant_evaluated()) {
+            return x == 0 ? 0 : (x < 0 ? -x : x); 
+        }
+        return std::abs(x);
     }
 
     constexpr bool is_nan(Real x) noexcept {
-        return x != x; //in use until std::is_nan becomes constexpr.
+        if (std::is_constant_evaluated()) {
+            return x != x; //in use until std::is_nan becomes constexpr.
+        }
+        return std::isnan(x);
     }
 
     constexpr Real sqrt(Real x) noexcept {
@@ -43,9 +49,8 @@ namespace math {
             return x >= 0.0f && x < std::numeric_limits<Real>::infinity()
                 ? Detail::sqrtNewtonRaphson(x, x, 0.0f)
                 : std::numeric_limits<Real>::quiet_NaN();
-        } else {            
-            return std::sqrt(x);
-        }        
+        } 
+        return std::sqrt(x);                
     }
 
     static constexpr auto SHADOW_BIAS = 0.005f; //to avoid shadow acne due to spurious self-intersections

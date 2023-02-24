@@ -63,18 +63,11 @@ static constexpr Color RED = color(1, 0, 0);
 static constexpr Color GREEN = color(0, 1, 0);
 static constexpr Color BLUE = color(0, 0, 1);
 
-#pragma warning(push)
-#pragma warning( disable : 4201 )
-//warning C4201: nonstandard extension used: nameless struct/union
-struct Tuple final {
-    static const auto SIZE = 4;
-    union {
-        Real data[4]{};
-        struct {
-            Real x, y, z, w;
-        };
-    };
-#pragma warning(pop)
+struct Tuple final {    
+    Real x{};
+    Real y{};            
+    Real z{};
+    Real w{};
 
     constexpr Tuple operator*(Real scalar) const noexcept {
         return Tuple{ x * scalar, y * scalar, z * scalar, w * scalar };

@@ -35,7 +35,7 @@ using Point = Tuple;
 static constexpr auto PPM_VERSION = "P3"sv;
 static constexpr uint16_t PPM_MAX_LINE_LENGTH = 70;
 static constexpr uint16_t PPM_MAX_BYTE_VALUE = 255; //max value of color components in PPM file. 
-static constexpr bool RUN_SEQUENTIAL = false;
+static constexpr bool RUN_SEQUENTIAL = true;
 static constexpr unsigned SUGGESTED_THREAD_COUNT = 8; //only applicable is RUN_SEQUENTIAL = false. 
 
 [[nodiscard]] bool empty(auto begin, auto end) noexcept {
