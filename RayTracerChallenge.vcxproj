@@ -74,6 +74,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="Ray.h" />
+    <ClInclude Include="Shapes.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="StringHelpers.h" />
     <ClInclude Include="tests\CameraTests.h" />

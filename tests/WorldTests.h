@@ -7,10 +7,11 @@ DISABLE_WARNINGS_FROM_GTEST
 
 TEST(World, hasDefaultWorld) {
   const auto w = World();
-  constexpr auto s0 = sphere();
-  constexpr auto s1 = sphere(World::DEFAULT_WORLD_MATERIAL); 
+  const Shapes s0{ sphere() };
+  const Shapes s1 = sphere(World::DEFAULT_WORLD_MATERIAL); 
   auto s2 = sphere();
-  s2.transform = scaling(0.5f, 0.5f, 0.5f);    
+  s2.transform = scaling(0.5f, 0.5f, 0.5f);
+  EXPECT_TRUE(w.size() == 2);
   EXPECT_FALSE(w.contains(s0));
   EXPECT_TRUE(w.contains(s1));
   EXPECT_TRUE(w.contains(s2));
@@ -64,11 +65,11 @@ TEST(World, colorWhenRayHit) {
 
 TEST(World, colorWhenHitBehindRay) {
     auto w = World();
-    w[0].surface.ambient = 1.0f; //outer sphere
-    w[1].surface.ambient = 1.0f; //inner sphere
+    get_sphere(w, 0).surface.ambient = 1.0f; //outer sphere
+    get_sphere(w, 1).surface.ambient = 1.0f; //inner sphere
     const auto r = ray(point(0, 0, 0.75f), vector(0, 0, -1));
     const auto col = color_at(w, r);
-    EXPECT_EQ(col, w[1].surface.color);
+    EXPECT_EQ(col, get_sphere(w, 1).surface.color);
 }
 
 RESTORE_WARNINGS

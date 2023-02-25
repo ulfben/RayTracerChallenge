@@ -19,7 +19,13 @@ struct Material final {
     Real shininess = 200.0f;
     constexpr bool operator==(const Material& that) const noexcept = default;
 };
-
+#pragma warning(push)
+#pragma warning( disable : 26481 ) //spurious warning; "don't use pointer arithmetic" 
+std::ostream& operator<<(std::ostream& os, const Material& t) {
+    os << std::format("Material(color({},{},{}), am({:f}), di({:f}), sp({:f}), sh({:f})"sv, t.color.r, t.color.g, t.color.b, t.ambient, t.diffuse, t.specular, t.shininess);
+    return os;
+}
+#pragma warning(pop)
 constexpr Material material() noexcept {
     return {};
 }

@@ -7,7 +7,7 @@ struct Color final {
     Real g{};
     Real b{};
     constexpr Color operator*(const Color& that) const noexcept {
-        return { r * that.r, g * that.g, b * that.b };
+        return { r * that.r, g * that.g, b * that.b }; //hadamard product
     }
     constexpr Color operator*(Real scalar) const noexcept {
         return Color{ r * scalar, g * scalar, b * scalar };
@@ -35,8 +35,6 @@ struct Color final {
 constexpr Color color(Real r, Real g, Real b) noexcept {
     return Color{ r, g, b };
 }
-
-
 
 //bytecolor is an optimization to help us speed up writing the image to files. 
 //the idea is to bulk-convert the image-buffer into a smaller integer buffer, 

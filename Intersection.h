@@ -1,21 +1,21 @@
 #pragma once
 #include "pch.h"
 #include "Ray.h"
+#include "Shapes.h"
 
-template<class T>
 struct Intersection final {
-    const T* objPtr = nullptr;
+    const Shapes* objPtr = nullptr;
     Real t{ 0 };
 
     explicit constexpr operator bool() const noexcept {
         return objPtr != nullptr;
     }
-    constexpr const T& object() const noexcept {
+    constexpr const Shapes& object() const noexcept {
         assert(objPtr != nullptr);
         return *objPtr;
     }
     constexpr const Material& surface() const noexcept {
-        return object().surface;
+        return std::get<Sphere>(object()).surface;
     }
     constexpr bool operator==(const Intersection& that) const noexcept {
         return *objPtr == *that.objPtr && math::float_cmp(t, that.t);
@@ -31,10 +31,9 @@ struct Intersection final {
     }
 };
 
-template<class T>
 struct Intersections final {
     using size_type = uint8_t;
-    using value_type = Intersection<T>;
+    using value_type = Intersection; 
     using container = std::vector<value_type>;
     using reference = container::reference;
     using pointer = container::pointer;
@@ -79,13 +78,13 @@ struct Intersections final {
     constexpr auto operator<=>(const Intersections& that) const noexcept = default;
 };
 
-template<class T>
-constexpr auto intersection(Real t, const T& obj) noexcept {
-    return Intersection<T>{ &obj, t };
+//template<class T>
+constexpr auto intersection(Real t, const Shapes& obj) noexcept {
+    return Intersection{ &obj, t };
 }
-template<class T>
+//template<class T>
 constexpr auto intersections() noexcept {
-    return Intersections<T>{};
+    return Intersections{};
 }
 template<class InterSection>
 constexpr auto intersections(InterSection i1, InterSection i2) noexcept {
@@ -106,7 +105,7 @@ constexpr auto intersect(const Sphere& s, const Ray& r) noexcept {
     const auto col = dot(sphere_to_ray, sphere_to_ray) - SPHERE_RADIUS;
     const auto discriminant = (b * b) - (4.0f * a * col);
     if (discriminant < 0) {
-        return intersections<Sphere>();
+        return intersections();
     }
     const auto sqrtOfDiscriminant = std::sqrt(discriminant);
     const auto t1 = (-b - sqrtOfDiscriminant) / (2 * a);
@@ -114,39 +113,54 @@ constexpr auto intersect(const Sphere& s, const Ray& r) noexcept {
     return intersections({ intersection(t1, s), intersection(t2, s) });
 };
 
-//TODO: parallelize this workhorse.
+constexpr auto intersect(const Shapes& variant, const Ray& r) noexcept {
+    //TODO: intersections 
+    //return std::visit([&r](const auto& obj) { return intersect(obj, r);  }, variant);
+    const auto& s = get_sphere(variant);
+    constexpr Real SPHERE_RADIUS = 1.0f; //assuming unit spheres for now
+    const auto ray2 = transform(r, inverse(s.transform));
+    const Vector sphere_to_ray = ray2.origin - s.position;
+    const auto a = dot(ray2.direction, ray2.direction);
+    const auto b = 2 * dot(ray2.direction, sphere_to_ray);
+    const auto col = dot(sphere_to_ray, sphere_to_ray) - SPHERE_RADIUS;
+    const auto discriminant = (b * b) - (4.0f * a * col);
+    if (discriminant < 0) {
+        return intersections();
+    }
+    const auto sqrtOfDiscriminant = std::sqrt(discriminant);
+    const auto t1 = (-b - sqrtOfDiscriminant) / (2 * a);
+    const auto t2 = (-b + sqrtOfDiscriminant) / (2 * a);
+    return intersections({ intersection(t1, variant), intersection(t2, variant) });
+};
+
 constexpr auto intersect(const World& world, const Ray& r) noexcept {
-    Intersections result = intersections<World::value_type>(); //will have to be rethought once we have different shapes.
-    for (const auto& obj : world) {
-        result.push_back(intersect(obj, r));
+    Intersections result = intersections(); 
+    for (const auto& variant : world) {        
+        result.push_back(intersect(variant, r));
     }
     result.sort();
     return result;
 };
 
-//TODO: limit template argument to Interactions-struct
 //TODO: consider an alternative algorithm: remove + min_element
-template <class Intersections>
-constexpr auto closest(const Intersections& xs) noexcept {
-    using value_type = Intersections::value_type;
+constexpr auto closest(const Intersections& xs) noexcept {    
     const auto iter = std::ranges::min_element(xs,
         // This comparison function allows us to find the smallest positive number 
         // by considering negative numbers as larger than positive numbers. 
-        [](const value_type& i1, const value_type& i2) noexcept {
+        [](const Intersection& i1, const Intersection& i2) noexcept {
             if (i1.t < 0.0f) { return false; }
             if (i2.t < 0.0f) { return true; }
             return i1.t < i2.t;
         }
     );
     if (iter == std::end(xs) || *iter < 0.0f) {
-        return value_type{}; //empty set, or no positive T's in the set. Return 0. 
+        return Intersection{}; //empty set, or no positive T's in the set. Return 0. 
     }
     return *iter;
 };
 
-template<class T>
 struct HitState final { //"prepared computations", name to be figured out. 
-    const T* objectPtr = nullptr; //the object we hit    
+    const Shapes* objectPtr = nullptr; //the object variant we hit    
     Point point{}; //the point in world-space where the intersection occurs
     Point over_point{}; //slightly nudged point to avoid intersection precision errors causing "acne"
     Vector eye_v{}; //inverted, pointing back towards the camera
@@ -154,8 +168,8 @@ struct HitState final { //"prepared computations", name to be figured out.
     Real t{ 0 }; //distance to hit
     bool inside = false;
 
-    constexpr HitState(const Intersection<T>& i, const Ray& r) noexcept
-        : objectPtr{ i.objPtr }, t{ i.t }, point{ position(r, i.t) }, eye_v{ -r.direction } {
+    constexpr HitState(const Intersection& i, const Ray& r) noexcept
+        : objectPtr{ i.objPtr }, point{ position(r, i.t) }, eye_v{ -r.direction }, t{ i.t } {
         normal = normal_at(object(), point);
         if (dot(normal, eye_v) < 0.0f) {
             inside = true;
@@ -170,16 +184,15 @@ struct HitState final { //"prepared computations", name to be figured out.
         return t != 0;
     }
     const Material& surface() const noexcept {
-        return object().surface;
+        return std::get<Sphere>(object()).surface;
     }
-    const T& object() const noexcept {
+    const Shapes& object() const noexcept {
         assert(objectPtr && "HitState::object() called on empty HitState.");
         return *objectPtr;
     }
 };
 
-template<class T>
-constexpr HitState<T> prepare_computations(const Intersection<T>& i, const Ray& r) noexcept {
+constexpr HitState prepare_computations(const Intersection& i, const Ray& r) noexcept {
     return HitState(i, r);
 }
 
@@ -192,8 +205,7 @@ constexpr bool is_shadowed(const World& w, const Point& p){
     return (hit && (hit.t*hit.t) < distanceSq); //something is between us and the light.
 }
 
-template<class T>
-constexpr Color shade_hit(const World& w, const HitState<T>& hit) noexcept {
+constexpr Color shade_hit(const World& w, const HitState& hit) noexcept {
     if (is_shadowed(w, hit.over_point)) {
         return lighting_shadow(hit.surface(), w.light);
     }

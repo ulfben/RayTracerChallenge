@@ -30,7 +30,15 @@ constexpr Sphere sphere() noexcept {
     return Sphere{ point(0,0,0), 1.0f };
 }
 
-constexpr Vector normal_at(const Sphere& s, const Point& p) noexcept { 
+#pragma warning(push)
+#pragma warning( disable : 26481 ) //spurious warning; "don't use pointer arithmetic" 
+std::ostream& operator<<(std::ostream& os, const Sphere& t) {
+    os << std::format("Sphere(({},{},{}), {})"sv, t.position.x, t.position.y, t.position.z, t.radius);
+    return os;
+}
+#pragma warning(pop)
+
+constexpr Vector local_normal_at(const Sphere& s, const Point& p) noexcept { 
     const auto inv_transform = inverse(s.transform);
     const auto object_space_point = inv_transform * p; 
     const auto object_space_normal = object_space_point - s.position; /*s position is always 0*/
@@ -39,7 +47,7 @@ constexpr Vector normal_at(const Sphere& s, const Point& p) noexcept {
     return normalize(world_space_normal);
 }
 
-constexpr Vector normal_at(const Sphere* s, const Point& p) noexcept {
-    assert(s && "normal at called with nullptr. Make sure your hit is non-empty before using it!");
-    return normal_at(*s, p);
-}
+//constexpr Vector normal_at(const Sphere* s, const Point& p) noexcept {
+//    assert(s && "normal at called with nullptr. Make sure your hit is non-empty before using it!");
+//    return normal_at(*s, p);
+//}

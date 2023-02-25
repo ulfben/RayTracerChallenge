@@ -2,7 +2,7 @@
 #include "../pch.h"
 #include "../Ray.h"
 #include "../Intersection.h"
-#include "../Sphere.h"
+#include "../Shapes.h"
 
 DISABLE_WARNINGS_FROM_GTEST
 
@@ -94,12 +94,12 @@ TEST(Intersections, aggregatesIntersection) {
 
 TEST(intersect, setsTheObjectOnTheIntersections) {
     const auto r = ray(point(0,0,-5), vector(0,0,1));    
-    const auto s = sphere(point(0,0,0), 1.0f);
+    const Shapes s = sphere(point(0,0,0), 1.0f);
     const auto xs = intersect(s, r);
     EXPECT_EQ(xs.size(), 2);
     EXPECT_FLOAT_EQ(xs[0].t, 4.0f);
     EXPECT_FLOAT_EQ(xs[1].t, 6.0f);
-    EXPECT_TRUE(xs[0]);
+    EXPECT_TRUE(xs[0]);    
     EXPECT_EQ(*xs[0].objPtr, s);
     EXPECT_EQ(*xs[1].objPtr, s);
 }

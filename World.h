@@ -1,11 +1,11 @@
 #pragma once
 #include "pch.h"
 #include "Lights.h"
-#include "Sphere.h"
+#include "Shapes.h"
 
 struct World final {
     static constexpr auto DEFAULT_WORLD_MATERIAL = material(color(0.8f, 1.0f, 0.6f), 0.1f, 0.7f, 0.2f);   
-    using value_type = Sphere;    
+    using value_type = Shapes;    
     using container = std::vector<value_type>;
     using reference = container::reference;
     using const_reference = container::const_reference;
@@ -18,24 +18,17 @@ struct World final {
     container objects;    
     Light light = point_light(point(-10, 10, -10), WHITE);    
     
-    constexpr World() noexcept {                        
-        auto s2 = sphere();
-        s2.transform = scaling(0.5f, 0.5f, 0.5f);
-        try {
-            objects.push_back(sphere(DEFAULT_WORLD_MATERIAL));
-            objects.push_back(s2);
-        }
-        catch (...) {/*swallow. default world will be empty.*/}
+    constexpr World() {                                      
+        objects.emplace_back(sphere(DEFAULT_WORLD_MATERIAL));
+        objects.emplace_back(sphere());
+        std::get<Sphere>(objects.back()).transform = scaling(0.5f, 0.5f, 0.5f);
     }
-    constexpr World(std::initializer_list<Sphere> list) noexcept {
-        try {
-            objects.append_range(list);
-        }
-        catch (...) {/*swallow. default world will be empty.*/ }
+    explicit constexpr World(std::initializer_list<value_type> list) {        
+        objects.append_range(list);        
     }
-    constexpr bool contains(const value_type& object) const noexcept {        
-        return std::ranges::find(objects, object) != std::end(objects);
-    }
+    constexpr bool contains(const value_type& object) const noexcept {               
+        return std::ranges::find(objects, object) != objects.end();        
+    }   
     constexpr const_reference operator[](size_type i) const noexcept {
         assert(i < size() && "World::operator[i] index is out of bounds");
         return objects[i];
@@ -43,7 +36,7 @@ struct World final {
     constexpr reference operator[](size_type i) noexcept {
         assert(i < size() && "World::operator[i] index is out of bounds");
         return objects[i];
-    }    
+    }  
     explicit constexpr operator bool() const noexcept {
         return !empty();
     }
@@ -57,3 +50,10 @@ struct World final {
     constexpr const_iterator begin() const noexcept { return objects.begin(); }
     constexpr const_iterator end() const noexcept { return objects.end(); }  
 };
+
+constexpr Sphere& get_sphere(World& w, size_t i) noexcept{    
+    return std::get<Sphere>(w[i]);
+}
+constexpr const Sphere& get_sphere(const World& w, size_t i) noexcept{   
+    return std::get<Sphere>(w[i]);
+}

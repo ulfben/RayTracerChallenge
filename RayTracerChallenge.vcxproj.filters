@@ -55,6 +55,7 @@
       <Filter>tests</Filter>
     </ClInclude>
     <ClInclude Include="WorkQue.h" />
+    <ClInclude Include="Shapes.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
