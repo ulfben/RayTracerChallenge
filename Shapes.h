@@ -2,8 +2,9 @@
 #include "pch.h"
 #include <variant>
 #include "Sphere.h"
+#include "Plane.h"
 
-using Shapes = std::variant<Sphere>;
+using Shapes = std::variant<Sphere, Plane>;
 
 constexpr Vector normal_at(const Shapes& variant, const Point& p) noexcept { 
     return std::visit([&p](const auto& obj){ return local_normal_at(obj, p);}, variant);    

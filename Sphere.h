@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "Tuple.h"
 #include "Matrix.h"
-#include "Lights.h"
+#include "Material.h"
 
 struct Sphere final {
     Matrix4 transform{ Matrix4Identity }; 
@@ -46,8 +46,3 @@ constexpr Vector local_normal_at(const Sphere& s, const Point& p) noexcept {
     world_space_normal.w = 0; //hack to avoid having to work with the transform submatrix
     return normalize(world_space_normal);
 }
-
-//constexpr Vector normal_at(const Sphere* s, const Point& p) noexcept {
-//    assert(s && "normal at called with nullptr. Make sure your hit is non-empty before using it!");
-//    return normal_at(*s, p);
-//}

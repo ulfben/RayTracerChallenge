@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include "World.h"
 #include "Ray.h"
 #include "Shapes.h"
 
@@ -95,8 +96,27 @@ constexpr auto intersections(std::initializer_list<InterSection> is) noexcept {
     return Intersections(is);
 }
 
+
+constexpr auto local_intersect(const Plane& s, const Ray& r) noexcept {
+    return intersections();
+    //constexpr Real SPHERE_RADIUS = 1.0f; //assuming unit spheres for now
+    //const auto ray2 = transform(r, inverse(s.transform));
+    //const Vector sphere_to_ray = ray2.origin - s.position;
+    //const auto a = dot(ray2.direction, ray2.direction);
+    //const auto b = 2 * dot(ray2.direction, sphere_to_ray);
+    //const auto col = dot(sphere_to_ray, sphere_to_ray) - SPHERE_RADIUS;
+    //const auto discriminant = (b * b) - (4.0f * a * col);
+    //if (discriminant < 0) {
+    //    return intersections();
+    //}
+    //const auto sqrtOfDiscriminant = std::sqrt(discriminant);
+    //const auto t1 = (-b - sqrtOfDiscriminant) / (2 * a);
+    //const auto t2 = (-b + sqrtOfDiscriminant) / (2 * a);
+    //return intersections({ intersection(t1, s), intersection(t2, s) });
+};
+
 //https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
-constexpr auto intersect(const Sphere& s, const Ray& r) noexcept {
+constexpr auto local_intersect(const Sphere& s, const Ray& r) noexcept {
     constexpr Real SPHERE_RADIUS = 1.0f; //assuming unit spheres for now
     const auto ray2 = transform(r, inverse(s.transform));
     const Vector sphere_to_ray = ray2.origin - s.position;
@@ -115,22 +135,25 @@ constexpr auto intersect(const Sphere& s, const Ray& r) noexcept {
 
 constexpr auto intersect(const Shapes& variant, const Ray& r) noexcept {
     //TODO: intersections 
-    //return std::visit([&r](const auto& obj) { return intersect(obj, r);  }, variant);
-    const auto& s = get_sphere(variant);
-    constexpr Real SPHERE_RADIUS = 1.0f; //assuming unit spheres for now
-    const auto ray2 = transform(r, inverse(s.transform));
-    const Vector sphere_to_ray = ray2.origin - s.position;
-    const auto a = dot(ray2.direction, ray2.direction);
-    const auto b = 2 * dot(ray2.direction, sphere_to_ray);
-    const auto col = dot(sphere_to_ray, sphere_to_ray) - SPHERE_RADIUS;
-    const auto discriminant = (b * b) - (4.0f * a * col);
-    if (discriminant < 0) {
-        return intersections();
-    }
-    const auto sqrtOfDiscriminant = std::sqrt(discriminant);
-    const auto t1 = (-b - sqrtOfDiscriminant) / (2 * a);
-    const auto t2 = (-b + sqrtOfDiscriminant) / (2 * a);
-    return intersections({ intersection(t1, variant), intersection(t2, variant) });
+    return std::visit(
+        [&r](const auto& obj) -> Intersections { return local_intersect(obj, r);  }, 
+        variant
+    );
+    //const auto& s = get_sphere(variant);
+    //constexpr Real SPHERE_RADIUS = 1.0f; //assuming unit spheres for now
+    //const auto ray2 = transform(r, inverse(s.transform));
+    //const Vector sphere_to_ray = ray2.origin - s.position;
+    //const auto a = dot(ray2.direction, ray2.direction);
+    //const auto b = 2 * dot(ray2.direction, sphere_to_ray);
+    //const auto col = dot(sphere_to_ray, sphere_to_ray) - SPHERE_RADIUS;
+    //const auto discriminant = (b * b) - (4.0f * a * col);
+    //if (discriminant < 0) {
+    //    return intersections();
+    //}
+    //const auto sqrtOfDiscriminant = std::sqrt(discriminant);
+    //const auto t1 = (-b - sqrtOfDiscriminant) / (2 * a);
+    //const auto t2 = (-b + sqrtOfDiscriminant) / (2 * a);
+    //return intersections({ intersection(t1, variant), intersection(t2, variant) });
 };
 
 constexpr auto intersect(const World& world, const Ray& r) noexcept {
@@ -213,7 +236,8 @@ constexpr Color shade_hit(const World& w, const HitState& hit) noexcept {
 }
 
 constexpr Color color_at(const World& w, const Ray& r) noexcept {
-    const auto closestHit = closest(intersect(w, r));
+    const auto xs = intersect(w, r);
+    const auto closestHit = closest(xs);
     if (closestHit) {        
         return shade_hit(w, prepare_computations(closestHit, r));
     }

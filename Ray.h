@@ -1,8 +1,6 @@
 #pragma once
 #include "pch.h"
 #include "Tuple.h"
-#include "Sphere.h"
-#include "World.h"
 
 struct Ray final {
     Point origin;

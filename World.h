@@ -19,8 +19,8 @@ struct World final {
     Light light = point_light(point(-10, 10, -10), WHITE);    
     
     constexpr World() {                                      
-        objects.emplace_back(sphere(DEFAULT_WORLD_MATERIAL));
-        objects.emplace_back(sphere());
+        objects.push_back(sphere(DEFAULT_WORLD_MATERIAL));
+        objects.push_back(sphere());
         std::get<Sphere>(objects.back()).transform = scaling(0.5f, 0.5f, 0.5f);
     }
     explicit constexpr World(std::initializer_list<value_type> list) {        

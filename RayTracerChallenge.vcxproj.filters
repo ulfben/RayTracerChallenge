@@ -56,6 +56,11 @@
     </ClInclude>
     <ClInclude Include="WorkQue.h" />
     <ClInclude Include="Shapes.h" />
+    <ClInclude Include="tests\PlaneTests.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Plane.h" />
+    <ClInclude Include="Material.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
