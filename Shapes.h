@@ -9,7 +9,10 @@ using Shapes = std::variant<Sphere, Plane>;
 constexpr Vector normal_at(const Shapes& variant, const Point& p) { 
     return std::visit([&p](const auto& obj){ return local_normal_at(obj, p);}, variant);    
 }
-
+constexpr bool operator==(const Plane& a, const Shapes& v) noexcept {
+    const Plane* b = std::get_if<Plane>(&v);
+    return b && *b == a; //true if v contains a T that compares equal to t
+}
 constexpr bool operator==(const Sphere& a, const Shapes& v) noexcept {
     const Sphere* b = std::get_if<Sphere>(&v);
     return b && *b == a; //true if v contains a T that compares equal to t

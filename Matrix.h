@@ -336,8 +336,8 @@ constexpr Matrix4 scaling(Tuple p) noexcept {
 }
 
 /*constexpr*/ Matrix4 rotation_x(Real radians) noexcept {
-    const auto cos = std::cos(radians); //not available as constexpr yet...
-    const auto sin = std::sin(radians);
+    const auto cos = std::cos(radians); 
+    const auto sin = std::sin(radians);//not available as constexpr yet...
     return {
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, cos,  -sin, 0.0f,
@@ -367,7 +367,7 @@ constexpr Matrix4 scaling(Tuple p) noexcept {
 }
 
 /*constexpr*/ Matrix4 rotation(Real radians_x, Real radians_y, Real radians_z) noexcept {    
-    //return rotation_x(radians_x) * rotation_y(radians_y) * rotation_z(radians_z);   
+    //= return rotation_x(radians_x) * rotation_y(radians_y) * rotation_z(radians_z);   
     const auto cos_x = std::cos(radians_x);
     const auto sin_x = -std::sin(radians_x);
     const auto cos_y = std::cos(radians_y);

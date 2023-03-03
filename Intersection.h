@@ -24,8 +24,8 @@ struct Intersection final {
     constexpr bool operator==(const Intersection& that) const noexcept {
         return object() == that.object() && math::float_cmp(t, that.t);
     }       
-    constexpr auto operator<=>(Real time) const noexcept {
-        return t <=> time;
+    constexpr auto operator<(Real time) const noexcept {
+        return t < time;
     }
 };
 
@@ -88,8 +88,12 @@ constexpr auto intersections(std::initializer_list<Intersection> is) noexcept {
 }
 
 
-constexpr std::pair<Real, Real> local_intersect(const Plane& p, const Ray& r)  {
-    return {0.0f, 0.0f};
+constexpr std::pair<Real, Real> local_intersect([[maybe_unused]]const Plane& p, const Ray& r)  {
+    if (math::abs(r.direction.y) < math::BOOK_EPSILON) {
+        return {0.0f, 0.0f};
+    }
+    const auto t1 = -r.origin.y / r.direction.y;
+    return {t1, 0.0f};
 };
 
 //https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
@@ -112,7 +116,7 @@ constexpr std::pair<Real, Real> local_intersect(const Sphere& s, const Ray& r)  
 
 constexpr auto intersect(const Shapes& variant, const Ray& r)  {    
     const auto [t1, t2] = std::visit([&r](const auto& obj) { return local_intersect(obj, r);  }, variant );
-    if (t1 && t2) {
+    if (t1 || t2) {
         return intersections({ intersection(t1, variant), intersection(t2, variant) });
     }
     return intersections();  

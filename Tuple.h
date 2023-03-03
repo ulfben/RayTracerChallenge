@@ -99,6 +99,17 @@ struct Tuple final {
     };
 };
 
+template <>
+struct std::formatter<Tuple> : std::formatter<string_view> {
+    auto format(const Tuple& obj, std::format_context& ctx) const {
+        std::string temp;
+        std::format_to(std::back_inserter(temp), "({}, {}, {}, {})"sv, 
+                       obj.x, obj.y, obj.z, obj.w);
+        return std::formatter<string_view>::format(temp, ctx);
+    }
+};
+
+
 #pragma warning(push)
 #pragma warning( disable : 26481 ) //spurious warning; "don't use pointer arithmetic" 
 std::ostream& operator<<(std::ostream& os, const Tuple& t) {

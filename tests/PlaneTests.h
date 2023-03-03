@@ -23,13 +23,48 @@ TEST(Plane, normalIsConstantEverywhere) {
     EXPECT_EQ(n3, vector(0, 1, 0));
 }
 
-TEST(Plane, intersectWithRayParallelToThePlane) {
+TEST(Plane, intersectWithParallelRay) {
     constexpr auto p = plane();
     const auto r = ray(point(0, 10, 0), vector(0, 0, 1));
     const auto xs = local_intersect(p, r);
     //EXPECT_TRUE(xs.empty());    
     EXPECT_EQ(xs.first, 0.0f);
     EXPECT_EQ(xs.second, 0.0f);
+}
+
+TEST(Plane, intersectWithCoplanarRay) {
+    constexpr auto p = plane();
+    const auto r = ray(point(0, 0, 0), vector(0, 0, 1));
+    const auto xs = local_intersect(p, r);
+    //EXPECT_TRUE(xs.empty());    
+    EXPECT_EQ(xs.first, 0.0f);
+    EXPECT_EQ(xs.second, 0.0f);
+}
+
+TEST(Plane, intersectWithRayFromAbove) {
+    constexpr auto p = plane();
+    const auto r = ray(point(0, 1, 0), vector(0,-1, 0));
+    const auto xs = local_intersect(p, r);    
+    EXPECT_EQ(xs.first, 1.0f);
+    EXPECT_EQ(xs.second, 0.0f);
+
+    //TODO: rethink this interface. 
+    const auto xs2 = intersect(p, r);
+    EXPECT_FALSE(xs2.empty());    
+    EXPECT_EQ(xs2.begin()->object(), p);
+}
+
+TEST(Plane, intersectWithRayFromBelow) {
+    constexpr auto p = plane();
+    const auto r = ray(point(0, -1, 0), vector(0,1, 0));
+    const auto xs = local_intersect(p, r);    
+    EXPECT_EQ(xs.first, 1.0f);
+    EXPECT_EQ(xs.second, 0.0f);
+ 
+    //TODO: rethink this interface. 
+    const auto xs2 = intersect(p, r);
+    EXPECT_FALSE(xs2.empty());    
+    EXPECT_EQ(xs2.begin()->object(), p);
 }
 
 RESTORE_WARNINGS

@@ -33,7 +33,7 @@ constexpr Sphere sphere() noexcept {
 #pragma warning(push)
 #pragma warning( disable : 26481 ) //spurious warning; "don't use pointer arithmetic" 
 std::ostream& operator<<(std::ostream& os, const Sphere& t) {
-    os << std::format("Sphere(({},{},{}), {})"sv, t.position.x, t.position.y, t.position.z, t.radius);
+    os << std::format("Sphere({}, {})"sv, t.position, t.radius);
     return os;
 }
 #pragma warning(pop)

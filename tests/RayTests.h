@@ -74,7 +74,7 @@ TEST(Ray, intersectWhenSphereBehindRay) {
 
 TEST(Intersection, encapsulatesTandObject) {    
     const Shapes s{ std::in_place_type<Sphere>, point(0,0,0), 1.0f };
-    const auto i = Intersection{ &s, 3.5f }; //intersection(3.5f, s);
+    const auto i = intersection(3.5f, s);
     EXPECT_TRUE(i);
     EXPECT_EQ(i, i);    
     EXPECT_FLOAT_EQ(i.t, 3.5f);    
