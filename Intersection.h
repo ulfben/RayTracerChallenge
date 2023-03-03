@@ -8,25 +8,22 @@ struct Intersection final {
     const Shapes* objPtr = nullptr;
     Real t{ 0 };
 
-    explicit constexpr operator bool() const noexcept {
+    explicit constexpr operator bool() const  {
         return objPtr != nullptr;
     }
-    constexpr const Shapes& object() const noexcept {
+    constexpr const Shapes& object() const  {
         assert(objPtr != nullptr);
         return *objPtr;
     }
     constexpr const Material& surface() const noexcept {
-        return std::get<Sphere>(object()).surface;
+        return std::visit([](const auto& obj) -> const Material& { return obj.surface;  }, object());
     }
+    constexpr bool operator<(const Intersection& that) const noexcept {
+        return t < that.t;
+    }  
     constexpr bool operator==(const Intersection& that) const noexcept {
-        return *objPtr == *that.objPtr && math::float_cmp(t, that.t);
-    }
-    constexpr bool operator==(const Real that) const noexcept {
-        return math::float_cmp(t, that);
-    }
-    constexpr auto operator<=>(const Intersection& that) const noexcept {
-        return t <=> that.t;
-    }
+        return object() == that.object() && math::float_cmp(t, that.t);
+    }       
     constexpr auto operator<=>(Real time) const noexcept {
         return t <=> time;
     }
@@ -37,6 +34,7 @@ struct Intersections final {
     using value_type = Intersection; 
     using container = std::vector<value_type>;
     using reference = container::reference;
+    using const_reference = container::const_reference;
     using pointer = container::pointer;
     using const_pointer = container::const_pointer;
     using iterator = container::iterator;
@@ -45,7 +43,7 @@ struct Intersections final {
 
     explicit constexpr Intersections(std::initializer_list<value_type> intersections) noexcept : xs(intersections) {};
 
-    constexpr value_type operator[](size_type i) const noexcept {
+    constexpr const_reference operator[](size_type i) const noexcept {
         assert(i < size() && "Intersection::operator[i] index is out of bounds");
         return xs[i];
     }
@@ -63,10 +61,7 @@ struct Intersections final {
         xs.append_range(val);
     }
 
-    constexpr void sort() {
-        std::ranges::sort(xs, std::less<value_type>{});
-    }
-
+    constexpr void sort() noexcept { std::ranges::sort(xs, std::less<value_type>{}); }
     constexpr pointer data() noexcept { return xs.data(); }
     constexpr const_pointer data() const noexcept { return xs.data(); }
     constexpr size_type size() const noexcept { return narrow_cast<size_type>(xs.size()); }
@@ -79,44 +74,26 @@ struct Intersections final {
     constexpr auto operator<=>(const Intersections& that) const noexcept = default;
 };
 
-//template<class T>
 constexpr auto intersection(Real t, const Shapes& obj) noexcept {
     return Intersection{ &obj, t };
 }
-//template<class T>
 constexpr auto intersections() noexcept {
     return Intersections{};
 }
-template<class InterSection>
-constexpr auto intersections(InterSection i1, InterSection i2) noexcept {
+constexpr auto intersections(Intersection i1, Intersection i2) noexcept {
     return Intersections{ std::move(i1), std::move(i2) };
 }
-template<class InterSection>
-constexpr auto intersections(std::initializer_list<InterSection> is) noexcept {
+constexpr auto intersections(std::initializer_list<Intersection> is) noexcept {
     return Intersections(is);
 }
 
 
-constexpr auto local_intersect(const Plane& s, const Ray& r) noexcept {
-    return intersections();
-    //constexpr Real SPHERE_RADIUS = 1.0f; //assuming unit spheres for now
-    //const auto ray2 = transform(r, inverse(s.transform));
-    //const Vector sphere_to_ray = ray2.origin - s.position;
-    //const auto a = dot(ray2.direction, ray2.direction);
-    //const auto b = 2 * dot(ray2.direction, sphere_to_ray);
-    //const auto col = dot(sphere_to_ray, sphere_to_ray) - SPHERE_RADIUS;
-    //const auto discriminant = (b * b) - (4.0f * a * col);
-    //if (discriminant < 0) {
-    //    return intersections();
-    //}
-    //const auto sqrtOfDiscriminant = std::sqrt(discriminant);
-    //const auto t1 = (-b - sqrtOfDiscriminant) / (2 * a);
-    //const auto t2 = (-b + sqrtOfDiscriminant) / (2 * a);
-    //return intersections({ intersection(t1, s), intersection(t2, s) });
+constexpr std::pair<Real, Real> local_intersect(const Plane& p, const Ray& r)  {
+    return {0.0f, 0.0f};
 };
 
 //https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
-constexpr auto local_intersect(const Sphere& s, const Ray& r) noexcept {
+constexpr std::pair<Real, Real> local_intersect(const Sphere& s, const Ray& r)  {
     constexpr Real SPHERE_RADIUS = 1.0f; //assuming unit spheres for now
     const auto ray2 = transform(r, inverse(s.transform));
     const Vector sphere_to_ray = ray2.origin - s.position;
@@ -125,48 +102,33 @@ constexpr auto local_intersect(const Sphere& s, const Ray& r) noexcept {
     const auto col = dot(sphere_to_ray, sphere_to_ray) - SPHERE_RADIUS;
     const auto discriminant = (b * b) - (4.0f * a * col);
     if (discriminant < 0) {
-        return intersections();
+        return {0.0f, 0.0f};
     }
-    const auto sqrtOfDiscriminant = std::sqrt(discriminant);
+    const auto sqrtOfDiscriminant = math::sqrt(discriminant);
     const auto t1 = (-b - sqrtOfDiscriminant) / (2 * a);
     const auto t2 = (-b + sqrtOfDiscriminant) / (2 * a);
-    return intersections({ intersection(t1, s), intersection(t2, s) });
+    return {t1, t2};   
 };
 
-constexpr auto intersect(const Shapes& variant, const Ray& r) noexcept {
-    //TODO: intersections 
-    return std::visit(
-        [&r](const auto& obj) -> Intersections { return local_intersect(obj, r);  }, 
-        variant
-    );
-    //const auto& s = get_sphere(variant);
-    //constexpr Real SPHERE_RADIUS = 1.0f; //assuming unit spheres for now
-    //const auto ray2 = transform(r, inverse(s.transform));
-    //const Vector sphere_to_ray = ray2.origin - s.position;
-    //const auto a = dot(ray2.direction, ray2.direction);
-    //const auto b = 2 * dot(ray2.direction, sphere_to_ray);
-    //const auto col = dot(sphere_to_ray, sphere_to_ray) - SPHERE_RADIUS;
-    //const auto discriminant = (b * b) - (4.0f * a * col);
-    //if (discriminant < 0) {
-    //    return intersections();
-    //}
-    //const auto sqrtOfDiscriminant = std::sqrt(discriminant);
-    //const auto t1 = (-b - sqrtOfDiscriminant) / (2 * a);
-    //const auto t2 = (-b + sqrtOfDiscriminant) / (2 * a);
-    //return intersections({ intersection(t1, variant), intersection(t2, variant) });
+constexpr auto intersect(const Shapes& variant, const Ray& r)  {    
+    const auto [t1, t2] = std::visit([&r](const auto& obj) { return local_intersect(obj, r);  }, variant );
+    if (t1 && t2) {
+        return intersections({ intersection(t1, variant), intersection(t2, variant) });
+    }
+    return intersections();  
 };
 
-constexpr auto intersect(const World& world, const Ray& r) noexcept {
-    Intersections result = intersections(); 
+constexpr auto intersect(const World& world, const Ray& r)  {
+    Intersections result = intersections();     
     for (const auto& variant : world) {        
         result.push_back(intersect(variant, r));
-    }
+    }    
     result.sort();
     return result;
 };
 
 //TODO: consider an alternative algorithm: remove + min_element
-constexpr auto closest(const Intersections& xs) noexcept {    
+constexpr auto closest(const Intersections& xs)  {    
     const auto iter = std::ranges::min_element(xs,
         // This comparison function allows us to find the smallest positive number 
         // by considering negative numbers as larger than positive numbers. 
@@ -182,7 +144,7 @@ constexpr auto closest(const Intersections& xs) noexcept {
     return *iter;
 };
 
-struct HitState final { //"prepared computations", name to be figured out. 
+struct HitState final {
     const Shapes* objectPtr = nullptr; //the object variant we hit    
     Point point{}; //the point in world-space where the intersection occurs
     Point over_point{}; //slightly nudged point to avoid intersection precision errors causing "acne"
@@ -191,7 +153,7 @@ struct HitState final { //"prepared computations", name to be figured out.
     Real t{ 0 }; //distance to hit
     bool inside = false;
 
-    constexpr HitState(const Intersection& i, const Ray& r) noexcept
+    constexpr HitState(const Intersection& i, const Ray& r) 
         : objectPtr{ i.objPtr }, point{ position(r, i.t) }, eye_v{ -r.direction }, t{ i.t } {
         normal = normal_at(object(), point);
         if (dot(normal, eye_v) < 0.0f) {
@@ -206,8 +168,8 @@ struct HitState final { //"prepared computations", name to be figured out.
     explicit constexpr operator bool() const noexcept {
         return t != 0;
     }
-    const Material& surface() const noexcept {
-        return std::get<Sphere>(object()).surface;
+    const Material& surface() const noexcept {        
+        return std::visit([](const auto& obj) -> const Material& { return obj.surface;  }, object());
     }
     const Shapes& object() const noexcept {
         assert(objectPtr && "HitState::object() called on empty HitState.");
@@ -215,7 +177,7 @@ struct HitState final { //"prepared computations", name to be figured out.
     }
 };
 
-constexpr HitState prepare_computations(const Intersection& i, const Ray& r) noexcept {
+constexpr HitState prepare_computations(const Intersection& i, const Ray& r) {
     return HitState(i, r);
 }
 
@@ -235,12 +197,13 @@ constexpr Color shade_hit(const World& w, const HitState& hit) noexcept {
     return lighting(hit.surface(), w.light, hit.point, hit.eye_v, hit.normal);
 }
 
-constexpr Color color_at(const World& w, const Ray& r) noexcept {
+constexpr Color color_at(const World& w, const Ray& r) {    
     const auto xs = intersect(w, r);
     const auto closestHit = closest(xs);
-    if (closestHit) {        
-        return shade_hit(w, prepare_computations(closestHit, r));
-    }
+    if (closestHit) {
+        const auto calcs = prepare_computations(closestHit, r);
+        return shade_hit(w, calcs);
+    }    
     return BLACK;
 }
 

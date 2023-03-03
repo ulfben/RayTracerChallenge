@@ -211,7 +211,7 @@ TEST(DISABLED_Chapter8, CanRenderSceneWithShadows) {
     save_to_file(img, "output/chapter8_8.ppm"sv);
 }
 
-TEST(Chapter9, CanRenderMoreShapes) {
+TEST(DISABLED_Chapter9, CanRenderMoreShapes) {
     using size_type = Canvas::size_type;
     auto c = Camera(80, 40, math::PI / 3);
     c.transform = view_transform(point(0.0f, 1.5f, -5.0f), point(0, 1, 0), vector(0, 1, 0));

@@ -73,12 +73,12 @@ TEST(Ray, intersectWhenSphereBehindRay) {
 }
 
 TEST(Intersection, encapsulatesTandObject) {    
-    const auto s = sphere(point(0,0,0), 1.0f);
-    const auto i = intersection(3.5f, s);
+    const Shapes s{ std::in_place_type<Sphere>, point(0,0,0), 1.0f };
+    const auto i = Intersection{ &s, 3.5f }; //intersection(3.5f, s);
     EXPECT_TRUE(i);
     EXPECT_EQ(i, i);    
     EXPECT_FLOAT_EQ(i.t, 3.5f);    
-    EXPECT_EQ(*i.objPtr, s);
+    EXPECT_EQ(i.object(), s);
 }
 
 TEST(Intersections, aggregatesIntersection) {    
@@ -94,7 +94,7 @@ TEST(Intersections, aggregatesIntersection) {
 
 TEST(intersect, setsTheObjectOnTheIntersections) {
     const auto r = ray(point(0,0,-5), vector(0,0,1));    
-    const Shapes s = sphere(point(0,0,0), 1.0f);
+    const Sphere s = sphere(point(0,0,0), 1.0f);
     const auto xs = intersect(s, r);
     EXPECT_EQ(xs.size(), 2);
     EXPECT_FLOAT_EQ(xs[0].t, 4.0f);
@@ -210,7 +210,7 @@ TEST(Intersections, stateIncludesOffsetPoint) {
     const auto i1 = intersection(5, s);
     const auto hit = prepare_computations(i1, r);
     EXPECT_TRUE(hit);
-    EXPECT_LT(hit.over_point.z, -std::numeric_limits<Real>::epsilon()/2); //half of -EPSILON, to make sure over_point has been adjusted in the correction direction
+    EXPECT_LT(hit.over_point.z, -std::numeric_limits<Real>::epsilon()/2); //half of -EPSILON, to make sure over_point has been adjusted in the correct direction
     EXPECT_GT(hit.point.z, hit.over_point.z); 
 }
 

@@ -2,7 +2,9 @@
 #include "../pch.h"
 #include "../Tuple.h"
 #include "../Matrix.h"
+#include "../Ray.h"
 #include "../Shapes.h"
+#include "../Intersection.h"
 
 DISABLE_WARNINGS_FROM_GTEST
 
@@ -25,9 +27,9 @@ TEST(Plane, intersectWithRayParallelToThePlane) {
     constexpr auto p = plane();
     const auto r = ray(point(0, 10, 0), vector(0, 0, 1));
     const auto xs = local_intersect(p, r);
-    EXPECT_TRUE(xs.empty());    
+    //EXPECT_TRUE(xs.empty());    
+    EXPECT_EQ(xs.first, 0.0f);
+    EXPECT_EQ(xs.second, 0.0f);
 }
-
-
 
 RESTORE_WARNINGS

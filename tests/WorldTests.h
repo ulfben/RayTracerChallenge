@@ -2,6 +2,7 @@
 #include "../pch.h"
 #include "../World.h"
 #include "../Ray.h"
+#include "../Intersection.h"
 
 DISABLE_WARNINGS_FROM_GTEST
 
@@ -57,10 +58,10 @@ TEST(World, colorWhenRayMisses) {
 }
 
 TEST(World, colorWhenRayHit) {
-    auto w = World();       
+    auto w = World();
     const auto r = ray(point(0, 0, -5), vector(0, 0, 1));
-    const auto col = color_at(w, r);
-    EXPECT_EQ(col, color(0.38066f, 0.47583f, 0.2855f));    
+    const auto col = color_at(w, r); 
+    EXPECT_EQ(col, color(0.38066f, 0.47583f, 0.2855f));
 }
 
 TEST(World, colorWhenHitBehindRay) {

@@ -132,6 +132,7 @@
       <TranslateIncludes>false</TranslateIncludes>
       <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
       <EnableModules>false</EnableModules>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -157,6 +158,7 @@
       <TranslateIncludes>false</TranslateIncludes>
       <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
       <EnableModules>false</EnableModules>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -181,6 +183,7 @@
       <TranslateIncludes>false</TranslateIncludes>
       <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
       <EnableModules>false</EnableModules>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -207,6 +210,7 @@
       <TranslateIncludes>false</TranslateIncludes>
       <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
       <EnableModules>false</EnableModules>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
