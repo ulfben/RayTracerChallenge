@@ -18,6 +18,7 @@
 #include "tests/WorldTests.h"
 #include "tests/CameraTests.h"
 #include "tests/PlaneTests.h"
+#include "tests/ReflectionTests.h"
 
 TEST(DISABLED_Chapter2, CanOutputPPM) {    
     auto c = Canvas(300, 300);

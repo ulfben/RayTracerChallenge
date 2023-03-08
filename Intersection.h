@@ -176,10 +176,10 @@ struct HitState final {
     explicit constexpr operator bool() const noexcept {
         return t != 0;
     }
-    const Material& surface() const noexcept {        
+    constexpr const Material& surface() const noexcept {        
         return std::visit([](const auto& obj) -> const Material& { return obj.surface;  }, object());
     }
-    const Shapes& object() const noexcept {
+    constexpr const Shapes& object() const noexcept {
         assert(objectPtr && "HitState::object() called on empty HitState.");
         return *objectPtr;
     }
@@ -216,5 +216,10 @@ constexpr Color color_at(const World& w, const Ray& r) {
 }
 
 constexpr Color reflected_color(const World& w, const HitState& state) {        
-    return BLACK;
+    if (state.surface().reflective == 0) {
+        return BLACK;
+    }
+    const auto reflect_ray = ray(state.over_point, state.reflectv);
+    const auto c = color_at(w, reflect_ray);
+    return c * state.surface().reflective;
 }
