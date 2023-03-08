@@ -7,7 +7,14 @@
 using Shapes = std::variant<Sphere, Plane>;
 
 constexpr Vector normal_at(const Shapes& variant, const Point& p) { 
-    return std::visit([&p](const auto& obj){ return local_normal_at(obj, p);}, variant);    
+    return std::visit([&p](const auto& obj){ 
+        const auto inv_transform = inverse(obj.transform);
+        const auto object_space_point = inv_transform * p; 
+        const auto object_space_normal = local_normal_at(obj, object_space_point);
+        auto world_space_normal = transpose(inv_transform) * object_space_normal;
+        world_space_normal.w = 0; //hack to avoid having to work with the transform submatrix
+        return normalize(world_space_normal);               
+    }, variant);    
 }
 constexpr bool operator==(const Plane& a, const Shapes& v) noexcept {
     const Plane* b = std::get_if<Plane>(&v);

@@ -19,6 +19,6 @@ constexpr Plane plane() noexcept {
     return Plane{};
 }
 
-constexpr Vector local_normal_at([[maybe_unused]]const Plane& s, [[maybe_unused]] const Point& p) noexcept {     
+constexpr Vector local_normal_at([[maybe_unused]]const Plane& s, [[maybe_unused]] const Point& local_point) noexcept {     
     return vector(0.0f, 1.0f, 0.0f);
 }

@@ -38,11 +38,6 @@ std::ostream& operator<<(std::ostream& os, const Sphere& t) {
 }
 #pragma warning(pop)
 
-constexpr Vector local_normal_at(const Sphere& s, const Point& p) noexcept { 
-    const auto inv_transform = inverse(s.transform);
-    const auto object_space_point = inv_transform * p; 
-    const auto object_space_normal = object_space_point - s.position; /*s position is always 0*/
-    auto world_space_normal = transpose(inv_transform) * object_space_normal;
-    world_space_normal.w = 0; //hack to avoid having to work with the transform submatrix
-    return normalize(world_space_normal);
+constexpr Vector local_normal_at([[maybe_unused]]const Sphere& s, const Point& object_space_point) noexcept { 
+    return object_space_point; // -s.position; /*s position is always 0*/    
 }

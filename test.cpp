@@ -166,7 +166,7 @@ TEST(DISABLED_Chapter7, CanRenderScene) {
 
 TEST(DISABLED_Chapter8, CanRenderSceneWithShadows) {
     using size_type = Canvas::size_type;
-    auto c = Camera(800, 400, math::PI / 3);
+    auto c = Camera(400, 200, math::PI / 3);
     c.transform = view_transform(point(0.0f, 1.5f, -5.0f), point(0, 1, 0), vector(0, 1, 0));
 
     auto floor = sphere();
@@ -208,27 +208,26 @@ TEST(DISABLED_Chapter8, CanRenderSceneWithShadows) {
     world.light = point_light(point(-10, 10, -10), color(1, 1, 1));
 
     const auto img = render(c, world);
-    save_to_file(img, "output/chapter8_8.ppm"sv);
+    save_to_file(img, "output/chapter8_9.ppm"sv);
 }
 
-TEST(DISABLED_Chapter9, CanRenderMoreShapes) {
+TEST(Chapter9, CanRenderPlanes) {
     using size_type = Canvas::size_type;
-    auto c = Camera(80, 40, math::PI / 3);
+    auto c = Camera(200, 100, math::PI / 3.0f);
     c.transform = view_transform(point(0.0f, 1.5f, -5.0f), point(0, 1, 0), vector(0, 1, 0));
 
-    auto floor = sphere();
-    floor.transform = scaling(10, 0.01f, 10);
-    floor.surface = material();
+    auto floor = plane();
+    floor.transform =  translation(0.0f, 0.0f, 3.0f) * rotation_x(math::HALF_PI);  
     floor.surface.color = color(1, 0.9f, 0.9f);
-    floor.surface.specular = 0;
+    floor.surface.specular = 0.8f;
 
-    auto left_wall = sphere();
-    left_wall.transform = translation(0, 0, 5) * rotation_y(-math::PI / 4.0f) * rotation_x(math::PI / 2) * scaling(10.0f, 0.01f, 10.0f);
+    /*auto left_wall = sphere();
+    left_wall.transform = translation(0, 0, 5) * rotation_y(-math::PI / 4.0f) * rotation_x(math::PI  / 2) * scaling(10.0f, 0.01f, 10.0f);
     left_wall.surface = floor.surface;
 
     auto right_wall = sphere();
     right_wall.transform = translation(0, 0, 5) * rotation_y(math::PI / 4.0f) * rotation_x(math::PI / 2) * scaling(10.0f, 0.01f, 10.0f);
-    right_wall.surface = floor.surface;
+    right_wall.surface = floor.surface;*/
 
     auto middle = sphere();
     middle.transform = translation(-0.5f, 1, 0.5f);
@@ -251,7 +250,7 @@ TEST(DISABLED_Chapter9, CanRenderMoreShapes) {
     left.surface.diffuse = 0.7f;
     left.surface.specular = 0.3f;
 
-    auto world = World({ floor, left_wall, right_wall, left, middle, right });
+    auto world = World({ floor, left, middle, right });
     world.light = point_light(point(-10, 10, -10), color(1, 1, 1));
 
     const auto img = render(c, world);

@@ -55,7 +55,7 @@ TEST(Plane, intersectWithRayFromAbove) {
 }
 
 TEST(Plane, intersectWithRayFromBelow) {
-    constexpr auto p = plane();
+    constexpr auto p = Plane();
     const auto r = ray(point(0, -1, 0), vector(0,1, 0));
     const auto xs = local_intersect(p, r);    
     EXPECT_EQ(xs.first, 1.0f);
