@@ -156,7 +156,8 @@ struct HitState final {
     Point over_point{}; //slightly nudged point to avoid intersection precision errors causing "acne"
     Vector eye_v{}; //inverted, pointing back towards the camera
     Vector normal{}; //the normal of the point 
-    Real t{ 0 }; //distance to hit
+    Vector reflectv{}; //reflection vector
+    Real t{ 0 }; //distance to hit    
     bool inside = false;
 
     constexpr HitState(const Intersection& i, const Ray& r) 
@@ -169,6 +170,7 @@ struct HitState final {
         //move the point out slightly along the normal to ensure that the shadow ray 
         // originates in front of the surface and not behind it (causing spurious self-shading)
         over_point = point + (normal * math::SHADOW_BIAS);
+        reflectv = reflect(r.direction, normal);
     }
 
     explicit constexpr operator bool() const noexcept {
@@ -213,3 +215,6 @@ constexpr Color color_at(const World& w, const Ray& r) {
     return BLACK;
 }
 
+constexpr Color reflected_color(const World& w, const HitState& state) {        
+    return BLACK;
+}

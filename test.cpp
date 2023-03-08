@@ -117,8 +117,7 @@ TEST(DISABLED_Chapter6, CanRenderPhongShadedSphere) {
     save_to_file(c, "output/chapter6_2.ppm"sv);    
 }
 
-TEST(DISABLED_Chapter7, CanRenderScene) {
-    using size_type = Canvas::size_type;
+TEST(DISABLED_Chapter7, CanRenderScene) {    
     auto c = Camera(400, 200, math::PI / 3);
     c.transform = view_transform(point(0.0f, 1.5f, -5.0f), point(0, 1, 0), vector(0, 1, 0));
 
@@ -164,8 +163,7 @@ TEST(DISABLED_Chapter7, CanRenderScene) {
     save_to_file(img, "output/chapter7_1.ppm"sv);    
 }
 
-TEST(DISABLED_Chapter8, CanRenderSceneWithShadows) {
-    using size_type = Canvas::size_type;
+TEST(DISABLED_Chapter8, CanRenderSceneWithShadows) {    
     auto c = Camera(400, 200, math::PI / 3);
     c.transform = view_transform(point(0.0f, 1.5f, -5.0f), point(0, 1, 0), vector(0, 1, 0));
 
@@ -211,7 +209,7 @@ TEST(DISABLED_Chapter8, CanRenderSceneWithShadows) {
     save_to_file(img, "output/chapter8_9.ppm"sv);
 }
 
-TEST(Chapter9, CanRenderPlanes) {    
+TEST(DISABLED_Chapter9, CanRenderPlanes) {    
     auto c = Camera(800, 400, math::PI / 3.0f);
     c.transform = view_transform(point(0.0f, 1.5f, -5.0f), point(0, 1, 0), vector(0, 1, 0));
 

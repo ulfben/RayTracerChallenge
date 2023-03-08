@@ -66,11 +66,11 @@ TEST(World, colorWhenRayHit) {
 
 TEST(World, colorWhenHitBehindRay) {
     auto w = World();
-    get_sphere(w, 0).surface.ambient = 1.0f; //outer sphere
-    get_sphere(w, 1).surface.ambient = 1.0f; //inner sphere
+    get_material(w, 0).ambient = 1.0f; //outer sphere
+    get_material(w, 1).ambient = 1.0f; //inner sphere
     const auto r = ray(point(0, 0, 0.75f), vector(0, 0, -1));
     const auto col = color_at(w, r);
-    EXPECT_EQ(col, get_sphere(w, 1).surface.color);
+    EXPECT_EQ(col,  get_material(w, 1).color);
 }
 
 RESTORE_WARNINGS

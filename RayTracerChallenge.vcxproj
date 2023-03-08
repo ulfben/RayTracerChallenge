@@ -88,6 +88,7 @@
     <ClInclude Include="tests\PhongReflectionTests.h" />
     <ClInclude Include="tests\PlaneTests.h" />
     <ClInclude Include="tests\RayTests.h" />
+    <ClInclude Include="tests\ReflectionTests.h" />
     <ClInclude Include="tests\SphereTests.h" />
     <ClInclude Include="tests\VectorTests.h" />
     <ClInclude Include="tests\WorldTests.h" />
