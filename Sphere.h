@@ -3,12 +3,13 @@
 #include "Tuple.h"
 #include "Matrix.h"
 #include "Material.h"
+#include "Ray.h"
 
 struct Sphere final {
     Matrix4 transform{ Matrix4Identity }; 
     Material surface{ material() }; 
     Point position{0,0,0};
-    Real radius{0};
+    Real radius{0};    
     constexpr Sphere() noexcept = default;
     constexpr Sphere(Point p, Real rad) noexcept : position(p), radius(rad)
     {}

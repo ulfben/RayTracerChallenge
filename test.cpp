@@ -211,23 +211,17 @@ TEST(DISABLED_Chapter8, CanRenderSceneWithShadows) {
     save_to_file(img, "output/chapter8_9.ppm"sv);
 }
 
-TEST(Chapter9, CanRenderPlanes) {
-    using size_type = Canvas::size_type;
-    auto c = Camera(200, 100, math::PI / 3.0f);
+TEST(Chapter9, CanRenderPlanes) {    
+    auto c = Camera(800, 400, math::PI / 3.0f);
     c.transform = view_transform(point(0.0f, 1.5f, -5.0f), point(0, 1, 0), vector(0, 1, 0));
 
-    auto floor = plane();
-    floor.transform =  translation(0.0f, 0.0f, 3.0f) * rotation_x(math::HALF_PI);  
-    floor.surface.color = color(1, 0.9f, 0.9f);
+    auto floor = plane();  
+    floor.surface.color =  color(1, 0.9f, 0.9f);
     floor.surface.specular = 0.8f;
 
-    /*auto left_wall = sphere();
-    left_wall.transform = translation(0, 0, 5) * rotation_y(-math::PI / 4.0f) * rotation_x(math::PI  / 2) * scaling(10.0f, 0.01f, 10.0f);
-    left_wall.surface = floor.surface;
-
-    auto right_wall = sphere();
-    right_wall.transform = translation(0, 0, 5) * rotation_y(math::PI / 4.0f) * rotation_x(math::PI / 2) * scaling(10.0f, 0.01f, 10.0f);
-    right_wall.surface = floor.surface;*/
+    auto back_wall = plane();
+    back_wall.transform = translation(0, 0, 5) * rotation_x(math::HALF_PI);
+    back_wall.surface = floor.surface;    
 
     auto middle = sphere();
     middle.transform = translation(-0.5f, 1, 0.5f);
@@ -250,7 +244,7 @@ TEST(Chapter9, CanRenderPlanes) {
     left.surface.diffuse = 0.7f;
     left.surface.specular = 0.3f;
 
-    auto world = World({ floor, left, middle, right });
+    auto world = World({ floor, back_wall, left, middle, right });
     world.light = point_light(point(-10, 10, -10), color(1, 1, 1));
 
     const auto img = render(c, world);

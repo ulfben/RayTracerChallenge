@@ -172,6 +172,36 @@ TEST(intersect, aScaledSphere) {
     EXPECT_FLOAT_EQ(xs[1].t, 7.0f);    
 }
 
+//TEST(intersect, aScaledShape) {    
+//    const auto r = ray(point(0,0,-5), vector(0,0,1));
+//    auto s = sphere(point(0,0,0), 1.0f);
+//    s.transform = scaling(2, 2, 2);    
+//    const auto xs = intersect(s, r);    
+//    EXPECT_EQ(s.saved_ray.origin, point(0, 0, -2.5f));
+//    EXPECT_EQ(s.saved_ray.direction, vector(0, 0, 0.5f));    
+//
+//    auto p = plane();
+//    p.transform = scaling(2, 2, 2);    
+//    const auto xs1 = intersect(p, r);    
+//    EXPECT_EQ(p.saved_ray.origin, point(0, 0, -2.5f));
+//    EXPECT_EQ(p.saved_ray.direction, vector(0, 0, 0.5f));    
+//}
+//
+//TEST(intersect, aTranslatedShape) {    
+//    const auto r = ray(point(0,0,-5), vector(0,0,1));
+//    auto s = sphere(point(0,0,0), 1.0f);
+//    s.transform = translation(5,0,0);    
+//    const auto xs = intersect(s, r);    
+//    EXPECT_EQ(s.saved_ray.origin, point(-5.0f, 0, -5.0f));
+//    EXPECT_EQ(s.saved_ray.direction, vector(0, 0, 1.0f));    
+//
+//    auto p = plane();
+//    p.transform = scaling(2, 2, 2);    
+//    const auto xs1 = intersect(p, r);    
+//    EXPECT_EQ(p.saved_ray.origin, point(-5.0f, 0, -5.0f));
+//    EXPECT_EQ(p.saved_ray.direction, vector(0, 0, 1.0f));    
+//}
+
 TEST(Intersections, precomputeIntersectionState) {    
     const auto r = ray(point(0,0,-5), vector(0,0,1));
     const auto s = sphere(point(0,0,0), 1.0f);
