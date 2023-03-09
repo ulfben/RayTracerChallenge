@@ -204,7 +204,7 @@ TEST(intersect, aScaledSphere) {
 
 TEST(Intersections, precomputeIntersectionState) {    
     const auto r = ray(point(0,0,-5), vector(0,0,1));
-    const auto s = sphere(ORIGO, 1.0f);
+    const Shapes s = sphere(ORIGO, 1.0f);
     const auto i1 = intersection(4, s);
     const auto hit = prepare_computations(i1, r);
     EXPECT_FLOAT_EQ(i1.t, hit.t);    
@@ -216,7 +216,7 @@ TEST(Intersections, precomputeIntersectionState) {
 
 TEST(Intersections, stateIncludesInside) {    
     const auto r = ray(point(0,0,-5), vector(0,0,1));
-    const auto s = sphere(ORIGO, 1.0f);
+    const Shapes s = sphere(ORIGO, 1.0f);
     const auto i1 = intersection(4, s);
     const auto hit = prepare_computations(i1, r);
     EXPECT_FALSE(hit.inside);        
@@ -224,7 +224,7 @@ TEST(Intersections, stateIncludesInside) {
 
 TEST(Intersections, stateIncludesInside2) {    
     const auto r = ray(point(0,0, 0), vector(0,0,1));
-    const auto s = sphere(ORIGO, 1.0f);
+    const Shapes s = sphere(ORIGO, 1.0f);
     const auto i1 = intersection(1, s);
     const auto hit = prepare_computations(i1, r);
     EXPECT_TRUE(hit.inside);
@@ -235,12 +235,11 @@ TEST(Intersections, stateIncludesInside2) {
 
 TEST(Intersections, stateIncludesOffsetPoint) {
     const auto r = ray(point(0, 0, -5), vector(0, 0, 1));
-    auto s = sphere(ORIGO, 1.0f);
-    s.transform = translation(0,0,1);
-    const auto i1 = intersection(5, s);
+    Shapes sh = sphere(translation(0,0,1));   
+    const auto i1 = intersection(5, sh);
     const auto hit = prepare_computations(i1, r);
     EXPECT_TRUE(hit);
-    EXPECT_LT(hit.over_point.z, -std::numeric_limits<Real>::epsilon()/2); //half of -EPSILON, to make sure over_point has been adjusted in the correct direction
+    EXPECT_LT(hit.over_point.z, -std::numeric_limits<Real>::epsilon()/2); //half of -EPSILON, to make sure over_point has been adjusted in the correct direction    
     EXPECT_GT(hit.point.z, hit.over_point.z); 
 }
 

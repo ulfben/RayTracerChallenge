@@ -249,3 +249,41 @@ TEST(DISABLED_Chapter9, CanRenderPlanes) {
     const auto img = render(c, world);
     save_to_file(img, "output/chapter9_0.ppm"sv);
 }
+
+TEST(Chapter11, CanRenderReflections) {    
+    auto c = Camera(600, 400, math::PI / 3.0f);
+    c.transform = view_transform(point(1.0f, 0.4f, -2.5f), point(0, 1, 0), vector(0, 1, 0));
+
+    auto floor = plane();  
+    floor.surface.color = color(1, 0.9f, 0.9f);    
+    floor.surface.specular = 0.8f;
+    floor.surface.reflective = 0.1f;
+
+    auto back_wall = plane();
+    back_wall.transform = translation(0, 0, 5) * rotation_x(math::HALF_PI);    
+
+    auto middle = sphere();
+    middle.transform = translation(-0.5f, 1, 0.5f);    
+    middle.surface = mirror();
+
+    auto right = sphere();
+    right.transform = translation(1.5f, 0.5f, -0.5f) * scaling(0.5f, 0.5f, 0.5f);
+    right.surface = material();
+    right.surface.color = color(0.5f, 1, 0.1f);
+    right.surface.diffuse = 0.7f;
+    right.surface.specular = 0.3f;  
+    right.surface.reflective = 0.2f;
+
+    auto left = sphere();
+    left.transform = translation(-1.5f, 0.33f, -0.75f) * scaling(0.33f, 0.33f, 0.33f);
+    left.surface = material();
+    left.surface.color = color(1.0f, 0.8f, 0.1f);
+    left.surface.diffuse = 0.7f;
+    left.surface.specular = 0.3f; 
+
+    auto world = World({ floor,  left, middle, right });
+    world.light = point_light(point(-10, 10, -10), color(1, 1, 1));
+
+    const auto img = render(c, world);
+    save_to_file(img, "output/chapter11_3.ppm"sv);
+}
