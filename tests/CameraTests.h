@@ -30,7 +30,7 @@ TEST(Camera, calculatesPixelSizeForVerticalCanvas) {
 TEST(Camera, constructRayThroughCenterOfCanvas) {
     const auto c = Camera(201, 101, math::PI / 2.0f);
     const auto r = ray_for_pixel(c, 100, 50);
-    EXPECT_EQ(r.origin, point(0,0,0));
+    EXPECT_EQ(r.origin, ORIGO);
     EXPECT_EQ(r.direction, vector(0,0,-1));
 }
 

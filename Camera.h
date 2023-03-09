@@ -43,7 +43,7 @@ constexpr Ray ray_for_pixel(const Camera& c, size_t px, size_t py) noexcept{
     //and then compute the ray's direction. (canvas is at z = -1)
     const auto inv = inverse(c.transform);
     const auto pixel = inv * point(world_x, world_y, -1.0f);
-    const auto origin = inv * point(0,0,0);
+    const auto origin = inv * ORIGO;
     const auto direction = normalize(pixel - origin);
     return ray(origin, direction);
 }

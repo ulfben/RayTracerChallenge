@@ -188,7 +188,7 @@ TEST(RotationMatrix, aroundAllAxis) {
 
 TEST(view_transform, defaultOrientation) {
     //Describes the world's default orientation, when nothing needs to be scaled, rotated or moved.     
-    constexpr auto from = point(0,0,0);
+    constexpr auto from = ORIGO;
     constexpr auto to = point(0, 0, -1); //The default orientation looks from the origin along the negative z-axis.
     constexpr auto up = vector(0, 1, 0); //Up is in the positive Y direction
     const auto t = view_transform(from, to, up); 
@@ -199,7 +199,7 @@ TEST(view_transform, lookingBackwardsMirrorsXAndZ) {
     //turning around and looking in the positive Z-direction is like looking in a mirror
     //front and back is swapped, left and right is swapped. In other words; z and x are reflected.
     //reflection is the same as scaling by a negative number, so that's what the test is. 
-    constexpr auto from = point(0,0,0);
+    constexpr auto from = ORIGO;
     constexpr auto to = point(0, 0, 1); //looking "backwards", along positive Z axis
     constexpr auto up = vector(0, 1, 0); 
     const auto t = view_transform(from, to, up); 

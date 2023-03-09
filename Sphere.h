@@ -29,13 +29,13 @@ constexpr Sphere sphere(Point p, Real radius) noexcept {
     return Sphere{ p, radius };
 }
 constexpr Sphere sphere(Material m) noexcept {
-    return Sphere{ point(0,0,0), 1.0f, std::move(m) };    
+    return Sphere{ ORIGO, 1.0f, std::move(m) };    
 }
 constexpr Sphere sphere(Matrix4 transform) noexcept {
     return Sphere(std::move(transform));    
 }
 constexpr Sphere sphere() noexcept {
-    return Sphere{ point(0,0,0), 1.0f };
+    return Sphere{ ORIGO, 1.0f };
 }
 
 #pragma warning(push)

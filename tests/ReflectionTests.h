@@ -68,7 +68,7 @@ TEST(Reflection, canHandleInfiniteRecursion) {
     auto upper = plane(mirror(), translation(0,1,0));    
     auto w = World({lower, upper});
     w.light = point_light(ORIGO, color(1, 1, 1));    
-    const auto r = ray(point(0,0,0), vector(0,1,0)); 
+    const auto r = ray(ORIGO, vector(0,1,0)); 
     const auto c = color_at(w, r); 
     EXPECT_TRUE(true); 
 }

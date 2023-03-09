@@ -7,7 +7,7 @@ class Phong : public ::testing::Test {
  protected:
      Phong() noexcept = default;
      Material surface = material();
-     Point position = point(0,0,0); //world space point that the light is bouncing off
+     Point position = ORIGO; //world space point that the light is bouncing off
      Vector normal = vector(0, 0, -1);
 };
 
