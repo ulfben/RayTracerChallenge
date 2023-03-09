@@ -238,7 +238,8 @@ constexpr Color shade_hit(const World& w, const HitState& hit, int remaining = 4
     const auto shadowed = is_shadowed(w, hit.over_point);    
     const auto c = lighting(hit.surface(), w.light, hit.point, hit.eye_v, hit.normal, shadowed);
     const auto reflected_c = reflected_color(w, hit, remaining);
-    return c + reflected_c;
+    const auto refracted_c = refracted_color(w, hit, remaining);
+    return c + reflected_c + refracted_c;
 }
 
 constexpr Color color_at(const World& w, const Ray& r, int remaining = 4) noexcept{    

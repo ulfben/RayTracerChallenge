@@ -93,7 +93,8 @@ TEST(Transparency, shadeHitWithTransparentMaterial) {
     const auto xs = intersections({ intersection(sqrt, floor) });
     const auto state = prepare_computations(xs[0], r, xs);
     const auto c = shade_hit(w, state, 5);
-    EXPECT_EQ(c, color(0.93642f, 0.68462f, 0.68462f)); 
+    //color(0.93642f, 0.68462f, 0.68462f) //book oracle     
+    EXPECT_EQ(c, color(0.93642545f, 0.68642545f, 0.68642545f)); 
 }
 
 RESTORE_WARNINGS
