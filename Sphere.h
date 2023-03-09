@@ -19,6 +19,8 @@ struct Sphere final {
     {}
     explicit constexpr Sphere(Matrix4 transf) noexcept : transform(std::move(transf))
     {}
+    constexpr Sphere(Material m, Matrix4 transf) noexcept : transform(std::move(transf)), surface(std::move(m))
+    {}
     constexpr auto operator==(const Sphere& that) const noexcept {
         return position == that.position && math::float_cmp(radius, that.radius)
             && surface == that.surface && transform == that.transform;
@@ -33,6 +35,9 @@ constexpr Sphere sphere(Material m) noexcept {
 }
 constexpr Sphere sphere(Matrix4 transform) noexcept {
     return Sphere(std::move(transform));    
+}
+constexpr Sphere sphere(Material m, Matrix4 transform) noexcept {
+    return Sphere(std::move(m), std::move(transform));    
 }
 constexpr Sphere sphere() noexcept {
     return Sphere{ ORIGO, 1.0f };

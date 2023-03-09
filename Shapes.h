@@ -28,6 +28,29 @@ constexpr bool operator==(const Shapes& v, const Sphere& a) noexcept {
     return a == v;     
 }
 
+constexpr Matrix4& transform(Shapes& variant) noexcept { 
+    return std::visit([](auto& obj) -> Matrix4& { 
+        return obj.transform;
+    }, variant);    
+}
+constexpr Material& surface(Shapes& variant) noexcept { 
+    return std::visit([](auto& obj) -> Material& { 
+        return obj.surface;
+    }, variant);    
+}
+
+constexpr const Matrix4& transform(const Shapes& variant) noexcept { 
+    return std::visit([](const auto& obj) -> const Matrix4& { 
+        return obj.transform;
+    }, variant);    
+}
+constexpr const Material& surface(const Shapes& variant) noexcept { 
+    return std::visit([](const auto& obj) -> const Material& { 
+        return obj.surface;
+    }, variant);    
+}
+
+
 //constexpr Sphere& get_sphere(Shapes& variant){    
 //    return std::get<Sphere>(variant);
 //}

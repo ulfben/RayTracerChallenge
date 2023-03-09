@@ -157,7 +157,9 @@ struct HitState final {
     Vector eye_v{}; //inverted, pointing back towards the camera
     Vector normal{}; //the normal of the point 
     Vector reflectv{}; //reflection vector
-    Real t{ 0 }; //distance to hit    
+    Real t{ 0 }; //distance to hit
+    Real n1{ 1.0f }; //refractive index of the material we exited
+    Real n2{ 1.0f }; //refractive index of the material we entered
     bool inside = false;
 
     constexpr HitState(const Intersection& i, const Ray& r) noexcept 
@@ -170,14 +172,35 @@ struct HitState final {
         //move the point out slightly along the normal to ensure that the shadow ray 
         // originates in front of the surface and not behind it (causing spurious self-shading)
         over_point = point + (normal * math::SHADOW_BIAS);
-        reflectv = normalize(reflect(r.direction, normal));
+        reflectv = reflect(r.direction, normal);
+    }
+
+    constexpr HitState(const Intersection& closest, const Ray& r, const Intersections& xs) noexcept : HitState(closest, r){
+        std::vector<const Shapes*> containers;
+        for (const auto& i : xs) {
+            const auto is_the_hit = i == closest;
+            if (is_the_hit) {            
+                n1 = containers.empty() ? 1.0f : ::surface(*containers.back()).refractive_index;            
+            }
+            
+            if (const auto iter = std::ranges::find(containers, i.objPtr); iter != containers.end()) {
+                containers.erase(iter); //this intersection must be exiting the object, remove it from the lists
+            } else {
+                containers.push_back(i.objPtr); //the intersection is entering the object, add it to the list
+            }
+
+            if (is_the_hit) {            
+                n2 = containers.empty() ? 1.0f : ::surface(*containers.back()).refractive_index;                 
+                break; //terminate the loop
+            }
+        }
     }
 
     explicit constexpr operator bool() const noexcept {
         return t != 0;
     }
     constexpr const Material& surface() const noexcept {        
-        return std::visit([](const auto& obj) -> const Material& { return obj.surface;  }, object());
+        return ::surface(object());
     }
     constexpr const Shapes& object() const noexcept {
         assert(objectPtr && "HitState::object() called on empty HitState.");
@@ -187,6 +210,10 @@ struct HitState final {
 
 constexpr HitState prepare_computations(const Intersection& i, const Ray& r) noexcept {
     return HitState(i, r);
+}
+
+constexpr HitState prepare_computations(const Intersection& i, const Ray& r, const Intersections& xs)  noexcept {
+    return HitState(i, r, xs);
 }
 
 constexpr bool is_shadowed(const World& w, const Point& p) noexcept {
@@ -216,7 +243,7 @@ constexpr Color color_at(const World& w, const Ray& r, int remaining = 4) noexce
         const auto xs = intersect(w, r); //allocates.
         const auto closestHit = closest(xs);
         if (closestHit) {
-            const auto calcs = prepare_computations(closestHit, r);
+            const auto calcs = prepare_computations(closestHit, r, xs);
             return shade_hit(w, calcs, remaining);
         }    
     }

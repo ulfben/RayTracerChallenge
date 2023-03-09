@@ -83,6 +83,7 @@
     <ClInclude Include="tests\CanvasTests.h" />
     <ClInclude Include="tests\ColorTests.h" />
     <ClInclude Include="tests\FloatCompareTests.h" />
+    <ClInclude Include="tests\MaterialTests.h" />
     <ClInclude Include="tests\MatrixTests.h" />
     <ClInclude Include="tests\MatrixTransformationTests.h" />
     <ClInclude Include="tests\PhongReflectionTests.h" />
@@ -90,6 +91,7 @@
     <ClInclude Include="tests\RayTests.h" />
     <ClInclude Include="tests\ReflectionTests.h" />
     <ClInclude Include="tests\SphereTests.h" />
+    <ClInclude Include="tests\TransparencyTests.h" />
     <ClInclude Include="tests\VectorTests.h" />
     <ClInclude Include="tests\WorldTests.h" />
     <ClInclude Include="Tuple.h" />

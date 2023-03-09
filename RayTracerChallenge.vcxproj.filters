@@ -64,6 +64,12 @@
     <ClInclude Include="tests\ReflectionTests.h">
       <Filter>tests</Filter>
     </ClInclude>
+    <ClInclude Include="tests\MaterialTests.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\TransparencyTests.h">
+      <Filter>tests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
