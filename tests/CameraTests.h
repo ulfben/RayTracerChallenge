@@ -37,7 +37,7 @@ TEST(Camera, constructRayThroughCenterOfCanvas) {
 TEST(Camera, constructRayThroughCornerOfCanvas) {
     const auto c = Camera(201, 101, math::PI / 2.0f);
     const auto r = ray_for_pixel(c, 0, 0);
-    EXPECT_EQ(r.origin, point(0, 0, 0));
+    EXPECT_EQ(r.origin, ORIGO);
     EXPECT_EQ(r.direction, vector(0.66519f, 0.33259f, -0.66851f));
 }
 
@@ -54,7 +54,7 @@ TEST(Camera, renderWorldWithCamera) {
     const auto w = World();    
     auto c = Camera(11, 11, math::PI / 2.0f);
     const auto from = point(0, 0, -5);
-    const auto to = point(0, 0, 0);
+    const auto to = ORIGO;
     const auto up = point(0, 1, 0);
     c.transform = view_transform(from, to, up);    
     const auto img = render(c, w);

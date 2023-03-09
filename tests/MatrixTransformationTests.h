@@ -208,7 +208,7 @@ TEST(view_transform, lookingBackwardsMirrorsXAndZ) {
 
 TEST(view_transform, movesWorldRelativeToTheEye) {    
     constexpr auto from = point(0,0,8);//"place" eye 8 units out on Z
-    constexpr auto to = point(0, 0, 0); //look back at origin
+    constexpr auto to = ORIGO; //look back at origin
     constexpr auto up = vector(0, 1, 0); 
     const auto t = view_transform(from, to, up); 
     EXPECT_EQ(t, translation(0, 0, -8)); //the transform translates everything backwards 8 units 

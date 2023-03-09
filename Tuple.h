@@ -140,6 +140,8 @@ constexpr Point point(Real x, Real y, Real z) noexcept {
     return Point{ x, y, z, 1.0f };
 }
 
+static constexpr Point ORIGO = point(0,0,0);
+
 constexpr ByteColor to_byte_color(Color col) noexcept {
     return ByteColor(col);
 }

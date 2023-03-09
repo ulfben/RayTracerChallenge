@@ -124,7 +124,7 @@ constexpr auto intersect(const Shapes& variant, const Ray& r)  {
     return intersections();  
 };
 
-constexpr auto intersect(const World& world, const Ray& r)  {
+constexpr auto intersect(const World& world, const Ray& r) {
     Intersections result = intersections();     
     for (const auto& variant : world) {        
         result.push_back(intersect(variant, r));
@@ -134,7 +134,7 @@ constexpr auto intersect(const World& world, const Ray& r)  {
 };
 
 //TODO: consider an alternative algorithm: remove + min_element
-constexpr auto closest(const Intersections& xs)  {    
+constexpr auto closest(const Intersections& xs) noexcept {    
     const auto iter = std::ranges::min_element(xs,
         // This comparison function allows us to find the smallest positive number 
         // by considering negative numbers as larger than positive numbers. 
@@ -160,7 +160,7 @@ struct HitState final {
     Real t{ 0 }; //distance to hit    
     bool inside = false;
 
-    constexpr HitState(const Intersection& i, const Ray& r) 
+    constexpr HitState(const Intersection& i, const Ray& r) noexcept 
         : objectPtr{ i.objPtr }, point{ position(r, i.t) }, eye_v{ -r.direction }, t{ i.t } {
         normal = normal_at(object(), point);
         if (dot(normal, eye_v) < 0.0f) {
@@ -170,7 +170,7 @@ struct HitState final {
         //move the point out slightly along the normal to ensure that the shadow ray 
         // originates in front of the surface and not behind it (causing spurious self-shading)
         over_point = point + (normal * math::SHADOW_BIAS);
-        reflectv = reflect(r.direction, normal);
+        reflectv = normalize(reflect(r.direction, normal));
     }
 
     explicit constexpr operator bool() const noexcept {
@@ -185,41 +185,50 @@ struct HitState final {
     }
 };
 
-constexpr HitState prepare_computations(const Intersection& i, const Ray& r) {
+constexpr HitState prepare_computations(const Intersection& i, const Ray& r) noexcept {
     return HitState(i, r);
 }
 
-constexpr bool is_shadowed(const World& w, const Point& p){
+constexpr bool is_shadowed(const World& w, const Point& p) noexcept {
     const auto v = w.light.position - p;
     const auto distanceSq = magnitudeSq(v);
     const auto direction = normalize(v);
     const auto r = ray(p, direction); //ray from point towards light source
-    const auto hit = closest(intersect(w, r));
-    return (hit && (hit.t*hit.t) < distanceSq); //something is between us and the light.
-}
-
-constexpr Color shade_hit(const World& w, const HitState& hit) noexcept {
-    if (is_shadowed(w, hit.over_point)) {
-        return lighting_shadow(hit.surface(), w.light);
+    try {
+        const auto hit = closest(intersect(w, r)); //intersect allocates
+        return (hit && (hit.t * hit.t) < distanceSq); //something is between us and the light.
     }
-    return lighting(hit.surface(), w.light, hit.point, hit.eye_v, hit.normal);
+    catch (...) {}    
+    return false;
 }
 
-constexpr Color color_at(const World& w, const Ray& r) {    
-    const auto xs = intersect(w, r);
-    const auto closestHit = closest(xs);
-    if (closestHit) {
-        const auto calcs = prepare_computations(closestHit, r);
-        return shade_hit(w, calcs);
-    }    
+constexpr Color reflected_color(const World& w, const HitState& state, int remaining) noexcept;
+
+constexpr Color shade_hit(const World& w, const HitState& hit, int remaining = 4) noexcept {
+    const auto shadowed = is_shadowed(w, hit.over_point);    
+    const auto c = lighting(hit.surface(), w.light, hit.point, hit.eye_v, hit.normal, shadowed);
+    const auto reflected_c = reflected_color(w, hit, remaining);
+    return c + reflected_c;
+}
+
+constexpr Color color_at(const World& w, const Ray& r, int remaining = 4) noexcept{    
+    try {
+        const auto xs = intersect(w, r); //allocates.
+        const auto closestHit = closest(xs);
+        if (closestHit) {
+            const auto calcs = prepare_computations(closestHit, r);
+            return shade_hit(w, calcs, remaining);
+        }    
+    }
+    catch (...) {}        
     return BLACK;
 }
 
-constexpr Color reflected_color(const World& w, const HitState& state) {        
-    if (state.surface().reflective == 0) {
+constexpr Color reflected_color(const World& w, const HitState& state, int remaining) noexcept {        
+    if (remaining <= 0 || state.surface().reflective == 0) {
         return BLACK;
     }
     const auto reflect_ray = ray(state.over_point, state.reflectv);
-    const auto c = color_at(w, reflect_ray);
+    const auto c = color_at(w, reflect_ray, remaining-1);
     return c * state.surface().reflective;
 }

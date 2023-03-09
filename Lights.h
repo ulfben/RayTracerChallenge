@@ -12,12 +12,21 @@ constexpr Light point_light(Point p, Color i) noexcept {
     return Light{ p, i };
 }
 
+constexpr Color lighting_shadow(const Material& surface, const Light& light) noexcept {    
+    const auto effective_color = surface.color * light.intensity;    
+    const auto ambient = effective_color * surface.ambient;
+    return ambient; //we're in shadow, so no diffuse or specular contribution needed.
+}
+
 constexpr Color lighting(const Material& surface, const Light& light, const Point& p, const Vector& eye, const Vector& normal, bool in_shadow = false) noexcept {
+    if (in_shadow) {
+        return lighting_shadow(surface, light);
+    }
     const auto effective_color = surface.color * light.intensity;
     const auto direction_to_light = normalize(light.position - p);
     const auto ambient = effective_color * surface.ambient;
     const auto light_dot_normal = dot(direction_to_light, normal);
-    if (light_dot_normal <= 0 || in_shadow) {
+    if (light_dot_normal <= 0) {
         return ambient; //light dot normal, if negative, means the light is on the opposite side of the surface, so both the diffuse and specular component will be 0
     }
     const auto diffuse = effective_color * surface.diffuse * light_dot_normal;
@@ -26,10 +35,3 @@ constexpr Color lighting(const Material& surface, const Light& light, const Poin
     const auto specular = light.intensity * surface.specular * std::pow(std::max(dot(reflection_v, eye), 0.0f), surface.shininess);
     return ambient + diffuse + specular;
 }
-
-constexpr Color lighting_shadow(const Material& surface, const Light& light) noexcept {    
-    const auto effective_color = surface.color * light.intensity;    
-    const auto ambient = effective_color * surface.ambient;
-    return ambient; //we're in shadow, so no diffuse or specular contribution needed.
-}
-

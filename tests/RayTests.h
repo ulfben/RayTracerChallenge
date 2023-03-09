@@ -235,7 +235,7 @@ TEST(Intersections, stateIncludesInside2) {
 
 TEST(Intersections, stateIncludesOffsetPoint) {
     const auto r = ray(point(0, 0, -5), vector(0, 0, 1));
-    auto s = sphere(point(0, 0, 0), 1.0f);
+    auto s = sphere(ORIGO, 1.0f);
     s.transform = translation(0,0,1);
     const auto i1 = intersection(5, s);
     const auto hit = prepare_computations(i1, r);

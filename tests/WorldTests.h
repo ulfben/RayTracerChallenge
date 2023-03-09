@@ -9,9 +9,8 @@ DISABLE_WARNINGS_FROM_GTEST
 TEST(World, hasDefaultWorld) {
   const auto w = World();
   const Shapes s0{ sphere() };
-  const Shapes s1 = sphere(World::DEFAULT_WORLD_MATERIAL); 
-  auto s2 = sphere();
-  s2.transform = scaling(0.5f, 0.5f, 0.5f);
+  const Shapes s1 = sphere(World::DEFAULT_MATERIAL); 
+  const auto s2 = sphere(scaling(0.5f, 0.5f, 0.5f));
   EXPECT_TRUE(w.size() == 2);
   EXPECT_FALSE(w.contains(s0));
   EXPECT_TRUE(w.contains(s1));
@@ -43,7 +42,7 @@ TEST(World, shadeAnIntersection) {
 TEST(World, shadeAnIntersectionFromInside) {
     auto w = World();
     w.light = point_light(point(0, 0.25f, 0), WHITE);
-    const auto r = ray(point(0, 0, 0), vector(0, 0, 1));    
+    const auto r = ray(ORIGO, vector(0, 0, 1));    
     const auto i = intersection(0.5f, w[1]);
     const auto comps = prepare_computations(i, r);
     const auto col = shade_hit(w, comps);

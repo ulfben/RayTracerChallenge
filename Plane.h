@@ -11,11 +11,15 @@ struct Plane final {
     Material surface{};             
     constexpr auto operator==(const Plane& that) const noexcept {
         return surface == that.surface && transform == that.transform;
-    }
+    };
 };
 
 constexpr Plane plane() noexcept {
     return Plane{};
+}
+
+constexpr Plane plane(Material surface, Matrix4 transform) noexcept {
+    return Plane{std::move(transform), std::move(surface)};
 }
 
 constexpr Vector local_normal_at([[maybe_unused]]const Plane& s, [[maybe_unused]] const Point& local_point) noexcept {     

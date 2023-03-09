@@ -24,3 +24,8 @@ constexpr Material material() noexcept {
 constexpr Material material(Color c, Real ambient = 0.1f, Real diffuse = 0.9f, Real specular = 0.9f, Real shininess = 200.0f, Real reflective = 0.0f) noexcept {
     return Material{c, ambient, diffuse, specular, shininess, reflective};    
 }
+constexpr Material mirror() noexcept {
+    Material m{};
+    m.reflective = 1.0f;
+    return m;
+}
