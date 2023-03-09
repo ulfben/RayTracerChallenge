@@ -17,7 +17,9 @@ struct Plane final {
 constexpr Plane plane() noexcept {
     return Plane{};
 }
-
+constexpr Plane plane(Matrix4 transform) noexcept {
+    return Plane{ std::move(transform) };
+}
 constexpr Plane plane(Material surface, Matrix4 transform) noexcept {
     return Plane{std::move(transform), std::move(surface)};
 }

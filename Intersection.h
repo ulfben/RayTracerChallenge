@@ -154,6 +154,7 @@ struct HitState final {
     const Shapes* objectPtr = nullptr; //the object variant we hit    
     Point point{}; //the point in world-space where the intersection occurs
     Point over_point{}; //slightly nudged point to avoid intersection precision errors causing "acne"
+    Point under_point{}; //sligthly nudged, for refraction and transparencies
     Vector eye_v{}; //inverted, pointing back towards the camera
     Vector normal{}; //the normal of the point 
     Vector reflectv{}; //reflection vector
@@ -172,6 +173,7 @@ struct HitState final {
         //move the point out slightly along the normal to ensure that the shadow ray 
         // originates in front of the surface and not behind it (causing spurious self-shading)
         over_point = point + (normal * math::SHADOW_BIAS);
+        under_point = point - (normal * math::SHADOW_BIAS);
         reflectv = reflect(r.direction, normal);
     }
 
@@ -230,6 +232,7 @@ constexpr bool is_shadowed(const World& w, const Point& p) noexcept {
 }
 
 constexpr Color reflected_color(const World& w, const HitState& state, int remaining) noexcept;
+constexpr Color refracted_color(const World& w, const HitState& state, int remaining) noexcept;
 
 constexpr Color shade_hit(const World& w, const HitState& hit, int remaining = 4) noexcept {
     const auto shadowed = is_shadowed(w, hit.over_point);    
@@ -258,4 +261,20 @@ constexpr Color reflected_color(const World& w, const HitState& state, int remai
     const auto reflect_ray = ray(state.over_point, state.reflectv);
     const auto c = color_at(w, reflect_ray, remaining-1);
     return c * state.surface().reflective;
+}
+
+constexpr Color refracted_color(const World& w, const HitState& state, int remaining) noexcept {        
+    if (remaining <= 0 || state.surface().transparency == 0) {
+        return BLACK;
+    }
+    const auto n_ratio = state.n1 / state.n2;
+    const auto cos_i = dot(state.eye_v, state.normal);
+    const auto sin2_t = (n_ratio * n_ratio) * (1 - (cos_i * cos_i));
+    if (sin2_t > 1.0f) {
+        return BLACK; //total internal reflection
+    }
+    const auto cos_t = math::sqrt(1.0f - sin2_t);
+    const auto direction = state.normal * (n_ratio * cos_i - cos_t) - state.eye_v * n_ratio;
+    const auto refract_ray = ray(state.under_point, direction);
+    return color_at(w, refract_ray, remaining - 1) * state.surface().transparency;
 }

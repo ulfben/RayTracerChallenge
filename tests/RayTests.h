@@ -233,7 +233,7 @@ TEST(Intersections, stateIncludesInside2) {
     EXPECT_EQ(hit.normal, vector(0, 0, -1));
 }
 
-TEST(Intersections, stateIncludesOffsetPoint) {
+TEST(Intersections, stateIncludesOverPoint) {
     const auto r = ray(point(0, 0, -5), vector(0, 0, 1));
     Shapes sh = sphere(translation(0,0,1));   
     const auto i1 = intersection(5, sh);
@@ -241,6 +241,17 @@ TEST(Intersections, stateIncludesOffsetPoint) {
     EXPECT_TRUE(hit);
     EXPECT_LT(hit.over_point.z, -std::numeric_limits<Real>::epsilon()/2); //half of -EPSILON, to make sure over_point has been adjusted in the correct direction    
     EXPECT_GT(hit.point.z, hit.over_point.z); 
+}
+
+TEST(Intersections, stateIncludesUnderPoint) {
+    const auto r = ray(point(0, 0, -5), vector(0, 0, 1));
+    Shapes sh = sphere(glass(), translation(0,0,1));   
+    const auto i1 = intersection(5, sh);
+    const auto xs = intersections({ i1 });
+    const auto hit = prepare_computations(i1, r, xs);
+    EXPECT_TRUE(hit);
+    EXPECT_GT(hit.under_point.z, std::numeric_limits<Real>::epsilon()/2.0f);
+    EXPECT_LT(hit.point.z, hit.under_point.z); 
 }
 
 RESTORE_WARNINGS
