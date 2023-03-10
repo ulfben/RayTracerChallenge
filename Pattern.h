@@ -10,7 +10,7 @@ struct NullPattern final {
     constexpr bool operator==(const NullPattern& that) const noexcept = default;
 };
 
-struct StripedPattern final {
+struct StripePattern final {
     Color a{};
     Color b{};
     constexpr Color at(const Point& p) const noexcept {
@@ -18,13 +18,13 @@ struct StripedPattern final {
     }
     explicit constexpr operator bool() const  { return true; }
     constexpr bool empty() const  { return false; }
-    constexpr bool operator==(const StripedPattern& that) const noexcept  = default;
+    constexpr bool operator==(const StripePattern& that) const noexcept  = default;
     
 };
 
-using Patterns = std::variant<NullPattern, StripedPattern>; 
+using Patterns = std::variant<NullPattern, StripePattern>; 
 template<typename T> 
-concept patterns = std::is_same_v<NullPattern, T> || std::is_same_v<StripedPattern, T>;
+concept patterns = std::is_same_v<NullPattern, T> || std::is_same_v<StripePattern, T>;
 
 template<typename T>
 requires patterns<T>
@@ -43,8 +43,8 @@ constexpr auto null_pattern() noexcept {
     return NullPattern{};
 };
 
-constexpr auto strip_pattern(Color a, Color b) noexcept {
-    return StripedPattern{ a, b };
+constexpr auto stripe_pattern(Color a, Color b) noexcept {
+    return StripePattern{ a, b };
 };
 
 Color pattern_at(const Patterns& variant, const Point& p) noexcept {

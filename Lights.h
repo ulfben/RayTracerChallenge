@@ -18,11 +18,18 @@ constexpr Color lighting_shadow(const Material& surface, const Light& light) noe
     return ambient; //we're in shadow, so no diffuse or specular contribution needed.
 }
 
+constexpr Color lighting_shadow(const Color& col, const Light& light) noexcept {    
+    const auto effective_color = col * light.intensity;    
+    const auto ambient = effective_color * surface.ambient;
+    return ambient; //we're in shadow, so no diffuse or specular contribution needed.
+}
+
 constexpr Color lighting(const Material& surface, const Light& light, const Point& p, const Vector& eye, const Vector& normal, bool in_shadow = false) noexcept {
+    const auto color = has_pattern(surface) ? pattern_at(surface.pattern, p) : surface.color;
     if (in_shadow) {
         return lighting_shadow(surface, light);
     }
-    const auto effective_color = surface.color * light.intensity;
+    const auto effective_color = color * light.intensity;
     const auto direction_to_light = normalize(light.position - p);
     const auto ambient = effective_color * surface.ambient;
     const auto light_dot_normal = dot(direction_to_light, normal);
