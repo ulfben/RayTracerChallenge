@@ -42,4 +42,24 @@ TEST(Pattern, lightingWithPatternApplied) {
     EXPECT_EQ(lighting(m, light, point(1.1f, 0, 0), eyev, normalv, false), BLACK);    
 }
 
+TEST(Pattern, stripesWithAnObjectTransform) {
+    const auto obj = sphere(scaling(2, 2, 2));    
+    auto pattern = stripe_pattern(WHITE, BLACK);    
+    EXPECT_EQ(pattern_at(pattern, obj, point(1.5f, 0, 0)), WHITE);    
+}
+
+TEST(Pattern, stripesWithAnPatternTransform) {
+    const auto obj = sphere();    
+    auto pattern = stripe_pattern(WHITE, BLACK);
+    pattern.transform = scaling(2, 2, 2);
+    EXPECT_EQ(pattern_at(pattern, obj, point(1.5f, 0, 0)), WHITE);    
+}
+
+TEST(Pattern, stripesWithBothAnObjectAndPatternTransform) {
+    const auto obj = sphere(scaling(2, 2, 2));    
+    auto pattern = stripe_pattern(WHITE, BLACK);
+    pattern.transform = translation(0.5f, 0, 0);
+    EXPECT_EQ(pattern_at(pattern, obj, point(2.5f, 0, 0)), WHITE);    
+}
+
 RESTORE_WARNINGS

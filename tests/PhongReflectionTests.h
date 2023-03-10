@@ -54,7 +54,7 @@ TEST_F(Phong, lightingWithSurfaceInShadow) {
     const Vector eyev = vector(0, 0, -1);
     const Vector normalv = vector(0, 0, -1);
     const auto light = point_light(point(0, 0, -10), WHITE);
-    const auto result = lighting_shadow(surface, light);
+    const auto result = lighting(surface, light, position, eyev, normal, true);    
     EXPECT_EQ(result, color(0.1f, 0.1f, 0.1f)); //only the ambient component remains
 }
 
