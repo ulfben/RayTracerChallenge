@@ -218,6 +218,25 @@ constexpr HitState prepare_computations(const Intersection& i, const Ray& r, con
     return HitState(i, r, xs);
 }
 
+constexpr Real schlick(const HitState& state) noexcept {
+    //coside of the nagle between the eye and the normal vector
+    auto cos = dot(state.eye_v, state.normal);
+    //total internal reflection can only occur if n1 > n2
+    if (state.n1 > state.n2) {
+        const auto n = state.n1 / state.n2;
+        const auto sin2_t = (n * n) * (1.0f - (cos * cos));
+        if (sin2_t > 1.0f) {
+            return 1.0f;
+        }
+        //compute cosine of theta_t using trig identity
+        const auto cos_t = math::sqrt(1.0f - sin2_t);
+
+        //when n1 > n2, use cos(theta_t) instead
+        cos = cos_t;
+    }
+    const auto r0 = std::powf((state.n1 - state.n2) / (state.n1 + state.n2), 2);
+    return r0 + (1.0f - r0) * std::powf(1.0f - cos, 5);
+}
 constexpr bool is_shadowed(const World& w, const Point& p) noexcept {
     const auto v = w.light.position - p;
     const auto distanceSq = magnitudeSq(v);
@@ -236,10 +255,15 @@ constexpr Color refracted_color(const World& w, const HitState& state, int remai
 
 constexpr Color shade_hit(const World& w, const HitState& hit, int remaining = 4) noexcept {
     const auto shadowed = is_shadowed(w, hit.over_point);    
-    const auto c = lighting(hit.surface(), w.light, hit.point, hit.eye_v, hit.normal, shadowed);
+    const auto surface_c = lighting(hit.surface(), w.light, hit.point, hit.eye_v, hit.normal, shadowed);
     const auto reflected_c = reflected_color(w, hit, remaining);
     const auto refracted_c = refracted_color(w, hit, remaining);
-    return c + reflected_c + refracted_c;
+    const auto& mat = hit.surface();
+    if (mat.reflective > 0 && mat.transparency > 0) {
+        const auto reflectance = schlick(hit);
+        return surface_c + (reflected_c * reflectance) + (refracted_c * (1.0f - reflectance));
+    }
+    return surface_c + reflected_c + refracted_c;
 }
 
 constexpr Color color_at(const World& w, const Ray& r, int remaining = 4) noexcept{    

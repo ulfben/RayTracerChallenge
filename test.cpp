@@ -20,6 +20,7 @@
 #include "tests/PlaneTests.h"
 #include "tests/ReflectionTests.h"
 #include "tests/TransparencyTests.h"
+
 TEST(DISABLED_Chapter2, CanOutputPPM) {    
     auto c = Canvas(300, 300);
     const auto bottomEdge = static_cast<Real>(c.height());
@@ -264,7 +265,7 @@ TEST(DISABLED_Chapter11, CanRenderReflections) {
     middle.surface.color = color(0.1f, 1, 0.5f); //TODO: provide interface 
     middle.surface.diffuse = 0.7f;
     middle.surface.specular = 0.4f;
-    middle.surface.reflective = 0.8f;    
+    middle.surface.reflective = 0.8f;        
 
     auto right = sphere();
     right.transform = translation(1.5f, 0.5f, -0.5f) * scaling(0.5f, 0.5f, 0.5f);
@@ -286,5 +287,5 @@ TEST(DISABLED_Chapter11, CanRenderReflections) {
     world.light = point_light(point(-10, 10, -10), color(1, 1, 1));
 
     const auto img = render(c, world);
-    save_to_file(img, "output/chapter11_4.ppm"sv);
+    save_to_file(img, "output/chapter11_5.ppm"sv);
 }
