@@ -70,6 +70,10 @@
     <ClInclude Include="tests\TransparencyTests.h">
       <Filter>tests</Filter>
     </ClInclude>
+    <ClInclude Include="Pattern.h" />
+    <ClInclude Include="tests\PatternTests.h">
+      <Filter>tests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

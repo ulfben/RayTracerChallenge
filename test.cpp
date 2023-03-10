@@ -251,29 +251,35 @@ TEST(DISABLED_Chapter9, CanRenderPlanes) {
     save_to_file(img, "output/chapter9_0.ppm"sv);
 }
 
-TEST(DISABLED_Chapter11, CanRenderReflections) {    
+TEST(DISABLED_Chapter11, CanRenderReflectionsAndRefractions) {    
     auto c = Camera(600, 400, math::PI / 3.0f);
-    c.transform = view_transform(point(1.0f, 0.4f, -2.5f), point(0, 1, 0), vector(0, 1, 0));
+    c.transform = view_transform(point(1.0f, 3.4f, -2.5f), point(0, 1, 0), vector(0, 1, 0));
 
-    auto floor = plane();  
-    floor.surface.color = color(1, 0.9f, 0.9f);    
-    floor.surface.specular = 0.8f;
-    floor.surface.reflective = 0.08f;
-
-    auto middle = sphere();
-    middle.transform = translation(-0.5f, 1, 0.5f);    
-    middle.surface.color = color(0.1f, 1, 0.5f); //TODO: provide interface 
-    middle.surface.diffuse = 0.7f;
-    middle.surface.specular = 0.4f;
-    middle.surface.reflective = 0.8f;        
-
-    auto right = sphere();
-    right.transform = translation(1.5f, 0.5f, -0.5f) * scaling(0.5f, 0.5f, 0.5f);
-    right.surface = material();
-    right.surface.color = color(0.5f, 1, 0.1f);
-    right.surface.diffuse = 0.7f;
-    right.surface.specular = 0.3f;  
-    right.surface.reflective = 0.3f;
+    auto floor = plane(color(1, 0.9f, 0.9f));
+    surface(floor).specular = 0.8f;
+    surface(floor).reflective = 0.08f;
+    
+    auto mat = glass();
+    mat.color = color(0.0f, 0.1f, 0.0f); //the more reflective or transparent, the darker the color need to be,
+    mat.diffuse = 0.1f; //reflection and refraction is added to the surface color
+    mat.ambient = 0.1f; //so we tone down the diffuse and ambient to avoid it becoming too bright
+    mat.specular = 1.0f; //specular + reflective == fresnel effct
+    mat.reflective = 0.9f;   
+    mat.shininess = 300.0f; //reflective and transparent objects pairs well with a tight specular highlight         
+    mat.transparency = 0.9f;        
+    
+    const auto middle = sphere(mat, translation(-0.5f, 1, 0.5f));    
+    
+    auto green = material(color(0.5f, 1, 0.1f));
+    green.diffuse = 0.7f;
+    green.specular = 0.3f;  
+    green.reflective = 0.3f;
+    const auto right = sphere(green, (translation(1.5f, 0.5f, -0.5f) * scaling(0.5f, 0.5f, 0.5f)));    
+    
+    auto behind = right;
+    surface(behind).color = color(1.0f, 0.8f, 0.1f);
+    transform(behind) = translation(-1.5f, -0.3f, 4.0f) * scaling(1.2f, 1.2f, 1.2f);
+    surface(behind).reflective = 0.0f;
 
     auto left = sphere();
     left.transform = translation(-1.5f, 0.33f, -0.75f) * scaling(0.33f, 0.33f, 0.33f);
@@ -283,7 +289,7 @@ TEST(DISABLED_Chapter11, CanRenderReflections) {
     left.surface.specular = 0.3f; 
     left.surface.reflective = 0.3f;
 
-    auto world = World({ floor,  left, middle, right });
+    auto world = World({ floor, left, middle, behind, right });
     world.light = point_light(point(-10, 10, -10), color(1, 1, 1));
 
     const auto img = render(c, world);

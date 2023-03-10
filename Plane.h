@@ -20,6 +20,9 @@ constexpr Plane plane() noexcept {
 constexpr Plane plane(Matrix4 transform) noexcept {
     return Plane{ std::move(transform) };
 }
+constexpr Plane plane(Color col) noexcept {
+    return Plane{ Matrix4Identity, material(col) };
+}
 constexpr Plane plane(Material surface, Matrix4 transform) noexcept {
     return Plane{std::move(transform), std::move(surface)};
 }

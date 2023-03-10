@@ -177,7 +177,7 @@ struct HitState final {
         reflectv = reflect(r.direction, normal);
     }
 
-    constexpr HitState(const Intersection& closest, const Ray& r, const Intersections& xs) noexcept : HitState(closest, r){
+    constexpr HitState(const Intersection& closest, const Ray& r, const Intersections& xs) : HitState(closest, r){
         std::vector<const Shapes*> containers;
         for (const auto& i : xs) {
             const auto is_the_hit = i == closest;
@@ -219,7 +219,7 @@ constexpr HitState prepare_computations(const Intersection& i, const Ray& r, con
 }
 
 constexpr Real schlick(const HitState& state) noexcept {
-    //coside of the nagle between the eye and the normal vector
+    //cosine of the angle between the eye and the normal vector
     auto cos = dot(state.eye_v, state.normal);
     //total internal reflection can only occur if n1 > n2
     if (state.n1 > state.n2) {
@@ -230,7 +230,6 @@ constexpr Real schlick(const HitState& state) noexcept {
         }
         //compute cosine of theta_t using trig identity
         const auto cos_t = math::sqrt(1.0f - sin2_t);
-
         //when n1 > n2, use cos(theta_t) instead
         cos = cos_t;
     }
@@ -258,8 +257,7 @@ constexpr Color shade_hit(const World& w, const HitState& hit, int remaining = 4
     const auto surface_c = lighting(hit.surface(), w.light, hit.point, hit.eye_v, hit.normal, shadowed);
     const auto reflected_c = reflected_color(w, hit, remaining);
     const auto refracted_c = refracted_color(w, hit, remaining);
-    const auto& mat = hit.surface();
-    if (mat.reflective > 0 && mat.transparency > 0) {
+    if (const auto& mat = hit.surface(); mat.reflective > 0 && mat.transparency > 0) {
         const auto reflectance = schlick(hit);
         return surface_c + (reflected_c * reflectance) + (refracted_c * (1.0f - reflectance));
     }

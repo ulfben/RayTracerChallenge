@@ -30,6 +30,9 @@ struct Sphere final {
 constexpr Sphere sphere(Point p, Real radius) noexcept {
     return Sphere{ p, radius };
 }
+constexpr Sphere sphere(Color col) noexcept {
+    return Sphere{ ORIGO, 1.0f, material(col) };    
+}
 constexpr Sphere sphere(Material m) noexcept {
     return Sphere{ ORIGO, 1.0f, std::move(m) };    
 }

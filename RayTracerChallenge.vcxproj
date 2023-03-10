@@ -72,6 +72,7 @@
     <ClInclude Include="Material.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Matrix.h" />
+    <ClInclude Include="Pattern.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Projectile.h" />
@@ -86,6 +87,7 @@
     <ClInclude Include="tests\MaterialTests.h" />
     <ClInclude Include="tests\MatrixTests.h" />
     <ClInclude Include="tests\MatrixTransformationTests.h" />
+    <ClInclude Include="tests\PatternTests.h" />
     <ClInclude Include="tests\PhongReflectionTests.h" />
     <ClInclude Include="tests\PlaneTests.h" />
     <ClInclude Include="tests\RayTests.h" />

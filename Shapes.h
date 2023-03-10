@@ -5,6 +5,8 @@
 #include "Plane.h"
 
 using Shapes = std::variant<Sphere, Plane>;
+template<typename T> 
+concept shapes = std::is_same_v<Sphere, T> || std::is_same_v<Plane, T>;
 
 constexpr Vector normal_at(const Shapes& variant, const Point& p) { 
     return std::visit([&p](const auto& obj){ 
@@ -33,15 +35,14 @@ constexpr Matrix4& transform(Shapes& variant) noexcept {
         return obj.transform;
     }, variant);    
 }
-constexpr Material& surface(Shapes& variant) noexcept { 
-    return std::visit([](auto& obj) -> Material& { 
-        return obj.surface;
-    }, variant);    
-}
-
 constexpr const Matrix4& transform(const Shapes& variant) noexcept { 
     return std::visit([](const auto& obj) -> const Matrix4& { 
         return obj.transform;
+    }, variant);    
+}
+constexpr Material& surface(Shapes& variant) noexcept { 
+    return std::visit([](auto& obj) -> Material& { 
+        return obj.surface;
     }, variant);    
 }
 constexpr const Material& surface(const Shapes& variant) noexcept { 
@@ -50,13 +51,37 @@ constexpr const Material& surface(const Shapes& variant) noexcept {
     }, variant);    
 }
 
+constexpr Color& color(Shapes& variant) noexcept { 
+    return std::visit([](auto& obj) -> Color& { 
+        return obj.surface.color;
+    }, variant);    
+}
 
-//constexpr Sphere& get_sphere(Shapes& variant){    
-//    return std::get<Sphere>(variant);
-//}
-//constexpr const Sphere& get_sphere(const Shapes& variant){   
-//    return std::get<Sphere>(variant);
-//}
+constexpr const Color& color(const Shapes& variant) noexcept { 
+    return std::visit([](const auto& obj) -> const Color& { 
+        return obj.surface.color;
+    }, variant);    
+}
+
+
+constexpr Material& surface(shapes auto& obj) noexcept {
+    return obj.surface;
+}
+constexpr const Material& color(const shapes auto& obj) noexcept {
+    return obj.surface;
+}
+constexpr Matrix4& transform(shapes auto& obj) noexcept {
+    return obj.transform;
+}
+constexpr const Matrix4& transform(const shapes auto& obj) noexcept {
+    return obj.transform;
+}
+constexpr Color& color(shapes auto& obj) noexcept {
+    return obj.surface.color;
+}
+constexpr const Color& color(const shapes auto& obj) noexcept {
+    return obj.surface.color;
+}
 
 std::ostream& operator<<(std::ostream& os, const Shapes& var){
     const auto print_visitor = [&os](const auto& val) -> std::ostream& {
