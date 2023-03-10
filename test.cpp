@@ -252,6 +252,39 @@ TEST(DISABLED_Chapter9, CanRenderPlanes) {
     save_to_file(img, "output/chapter9_0.ppm"sv);
 }
 
+TEST(Chapter10, CanRenderPatterns) {    
+    auto c = Camera(600, 400, math::PI / 3.0f);
+    c.transform = view_transform(point(1.0f, 3.4f, -2.5f), point(0, 1, 0), vector(0, 1, 0));
+
+    auto floor = plane(color(1, 0.9f, 0.9f));
+    surface(floor).pattern = ring_pattern(WHITE, BLACK);
+    surface(floor).reflective = 0.08f;
+    
+    auto mat = material();
+    mat.pattern = checkers_pattern(RED, BLUE);    
+    const auto middle = sphere(mat, translation(-0.5f, 1, 0.5f));    
+    
+    auto green = material(color(0.5f, 1, 0.1f));
+    green.diffuse = 0.7f;
+    green.specular = 0.3f;  
+    green.reflective = 0.3f;
+    const auto right = sphere(green, (translation(1.5f, 0.5f, -0.5f) * scaling(0.5f, 0.5f, 0.5f)));    
+
+    auto left = sphere();
+    left.transform = translation(-1.5f, 0.33f, -0.75f) * scaling(0.33f, 0.33f, 0.33f);
+    left.surface = material();
+    surface(left).pattern = stripe_pattern(GREEN, BLUE);
+    transform(surface(left).pattern) = rotation_y(math::HALF_PI);
+    left.surface.diffuse = 0.7f;
+    left.surface.specular = 0.3f; 
+    left.surface.reflective = 0.3f;
+
+    auto world = World({ floor, left, middle, right });
+    world.light = point_light(point(-10, 10, -10), color(1, 1, 1));
+
+    const auto img = render(c, world);
+    save_to_file(img, "output/chapter10_1.ppm"sv);
+}
 TEST(DISABLED_Chapter11, CanRenderReflectionsAndRefractions) {    
     auto c = Camera(600, 400, math::PI / 3.0f);
     c.transform = view_transform(point(1.0f, 3.4f, -2.5f), point(0, 1, 0), vector(0, 1, 0));
