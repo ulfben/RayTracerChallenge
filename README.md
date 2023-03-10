@@ -26,8 +26,18 @@ Adding different Shapes. Currently Sphere and Plane.
 
 ![chapter9_0](https://user-images.githubusercontent.com/5237741/223790106-d58120f2-e8fb-4a74-adc6-2fe229d4eb09.png)
 
+# Chapter 10:
+Adding pattern, poorly for now.
+
+![chapter10_0](https://user-images.githubusercontent.com/5237741/224443664-cdf33e68-2b44-41a1-b0f9-2754ccb75c40.png)
+
+
 # Chapter 11:
 Adding reflections
 
 ![chapter11_2](https://user-images.githubusercontent.com/5237741/223970234-39a6bc29-cef3-4dfb-81d8-64f34ea5d4a6.png)
+
+And refractions:
+
+![chapter11_5](https://user-images.githubusercontent.com/5237741/224443615-fd7286a2-460f-478c-ba42-3d232b439c04.png)
 
