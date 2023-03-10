@@ -12,7 +12,7 @@ namespace math {
     constexpr auto PI = std::numbers::pi_v<Real>;
     constexpr auto INV_PI = std::numbers::inv_pi_v<Real>;
     constexpr auto TWO_PI = PI * 2.0f; //full circle
-    constexpr auto HALF_PI = math::PI / 2.0f;    
+    constexpr auto HALF_PI = math::PI / 2.0f;
     constexpr auto TO_DEG = 180.0f / PI;
     constexpr auto TO_RAD = PI / 180.0f;
 
@@ -32,7 +32,7 @@ namespace math {
         requires std::is_arithmetic_v<T>
     constexpr T abs(T x) noexcept {
         if (std::is_constant_evaluated()) {
-            return x == 0 ? 0 : (x < 0 ? -x : x); 
+            return x == 0 ? 0 : (x < 0 ? -x : x);
         }
         return std::abs(x);
     }
@@ -45,16 +45,28 @@ namespace math {
     }
 
     constexpr Real sqrt(Real x) noexcept {
-         if (std::is_constant_evaluated()) {
+        if (std::is_constant_evaluated()) {
             return x >= 0.0f && x < std::numeric_limits<Real>::infinity()
                 ? Detail::sqrtNewtonRaphson(x, x, 0.0f)
                 : std::numeric_limits<Real>::quiet_NaN();
-        } 
-        return std::sqrt(x);                
+        }
+        return std::sqrt(x);
     }
+     
+    constexpr int int_ceil(Real f) noexcept {
+        if (std::is_constant_evaluated()) {
+            const int i = static_cast<int>(f);
+            return f > i ? i + 1 : i;
+        }
+        return static_cast<int>(std::ceil(f));
 
-    constexpr int floor_to_int(Real x) noexcept {
-        return static_cast<int> (std::floor(x));
+    }
+    constexpr int int_floor(Real f) noexcept {
+        if (std::is_constant_evaluated()) {
+            const int i = static_cast<int>(f);
+            return f < i ? i - 1 : i;
+        }
+        return static_cast<int>(std::floor(f));
     }
 
     static constexpr auto SHADOW_BIAS = 0.005f; //to avoid shadow acne due to spurious self-intersections
@@ -116,7 +128,7 @@ namespace math {
     }
 
     //borrowed from Paul Floyd, https://accu.org/journals/overload/31/173/floyd/
-    constexpr bool cmpEq(float a, float b, float epsilon = 1.0e-7f, float abstol =  1.0e-12f) noexcept{
+    constexpr bool cmpEq(float a, float b, float epsilon = 1.0e-7f, float abstol = 1.0e-12f) noexcept {
         if (a == b) {
             return true;
         }

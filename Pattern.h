@@ -6,14 +6,18 @@
 struct Pattern final {
     std::function<Color(const Point& p)> apply_pattern;
 
-    Color pattern_at(const Point& p) const noexcept {
+    Color at(const Point& p) const noexcept {
         return apply_pattern(p);
     }
 };
 
-constexpr auto strip_pattern(Color a, Color b) noexcept {
+auto strip_pattern(Color a, Color b) noexcept {
     const auto func = [a, b](const Point& p) noexcept {        
-        return (math::floor_to_int(p.x) % 2 == 0) ? a : b;
+        return (math::int_floor(p.x) % 2 == 0) ? a : b;
     };
     return Pattern{func};
+};
+
+Color pattern_at(const Pattern& pattern, const Point& p) noexcept {
+    return pattern.at(p);
 };
