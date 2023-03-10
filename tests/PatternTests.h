@@ -73,4 +73,14 @@ TEST(Pattern, gradientInterpolatesLinearly) {    ;
     EXPECT_EQ(pattern_at(pattern, point(1.0f, 0, 0)), WHITE);
 }
 
+TEST(Pattern, ringPatternExtendInBothXandZ) {    ;    
+    auto pattern = ring_pattern(WHITE, BLACK);    
+    EXPECT_EQ(pattern_at(pattern, point(0.0f, 0, 0)), WHITE);
+    EXPECT_EQ(pattern_at(pattern, point(1.0f, 0, 0)), BLACK);    
+    EXPECT_EQ(pattern_at(pattern, point(0, 0, 1.0f)), BLACK);
+    //0.708f, just slightly more than sqrt(2)/2
+    EXPECT_EQ(pattern_at(pattern, point(0.708f, 0, 0.708f)), BLACK);        
+}
+
+
 RESTORE_WARNINGS

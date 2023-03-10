@@ -37,14 +37,13 @@ struct GradientPattern final {
     explicit constexpr operator bool() const  { return true; }
     constexpr bool empty() const  { return false; }
     constexpr bool operator==(const GradientPattern& that) const noexcept  = default;
-    
 };
 struct RingPattern final {
     Matrix4 transform{Matrix4Identity};
     Color a{};
     Color b{};
-    constexpr Color at(const Point& p) const noexcept {
-        if (math::floor(math::sqrt((p.x * p.x) + (p.z + p.z))) % 2 == 0) {
+    constexpr Color at(const Point& p) const noexcept {        
+        if (math::int_floor(math::sqrt((p.x * p.x) + (p.z + p.z))) % 2 == 0) {
             return a;
         }
         return b; 
@@ -52,7 +51,6 @@ struct RingPattern final {
     explicit constexpr operator bool() const  { return true; }
     constexpr bool empty() const  { return false; }
     constexpr bool operator==(const RingPattern& that) const noexcept  = default;
-    
 };
 
 using Patterns = std::variant<NullPattern, StripePattern, GradientPattern, RingPattern>; 
