@@ -63,10 +63,17 @@ namespace math {
     }
     constexpr int int_floor(Real f) noexcept {
         if (std::is_constant_evaluated()) {
-            const int i = static_cast<int>(f);
+            const auto i = static_cast<int>(f);
             return f < i ? i - 1 : i;
         }
         return static_cast<int>(std::floor(f));
+    }
+    constexpr Real floor(Real f) noexcept {
+        if (std::is_constant_evaluated()) {
+            const auto i = static_cast<Real>(f);
+            return f < i ? i - 1 : i;
+        }
+        return static_cast<Real>(std::floor(f));
     }
 
     static constexpr auto SHADOW_BIAS = 0.005f; //to avoid shadow acne due to spurious self-intersections

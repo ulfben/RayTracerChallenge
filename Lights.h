@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "Tuple.h"
 #include "Material.h"
+#include "Pattern.h"
 
 struct Light final {
     Point position;
