@@ -82,5 +82,22 @@ TEST(Pattern, ringPatternExtendInBothXandZ) {    ;
     EXPECT_EQ(pattern_at(pattern, point(0.708f, 0, 0.708f)), BLACK);        
 }
 
-
+TEST(Pattern, checkersShouldRepeatInX) {    ;    
+    auto pattern = checkers_pattern(WHITE, BLACK);    
+    EXPECT_EQ(pattern_at(pattern, point(0.0f, 0, 0)), WHITE);
+    EXPECT_EQ(pattern_at(pattern, point(0.99f, 0, 0)), WHITE);    
+    EXPECT_EQ(pattern_at(pattern, point(1.01f, 0, 0)), BLACK);    
+}
+TEST(Pattern, checkersShouldRepeatInY) {    ;    
+    auto pattern = checkers_pattern(WHITE, BLACK);    
+    EXPECT_EQ(pattern_at(pattern, point(0.0f, 0, 0)), WHITE);
+    EXPECT_EQ(pattern_at(pattern, point(0, 0.99f, 0)), WHITE);    
+    EXPECT_EQ(pattern_at(pattern, point(0, 1.01f, 0)), BLACK);    
+}
+TEST(Pattern, checkersShouldRepeatInZ) {    ;    
+    auto pattern = checkers_pattern(WHITE, BLACK);    
+    EXPECT_EQ(pattern_at(pattern, point(0.0f, 0, 0)), WHITE);
+    EXPECT_EQ(pattern_at(pattern, point(0, 0, 0.99f)), WHITE);    
+    EXPECT_EQ(pattern_at(pattern, point(0, 0, 1.01f)), BLACK);    
+}
 RESTORE_WARNINGS

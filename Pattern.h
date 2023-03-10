@@ -52,11 +52,44 @@ struct RingPattern final {
     constexpr bool empty() const  { return false; }
     constexpr bool operator==(const RingPattern& that) const noexcept  = default;
 };
+struct CheckersPattern final {
+    Matrix4 transform{Matrix4Identity};
+    Color a{};
+    Color b{};
+    constexpr Color at(const Point& p) const noexcept {        
+        const auto val = static_cast<int>(math::abs(p.x) + math::abs(p.y) + math::abs(p.z));
+        return (val % 2 == 0) ? a : b; 
+    }
+    explicit constexpr operator bool() const  { return true; }
+    constexpr bool empty() const  { return false; }
+    constexpr bool operator==(const CheckersPattern& that) const noexcept  = default;
+};
 
-using Patterns = std::variant<NullPattern, StripePattern, GradientPattern, RingPattern>; 
+constexpr auto null_pattern() noexcept {
+    return NullPattern{};
+};
+
+constexpr auto stripe_pattern(Color a, Color b) noexcept {
+    return StripePattern{ Matrix4Identity, a, b };
+};
+
+constexpr auto gradient_pattern(Color a, Color b) noexcept {
+    return GradientPattern{ Matrix4Identity, a, b };
+};
+
+constexpr auto ring_pattern(Color a, Color b) noexcept {
+    return RingPattern{ Matrix4Identity, a, b };
+};
+
+constexpr auto checkers_pattern(Color a, Color b) noexcept {
+    return CheckersPattern{ Matrix4Identity, a, b };
+};
+
+using Patterns = std::variant<NullPattern, StripePattern, GradientPattern, RingPattern, CheckersPattern>; 
 template<typename T> 
 concept patterns = std::is_same_v<NullPattern, T> || std::is_same_v<StripePattern, T> || 
-                   std::is_same_v<GradientPattern, T> || std::is_same_v<RingPattern, T>;
+                   std::is_same_v<GradientPattern, T> || std::is_same_v<RingPattern, T> ||
+                   std::is_same_v<CheckersPattern, T>;
 
 template<typename T>
 requires patterns<T>
@@ -78,22 +111,6 @@ constexpr const Matrix4& transform(const Patterns& variant) noexcept {
     return std::visit([](const auto& obj) noexcept -> const Matrix4& { 
         return obj.transform;
     }, variant);    
-};
-
-constexpr auto null_pattern() noexcept {
-    return NullPattern{};
-};
-
-constexpr auto stripe_pattern(Color a, Color b) noexcept {
-    return StripePattern{ Matrix4Identity, a, b };
-};
-
-constexpr auto gradient_pattern(Color a, Color b) noexcept {
-    return GradientPattern{ Matrix4Identity, a, b };
-};
-
-constexpr auto ring_pattern(Color a, Color b) noexcept {
-    return RingPattern{ Matrix4Identity, a, b };
 };
 
 Color pattern_at(const Patterns& variant, const Point& p) noexcept {
