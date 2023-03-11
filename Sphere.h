@@ -55,5 +55,5 @@ std::ostream& operator<<(std::ostream& os, const Sphere& t) {
 #pragma warning(pop)
 
 constexpr Vector local_normal_at([[maybe_unused]]const Sphere& s, const Point& object_space_point) noexcept { 
-    return object_space_point; // -s.position; /*s position is always 0*/    
+    return normalize(object_space_point-s.position); /*s position is always 0*/    
 }
