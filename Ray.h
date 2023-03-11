@@ -8,7 +8,8 @@ struct Ray final {
     constexpr bool operator==(const Ray& that) const noexcept = default;
 };
 constexpr Ray ray(Point p, Vector dir) noexcept {
-    assert(is_point(p) && is_vector(dir));
+    assert(is_point(p));
+    assert(is_vector(dir));
     return Ray{ p, dir };
 }
 

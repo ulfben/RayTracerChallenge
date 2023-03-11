@@ -20,14 +20,15 @@ struct Camera final{
     /*constexpr*/ Camera(size_type hsize_, size_type vsize_, Real field_of_view_) noexcept 
         : field_of_view(field_of_view_), width(hsize_), height(vsize_) {
         const auto half_view = std::tan(field_of_view / 2.0f); //TODO: constexpr tan
-        if(const Real aspect = float(width) / height; aspect >= 1){
+        auto widthf = static_cast<float>(width);
+        if(const Real aspect = widthf / static_cast<float>(height); aspect >= 1){
             half_width = half_view;
             half_height = half_view / aspect;
         }else{
             half_width = half_view * aspect;
             half_height = half_view;
         }
-        pixel_size = half_width * 2 / width;
+        pixel_size = half_width * 2.0f / widthf;
     }
 };
 
@@ -43,8 +44,8 @@ constexpr Ray ray_for_pixel(const Camera& c, size_t px, size_t py) noexcept{
     //and then compute the ray's direction. (canvas is at z = -1)
     const auto inv = inverse(c.transform);
     const auto pixel = inv * point(world_x, world_y, -1.0f);
-    const auto origin = inv * ORIGO;
-    const auto direction = normalize(pixel - origin);
+    const auto origin = inv * ORIGO;    
+    const auto direction = normalize(pixel - origin);    
     return ray(origin, direction);
 }
 
