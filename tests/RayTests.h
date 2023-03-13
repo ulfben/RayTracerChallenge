@@ -164,8 +164,7 @@ TEST(Ray, canBeScaled) {
 
 TEST(intersect, aScaledSphere) {    
     const auto r = ray(point(0,0,-5), vector(0,0,1));
-    auto s = sphere(ORIGO, 1.0f);
-    s.transform = scaling(2, 2, 2);    
+    const auto s = sphere(ORIGO, 1.0f, scaling(2, 2, 2));
     const auto xs = intersect(s, r);    
     EXPECT_EQ(xs.count(), 2);
     EXPECT_FLOAT_EQ(xs[0].t, 3.0f);

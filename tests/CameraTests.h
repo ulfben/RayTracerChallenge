@@ -10,7 +10,7 @@ TEST(Camera, canBeConstructed) {
     EXPECT_EQ(c.width, 160);
     EXPECT_EQ(c.height, 120);    
     EXPECT_FLOAT_EQ(c.field_of_view, math::PI / 2);
-    EXPECT_EQ(c.transform, Matrix4Identity);
+    EXPECT_EQ(c.getTransform(), Matrix4Identity);
 }
 
 TEST(Camera, calculatesPixelSizeForHorizontalCanvas) {
@@ -44,7 +44,7 @@ TEST(Camera, constructRayThroughCornerOfCanvas) {
 TEST(Camera, constructRayWithCameraTransformed) {
     const auto sqr = std::sqrtf(2.0f) / 2.0f;
     auto c = Camera(201, 101, math::PI / 2.0f);
-    c.transform = rotation_y(math::PI / 4.0f) * translation(0,-2,5);
+    c.setTransform(rotation_y(math::PI / 4.0f) * translation(0,-2,5));
     const auto r = ray_for_pixel(c, 100, 50);
     EXPECT_EQ(r.origin, point(0, 2, -5));
     EXPECT_EQ(r.direction, vector(sqr, 0, -sqr));
@@ -56,7 +56,7 @@ TEST(Camera, renderWorldWithCamera) {
     const auto from = point(0, 0, -5);
     const auto to = ORIGO;
     const auto up = point(0, 1, 0);
-    c.transform = view_transform(from, to, up);    
+    c.setTransform(view_transform(from, to, up));    
     const auto img = render(c, w);
     EXPECT_EQ(img.width(), c.height);
     EXPECT_EQ(img.height(), c.width);

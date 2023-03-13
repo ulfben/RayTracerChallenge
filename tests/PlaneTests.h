@@ -11,7 +11,7 @@ DISABLE_WARNINGS_FROM_GTEST
 
 TEST(Plane, hasTransform) {
     constexpr auto p = plane();
-    EXPECT_EQ(p.transform, Matrix4Identity);
+    EXPECT_EQ(p.getTransform(), Matrix4Identity);
 }
 
 TEST(Plane, normalIsConstantEverywhere) {

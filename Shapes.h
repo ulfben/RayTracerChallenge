@@ -9,11 +9,10 @@ template<typename T>
 concept shapes = std::is_same_v<Sphere, T> || std::is_same_v<Plane, T>;
 
 constexpr Vector normal_at(const Shapes& variant, const Point& p) { 
-    return std::visit([&p](const auto& obj){ 
-        const auto inv_transform = inverse(obj.transform);
-        const auto object_space_point = inv_transform * p; 
+    return std::visit([&p](const auto& obj){         
+        const auto object_space_point = obj.getInvTransform() * p; 
         const auto object_space_normal = local_normal_at(obj, object_space_point);
-        auto world_space_normal = transpose(inv_transform) * object_space_normal;
+        auto world_space_normal = transpose(obj.getInvTransform()) * object_space_normal;
         world_space_normal.w = 0; //hack to avoid having to work with the transform submatrix
         return normalize(world_space_normal);               
     }, variant);    
@@ -30,14 +29,19 @@ constexpr bool operator==(const Shapes& v, const Sphere& a) noexcept {
     return a == v;     
 }
 
-constexpr Matrix4& transform(Shapes& variant) noexcept { 
-    return std::visit([](auto& obj) -> Matrix4& { 
-        return obj.transform;
-    }, variant);    
-}
+//constexpr Matrix4& transform(Shapes& variant) noexcept { 
+//    return std::visit([](auto& obj) -> Matrix4& { 
+//        return obj.getTransform();
+//    }, variant);    
+//}
 constexpr const Matrix4& transform(const Shapes& variant) noexcept { 
     return std::visit([](const auto& obj) -> const Matrix4& { 
-        return obj.transform;
+        return obj.getTransform();
+    }, variant);    
+}
+constexpr const Matrix4& invTransform(const Shapes& variant) noexcept { 
+    return std::visit([](const auto& obj) -> const Matrix4& { 
+        return obj.getInvTransform();
     }, variant);    
 }
 constexpr Material& surface(Shapes& variant) noexcept { 
@@ -70,11 +74,17 @@ constexpr Material& surface(shapes auto& obj) noexcept {
 constexpr const Material& color(const shapes auto& obj) noexcept {
     return obj.surface;
 }
-constexpr Matrix4& transform(shapes auto& obj) noexcept {
-    return obj.transform;
-}
+//constexpr Matrix4& transform(shapes auto& obj) noexcept {
+//    return obj.getTransform();
+//}
 constexpr const Matrix4& transform(const shapes auto& obj) noexcept {
-    return obj.transform;
+    return  obj.getTransform();
+}
+//constexpr Matrix4& invTransform(shapes auto& obj) noexcept {
+//    return obj.getInvTransform();
+//}
+constexpr const Matrix4& invTransform(const shapes auto& obj) noexcept {
+    return obj.getInvTransform();
 }
 constexpr Color& color(shapes auto& obj) noexcept {
     return obj.surface.color;

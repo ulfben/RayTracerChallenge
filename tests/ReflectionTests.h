@@ -35,9 +35,8 @@ TEST(Reflection, reflectedColorForReflectiveMaterial) {
     constexpr auto sqrt = math::sqrt(2.0f);
     constexpr auto halfSqrt = sqrt / 2.0f;
     auto w = World();
-    Plane p = plane();
+    Plane p = plane(translation(0,-1,0));
     p.surface.reflective = 0.5f;
-    p.transform = translation(0,-1,0);
     w.push_back(std::move(p));
     const auto r = ray(point(0, 0, -3), vector(0, -halfSqrt, halfSqrt));    
     const auto ix = intersection(sqrt, w.back());
@@ -51,9 +50,8 @@ TEST(Reflection, shadowsCanBlendWithReflections) {
     constexpr auto sqrt = math::sqrt(2.0f);
     constexpr auto halfSqrt = sqrt / 2.0f;
     auto w = World();
-    Plane p = plane();
+    Plane p = plane(translation(0,-1,0));
     p.surface.reflective = 0.5f;
-    p.transform = translation(0,-1,0);
     w.push_back(std::move(p));
     const auto r = ray(point(0, 0, -3), vector(0, -halfSqrt, halfSqrt));    
     const auto ix = intersection(sqrt, w.back());
@@ -77,9 +75,8 @@ TEST(Reflection, canLimitRecursion) {
     constexpr auto sqrt = math::sqrt(2.0f);
     constexpr auto halfSqrt = sqrt / 2.0f;
     auto w = World();
-    Plane p = plane();
+    Plane p = plane(translation(0,-1,0));
     p.surface.reflective = 0.5f;
-    p.transform = translation(0,-1,0);
     w.push_back(std::move(p));
     const auto r = ray(point(0, 0, -3), vector(0, -halfSqrt, halfSqrt));    
     const auto ix = intersection(sqrt, w.back());

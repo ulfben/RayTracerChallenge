@@ -8,8 +8,7 @@
 #include "WorkQue.h"
 
 struct Camera final{
-    using size_type = Canvas::size_type;
-    Matrix4 transform = Matrix4Identity;        
+    using size_type = Canvas::size_type;     
     Real field_of_view = math::PI;
     Real half_width = 0; 
     Real half_height = 0;
@@ -30,6 +29,23 @@ struct Camera final{
         }
         pixel_size = half_width * 2.0f / widthf;
     }
+    /*constexpr*/ Camera(size_type hsize_, size_type vsize_, Real field_of_view_, Matrix4 viewTransform) noexcept 
+        : Camera(hsize_, vsize_, field_of_view_){
+        setTransform(viewTransform);
+    }
+    constexpr const Matrix4& getTransform() const noexcept {
+        return transform;
+    }
+    constexpr const Matrix4& getInvTransform() const noexcept {
+        return invTransform;
+    }
+    constexpr void setTransform(Matrix4 mat) noexcept {
+        transform = std::move(mat);
+        invTransform = inverse(transform);
+    }
+private: 
+    Matrix4 transform{ Matrix4Identity };
+    Matrix4 invTransform{ Matrix4Identity };
 };
 
 constexpr Ray ray_for_pixel(const Camera& c, size_t px, size_t py) noexcept{
@@ -42,10 +58,11 @@ constexpr Ray ray_for_pixel(const Camera& c, size_t px, size_t py) noexcept{
     const auto world_y = c.half_height - yoffset;
     //using the camera matrix, transform the canvas point and the origin, 
     //and then compute the ray's direction. (canvas is at z = -1)
-    const auto inv = inverse(c.transform);
-    const auto pixel = inv * point(world_x, world_y, -1.0f);
-    const auto origin = inv * ORIGO;    
-    const auto direction = normalize(pixel - origin);    
+    const auto pixel = c.getInvTransform() * point(world_x, world_y, -1.0f);
+    auto origin = c.getInvTransform() * ORIGO;
+    origin.w = 1.0f;
+    auto direction = normalize(pixel - origin);    
+    direction.w = 0.0f;
     return ray(origin, direction);
 }
 

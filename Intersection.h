@@ -115,7 +115,7 @@ constexpr std::pair<Real, Real> local_intersect(const Sphere& s, const Ray& loca
 
 constexpr auto intersect(const Shapes& variant, const Ray& r)  {     
     const auto [t1, t2] = std::visit([&r](const auto& obj) {
-        const auto local_ray = transform(r, inverse(obj.transform));
+        const auto local_ray = transform(r, obj.getInvTransform());
         return local_intersect(obj, local_ray);  }, variant 
     );
     if (t1 || t2) {
@@ -223,8 +223,8 @@ constexpr Real schlick(const HitState& state) noexcept {
     auto cos = dot(state.eye_v, state.normal);
     //total internal reflection can only occur if n1 > n2
     if (state.n1 > state.n2) {
-        const auto n = state.n1 / state.n2;
-        const auto sin2_t = (n * n) * (1.0f - (cos * cos));
+        const auto n_ratio = state.n1 / state.n2;
+        const auto sin2_t = (n_ratio * n_ratio) * (1.0f - (cos * cos));
         if (sin2_t > 1.0f) {
             return 1.0f;
         }
@@ -297,7 +297,7 @@ constexpr Color refracted_color(const World& w, const HitState& state, int remai
         return BLACK; //total internal reflection
     }
     const auto cos_t = math::sqrt(1.0f - sin2_t);
-    const auto direction = state.normal * (n_ratio * cos_i - cos_t) - state.eye_v * n_ratio;
+    const auto direction = state.normal * ((n_ratio * cos_i) - cos_t) - state.eye_v * n_ratio;
     const auto refract_ray = ray(state.under_point, direction);
     return color_at(w, refract_ray, remaining - 1) * state.surface().transparency;
 }
