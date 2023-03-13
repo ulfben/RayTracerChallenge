@@ -18,8 +18,8 @@ std::string ppm_header(size_t width, size_t height) {
 }  
 
 std::string to_ppm_seq(std::span<const Color> bitmap, size_t width, size_t height) {
-    std::string ppm = ppm_header(width, height);
-    std::vector<ByteColor> buffer(bitmap.begin(), bitmap.end());
+    std::string ppm = ppm_header(width, height);    
+    std::vector<ByteColor_sRGB> buffer(bitmap.begin(), bitmap.end());
     ppm.reserve(ppm.size() + (buffer.size() * CHARS_PER_PIXEL));
     for (const auto& color : buffer) {        
         ppm.append(to_string_with_trailing_space(color));        
@@ -27,8 +27,8 @@ std::string to_ppm_seq(std::span<const Color> bitmap, size_t width, size_t heigh
     return ppm;
 }
 
-std::string to_ppm_par(std::span<const Color> bitmap, size_t width, size_t height) {
-    std::vector<ByteColor> buffer(bitmap.begin(), bitmap.end());
+std::string to_ppm_par(std::span<const Color> bitmap, size_t width, size_t height) {    
+    std::vector<ByteColor_sRGB> buffer(bitmap.begin(), bitmap.end());
     WorkQue worker;    
     std::vector<std::string> out(worker.thread_count());         
     worker.schedule(buffer.size(), [&out, &buffer](size_t part, size_t i) noexcept {                            

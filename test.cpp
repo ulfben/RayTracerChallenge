@@ -116,7 +116,7 @@ TEST(DISABLED_Chapter6, CanRenderPhongShadedSphere) {
             }
         }
     }
-    save_to_file(c, "output/chapter6_2.ppm"sv);    
+    save_to_file(c, "output/chapter6_2_sRGB.ppm"sv);    
 }
 
 TEST(DISABLED_Chapter7, CanRenderScene) {    
@@ -150,7 +150,7 @@ TEST(DISABLED_Chapter7, CanRenderScene) {
                               point_light(point(-10, 10, -10), color(1,1,1)));    
     
     const auto img = render(c, world);    
-    save_to_file(img, "output/chapter7_1.ppm"sv);    
+    save_to_file(img, "output/chapter7_1_sRGB.ppm"sv);    
 }
 
 TEST(DISABLED_Chapter8, CanRenderSceneWithShadows) {    
@@ -182,7 +182,7 @@ TEST(DISABLED_Chapter8, CanRenderSceneWithShadows) {
                              point_light(point(-10, 10, -10), color(1, 1, 1)));
 
     const auto img = render(c, world);
-    save_to_file(img, "output/chapter8_9.ppm"sv);
+    save_to_file(img, "output/chapter8_9_sRGB.ppm"sv);
 }
 
 TEST(DISABLED_Chapter9, CanRenderPlanes) {    
@@ -211,7 +211,7 @@ TEST(DISABLED_Chapter9, CanRenderPlanes) {
     const auto world = World({ floor, back_wall, left, middle, right }, 
                             point_light(point(-10, 10, -10), color(1, 1, 1)));    
     const auto img = render(c, world);
-    save_to_file(img, "output/chapter9_0.ppm"sv);
+    save_to_file(img, "output/chapter9_0_sRGB.ppm"sv);
 }
 
 TEST(DISABLED_Chapter10, CanRenderPatterns) {    
@@ -240,10 +240,10 @@ TEST(DISABLED_Chapter10, CanRenderPatterns) {
     const auto world = World({ floor, left, middle, right }, 
                               point_light(point(-10, 10, -10), color(1, 1, 1)));    
     const auto img = render(c, world);
-    save_to_file(img, "output/chapter10_2.ppm"sv);
+    save_to_file(img, "output/chapter10_2_sRGB.ppm"sv);
 }
 
-TEST(Chapter11, CanRenderReflectionsAndRefractions) {    
+TEST(DISABLED_Chapter11, CanRenderReflectionsAndRefractions) {    
     const auto c = Camera(600, 400, math::PI / 3.0f,
         view_transform(point(1.0f, 3.4f, -2.5f), point(0, 1, 0), vector(0, 1, 0)));
 
@@ -282,5 +282,5 @@ TEST(Chapter11, CanRenderReflectionsAndRefractions) {
     const auto world = World({ floor, left, middle, behind, right }, 
                                 point_light(point(-10, 10, -10), color(1, 1, 1)));    
     const auto img = render(c, world);
-    save_to_file(img, "output/chapter11_5.ppm"sv);
+    save_to_file(img, "output/chapter11_5_sRGB.ppm"sv);
 }

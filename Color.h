@@ -2,6 +2,29 @@
 #include "pch.h"
 #include "Math.h"
 
+//sRGB conversion routines courtesy of http://www.ericbrasseur.org/gamma.html
+/*constexpr*/ Real sRGB_to_linear(Real s) noexcept {
+    constexpr Real a = 0.055f;
+    if (s <= 0.04045f) {
+        return s / 12.92f;
+    }
+    return std::pow((s + a) / (1.0f + a), 2.4f);
+}
+/*constexpr*/ Real linear_to_sRGB(Real s) noexcept {
+    constexpr Real a = 0.055f;
+    if (s <= 0.0031308f) {
+        return 12.92f * s;
+    }
+    return (1.0f + a) * std::pow(s, (1.0f / 2.4f)) - a;
+}
+
+/*constexpr*/ Real gamma_to_linear(Real s) noexcept {
+    return std::pow(s, 2.2f);
+}
+/*constexpr*/ Real linear_to_gamma(Real s) noexcept {
+    return std::pow(s, (1.0f / 2.2f));
+}
+
 struct Color final {
     Real r{};
     Real g{};
@@ -36,12 +59,25 @@ constexpr Color color(Real r, Real g, Real b) noexcept {
     return Color{ r, g, b };
 }
 
+void to_sRGB(Color& c) noexcept {
+    c.r = linear_to_sRGB(std::clamp(c.r, 0.0f, 1.0f));
+    c.g = linear_to_sRGB(std::clamp(c.g, 0.0f, 1.0f));
+    c.b = linear_to_sRGB(std::clamp(c.b, 0.0f, 1.0f));
+}
+
+void to_sRGB(std::span<Color> buffer) noexcept {
+    std::for_each(std::execution::par, buffer.begin(), buffer.end(),
+            [](auto& color) { to_sRGB(color); }
+    );
+}
+
+
 //bytecolor is an optimization to help us speed up writing the image to files. 
 //the idea is to bulk-convert the image-buffer into a smaller integer buffer, 
 //which we can then split across threads to make strings out of.
 struct ByteColor final {
     using value_type = uint8_t;
-    static constexpr float MAX = PPM_MAX_BYTE_VALUE;    
+    static constexpr float MAX = PPM_MAX_BYTE_VALUE;
     value_type r{};
     value_type g{};
     value_type b{};
@@ -55,8 +91,28 @@ struct ByteColor final {
     };
 };
 
-constexpr ByteColor to_byte_color(Color col) noexcept {
+constexpr ByteColor to_byte_color(const Color& col) noexcept {
     return ByteColor(col);
+}
+
+struct ByteColor_sRGB final {
+    using value_type = uint8_t;
+    static constexpr float MAX = PPM_MAX_BYTE_VALUE;
+    value_type r{};
+    value_type g{};
+    value_type b{};
+    constexpr ByteColor_sRGB() noexcept = default;
+    constexpr explicit ByteColor_sRGB(const Color& c) noexcept {
+        r = map_to<value_type>(linear_to_sRGB(std::clamp(c.r, 0.0f, 1.0f)));
+        g = map_to<value_type>(linear_to_sRGB(std::clamp(c.g, 0.0f, 1.0f)));
+        b = map_to<value_type>(linear_to_sRGB(std::clamp(c.b, 0.0f, 1.0f)));
+        assert(r <= MAX && g <= MAX && b <= MAX);
+        assert(r >= 0 && g >= 0 && b >= 0);
+    };
+};
+
+constexpr ByteColor_sRGB to_ByteColor_sRGB(const Color& col) noexcept {
+    return ByteColor_sRGB(col);
 }
 
 constexpr Color hadamard_product(const Color& a, const Color& b) noexcept {
@@ -76,13 +132,19 @@ std::ostream& operator<<(std::ostream& os, const Color& t) {
     return os;
 }
 
-std::string to_string(Color c) {
+std::string to_string(const Color& c) {
     return std::format("{} {} {}"sv, c.r, c.g, c.b);
 }
-std::string to_string(ByteColor c) {
+std::string to_string(const ByteColor& c) {
     return std::format("{} {} {}"sv, c.r, c.g, c.b);
 }
-std::string to_string_with_trailing_space(ByteColor c) {
+std::string to_string(const ByteColor_sRGB& c) {
+    return std::format("{} {} {}"sv, c.r, c.g, c.b);
+}
+std::string to_string_with_trailing_space(const ByteColor& c) {
+    return std::format("{} {} {} "sv, c.r, c.g, c.b);
+}
+std::string to_string_with_trailing_space(const ByteColor_sRGB& c) {
     return std::format("{} {} {} "sv, c.r, c.g, c.b);
 }
 #pragma warning(pop)
