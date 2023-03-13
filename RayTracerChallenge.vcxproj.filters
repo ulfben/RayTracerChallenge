@@ -74,6 +74,7 @@
     <ClInclude Include="tests\PatternTests.h">
       <Filter>tests</Filter>
     </ClInclude>
+    <ClInclude Include="Color.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -1,6 +1,6 @@
 #pragma once
 #include "../pch.h"
-#include "../Tuple.h"
+#include "../Color.h"
 #include "../Lights.h"
 DISABLE_WARNINGS_FROM_GTEST
 

@@ -67,6 +67,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Canvas.h" />
+    <ClInclude Include="Color.h" />
     <ClInclude Include="Intersection.h" />
     <ClInclude Include="Lights.h" />
     <ClInclude Include="Material.h" />

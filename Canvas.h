@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Tuple.h"
+#include "Color.h"
 #include "StringHelpers.h"
 #include "WorkQue.h"
 //A neat API example by lippuu: https://gist.github.com/lippuu/cbf4fa62fe8eed408159a558ff5c96ee

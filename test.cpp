@@ -240,7 +240,7 @@ TEST(DISABLED_Chapter10, CanRenderPatterns) {
     const auto world = World({ floor, left, middle, right }, 
                               point_light(point(-10, 10, -10), color(1, 1, 1)));    
     const auto img = render(c, world);
-    save_to_file(img, "output/chapter10_1.ppm"sv);
+    save_to_file(img, "output/chapter10_2.ppm"sv);
 }
 
 TEST(Chapter11, CanRenderReflectionsAndRefractions) {    
