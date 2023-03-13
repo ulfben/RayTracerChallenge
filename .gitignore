@@ -364,3 +364,4 @@ FodyWeavers.xsd
 /test.ppm
 /test_rounding_error.ppm
 /output
+/clean_vs_project_folder.bat
