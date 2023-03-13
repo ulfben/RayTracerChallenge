@@ -115,7 +115,7 @@ constexpr std::pair<Real, Real> local_intersect(const Sphere& s, const Ray& loca
 
 constexpr auto intersect(const Shapes& variant, const Ray& r)  {     
     const auto [t1, t2] = std::visit([&r](const auto& obj) {
-        const auto local_ray = transform(r, obj.getInvTransform());
+        const auto local_ray = transform(r, obj.inv_transform());
         return local_intersect(obj, local_ray);  }, variant 
     );
     if (t1 || t2) {

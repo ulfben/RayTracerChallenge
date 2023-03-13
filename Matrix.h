@@ -522,26 +522,14 @@ constexpr Matrix4 shearing(Real Xy, Real Xx, Real Yx, Real Yz, Real Zx, Real Zy)
     };
 }
 
-constexpr Matrix4 view_transform(const Point& from, const Point& to, const Vector& up) noexcept {        
-    using size_type = typename Matrix4::size_type;          
-    const auto forward = normalize(to - from);   //TODO: figure out why Point operator- isn't constexpr! 
-    const auto left = cross(forward, normalize(up));
-    const auto true_up = cross(left, forward);
-    //TODO: see if we can inline the translation calculations
-    //const auto tx = -dot(left, from); 
-    //const auto ty = -dot(true_up, from);
-    //const auto tz = dot(forward, from);
-    //return Matrix4{
-    //    left.x,      left.y,      left.z,      tx,
-    //    true_up.x,   true_up.y,   true_up.z,   ty,
-    //    -forward.x,  -forward.y,  -forward.z,  tz,
-    //    0,           0,           0,           1
-    //};
-    const auto orientation = Matrix4{
-        left.x,     left.y,     left.z,     0,
-        true_up.x,  true_up.y,  true_up.z,  0,
-        -forward.x, -forward.y, -forward.z, 0,
+constexpr Matrix4 view_transform(const Point& from, const Point& to, const Vector& up) noexcept {            
+    const auto forward = normalize(to - from);
+    const auto left = normalize(cross(forward, up));
+    const auto true_up = normalize(cross(left, forward));
+    return Matrix4 /*orientation*/{ 
+        left.x,     left.y,     left.z,     -dot(left, from),
+        true_up.x,  true_up.y,  true_up.z,  -dot(true_up, from),
+        -forward.x, -forward.y, -forward.z,  dot(forward, from),
         0,          0,          0,          1
-    };
-    return orientation * translation(-from.x, -from.y, -from.z);
+    };    
 }

@@ -44,27 +44,24 @@ TEST(Pattern, lightingWithPatternApplied) {
 
 TEST(Pattern, stripesWithAnObjectTransform) {
     const auto obj = sphere(scaling(2, 2, 2));    
-    auto pattern = stripe_pattern(WHITE, BLACK);    
+    const auto pattern = stripe_pattern(WHITE, BLACK);    
     EXPECT_EQ(pattern_at(pattern, obj, point(1.5f, 0, 0)), WHITE);    
 }
 
 TEST(Pattern, stripesWithAnPatternTransform) {
     const auto obj = sphere();    
-    auto pattern = stripe_pattern(WHITE, BLACK);
-    pattern.transform = scaling(2, 2, 2);
+    const auto pattern = stripe_pattern(WHITE, BLACK, scaling(2, 2, 2));
     EXPECT_EQ(pattern_at(pattern, obj, point(1.5f, 0, 0)), WHITE);    
 }
 
 TEST(Pattern, stripesWithBothAnObjectAndPatternTransform) {
     const auto obj = sphere(scaling(2, 2, 2));    
-    auto pattern = stripe_pattern(WHITE, BLACK);
-    pattern.transform = translation(0.5f, 0, 0);
+    const auto pattern = stripe_pattern(WHITE, BLACK, translation(0.5f, 0, 0));
     EXPECT_EQ(pattern_at(pattern, obj, point(2.5f, 0, 0)), WHITE);    
 }
 
 TEST(Pattern, gradientInterpolatesLinearly) {    ;    
-    auto pattern = gradient_pattern(WHITE, BLACK);
-    pattern.transform = translation(0.5f, 0, 0);
+    const auto pattern = gradient_pattern(WHITE, BLACK, translation(0.5f, 0, 0));
     EXPECT_EQ(pattern_at(pattern, point(0.0f, 0, 0)), WHITE);
     EXPECT_EQ(pattern_at(pattern, point(0.25f, 0, 0)), color(0.75f, 0.75f, 0.75f));    
     EXPECT_EQ(pattern_at(pattern, point(0.5f, 0, 0)), color(0.5f, 0.5f, 0.5f));
@@ -74,7 +71,7 @@ TEST(Pattern, gradientInterpolatesLinearly) {    ;
 }
 
 TEST(Pattern, ringPatternExtendInBothXandZ) {    ;    
-    auto pattern = ring_pattern(WHITE, BLACK);    
+    const auto pattern = ring_pattern(WHITE, BLACK);    
     EXPECT_EQ(pattern_at(pattern, point(0.0f, 0, 0)), WHITE);
     EXPECT_EQ(pattern_at(pattern, point(1.0f, 0, 0)), BLACK);    
     EXPECT_EQ(pattern_at(pattern, point(0, 0, 1.0f)), BLACK);
@@ -83,19 +80,19 @@ TEST(Pattern, ringPatternExtendInBothXandZ) {    ;
 }
 
 TEST(Pattern, checkersShouldRepeatInX) {    ;    
-    auto pattern = checkers_pattern(WHITE, BLACK);    
+    const auto pattern = checkers_pattern(WHITE, BLACK);    
     EXPECT_EQ(pattern_at(pattern, point(0.0f, 0, 0)), WHITE);
     EXPECT_EQ(pattern_at(pattern, point(0.99f, 0, 0)), WHITE);    
     EXPECT_EQ(pattern_at(pattern, point(1.01f, 0, 0)), BLACK);    
 }
 TEST(Pattern, checkersShouldRepeatInY) {    ;    
-    auto pattern = checkers_pattern(WHITE, BLACK);    
+    const auto pattern = checkers_pattern(WHITE, BLACK);    
     EXPECT_EQ(pattern_at(pattern, point(0.0f, 0, 0)), WHITE);
     EXPECT_EQ(pattern_at(pattern, point(0, 0.99f, 0)), WHITE);    
     EXPECT_EQ(pattern_at(pattern, point(0, 1.01f, 0)), BLACK);    
 }
 TEST(Pattern, checkersShouldRepeatInZ) {    ;    
-    auto pattern = checkers_pattern(WHITE, BLACK);    
+    const auto pattern = checkers_pattern(WHITE, BLACK);    
     EXPECT_EQ(pattern_at(pattern, point(0.0f, 0, 0)), WHITE);
     EXPECT_EQ(pattern_at(pattern, point(0, 0, 0.99f)), WHITE);    
     EXPECT_EQ(pattern_at(pattern, point(0, 0, 1.01f)), BLACK);    

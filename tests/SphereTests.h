@@ -8,8 +8,8 @@ DISABLE_WARNINGS_FROM_GTEST
 
 TEST(Sphere, hasTransform) {
     const auto s = sphere(ORIGO, 1.0f);
-    EXPECT_EQ(s.getTransform(), Matrix4Identity);
-    EXPECT_EQ(s.getInvTransform(), inverse(s.getTransform()));
+    EXPECT_EQ(s.transform(), Matrix4Identity);
+    EXPECT_EQ(s.inv_transform(), inverse(s.transform()));
 }
 
 TEST(Sphere, normalAtAPointOnXAxis) {

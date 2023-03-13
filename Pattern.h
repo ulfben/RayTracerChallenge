@@ -6,29 +6,53 @@
 #include "Shapes.h"
 
 struct NullPattern final {
-    Matrix4 transform{Matrix4Identity};
     constexpr Color at([[maybe_unused]] const Point& p) const noexcept { return BLACK; }
     explicit constexpr operator bool() const  { return false; }
     constexpr bool empty() const  { return true; }
     constexpr bool operator==(const NullPattern& that) const noexcept = default;
+    constexpr const Matrix4& transform() const noexcept {
+        return _transform;
+    }    
+    constexpr const Matrix4& inv_transform() const noexcept {
+        return _invTransform;
+    }
+    constexpr void setTransform([[maybe_unused]]Matrix4 mat) noexcept {}
+private: 
+    Matrix4 _transform{ Matrix4Identity };
+    Matrix4 _invTransform{ Matrix4Identity };
 };
 
 struct StripePattern final {
-    Matrix4 transform{Matrix4Identity};
-    Color a{};
-    Color b{};
+    constexpr StripePattern(Matrix4 mat, Color a_, Color b_) noexcept : a{ a_ }, b{b_} {
+        setTransform(std::move(mat));
+    }
     constexpr Color at(const Point& p) const noexcept {
         return (math::int_floor(p.x) % 2 == 0) ? a : b;
     }
     explicit constexpr operator bool() const  { return true; }
     constexpr bool empty() const  { return false; }
     constexpr bool operator==(const StripePattern& that) const noexcept  = default;    
+    constexpr const Matrix4& transform() const noexcept {
+        return _transform;
+    }    
+    constexpr const Matrix4& inv_transform() const noexcept {
+        return _invTransform;
+    }
+    constexpr void setTransform(Matrix4 mat) noexcept {
+        _transform = std::move(mat);
+        _invTransform = inverse(_transform);
+    }
+private: 
+    Matrix4 _transform{ Matrix4Identity };
+    Matrix4 _invTransform{ Matrix4Identity };
+    Color a{};
+    Color b{};
 };
 
 struct GradientPattern final {
-    Matrix4 transform{Matrix4Identity};
-    Color a{};
-    Color b{};
+    constexpr GradientPattern(Matrix4 mat, Color a_, Color b_) noexcept : a{ a_ }, b{b_} {
+        setTransform(std::move(mat));
+    }
     constexpr Color at(const Point& p) const noexcept {
         const auto distance = b - a; 
         const auto fraction = p.x - math::floor(p.x);
@@ -37,11 +61,26 @@ struct GradientPattern final {
     explicit constexpr operator bool() const  { return true; }
     constexpr bool empty() const  { return false; }
     constexpr bool operator==(const GradientPattern& that) const noexcept  = default;
-};
-struct RingPattern final {
-    Matrix4 transform{Matrix4Identity};
+    constexpr const Matrix4& transform() const noexcept {
+        return _transform;
+    }    
+    constexpr const Matrix4& inv_transform() const noexcept {
+        return _invTransform;
+    }
+    constexpr void setTransform(Matrix4 mat) noexcept {
+        _transform = std::move(mat);
+        _invTransform = inverse(_transform);
+    }
+private: 
+    Matrix4 _transform{ Matrix4Identity };
+    Matrix4 _invTransform{ Matrix4Identity };
     Color a{};
     Color b{};
+};
+struct RingPattern final {
+    constexpr RingPattern(Matrix4 mat, Color a_, Color b_) noexcept : a{ a_ }, b{b_} {
+        setTransform(std::move(mat));
+    }
     constexpr Color at(const Point& p) const noexcept {        
         if (math::int_floor(math::sqrt((p.x * p.x) + (p.z + p.z))) % 2 == 0) {
             return a;
@@ -51,11 +90,26 @@ struct RingPattern final {
     explicit constexpr operator bool() const  { return true; }
     constexpr bool empty() const  { return false; }
     constexpr bool operator==(const RingPattern& that) const noexcept  = default;
-};
-struct CheckersPattern final {
-    Matrix4 transform{Matrix4Identity};
+    constexpr const Matrix4& transform() const noexcept {
+        return _transform;
+    }    
+    constexpr const Matrix4& inv_transform() const noexcept {
+        return _invTransform;
+    }
+    constexpr void setTransform(Matrix4 mat) noexcept {
+        _transform = std::move(mat);
+        _invTransform = inverse(_transform);
+    }
+private: 
+    Matrix4 _transform{ Matrix4Identity };
+    Matrix4 _invTransform{ Matrix4Identity };
     Color a{};
     Color b{};
+};
+struct CheckersPattern final {    
+    constexpr CheckersPattern(Matrix4 mat, Color a_, Color b_) noexcept : a{ a_ }, b{b_} {
+        setTransform(std::move(mat));
+    }
     constexpr Color at(const Point& p) const noexcept {        
         const auto val = static_cast<int>(math::abs(p.x) + math::abs(p.y) + math::abs(p.z));
         return (val % 2 == 0) ? a : b; 
@@ -63,26 +117,38 @@ struct CheckersPattern final {
     explicit constexpr operator bool() const  { return true; }
     constexpr bool empty() const  { return false; }
     constexpr bool operator==(const CheckersPattern& that) const noexcept  = default;
+    constexpr const Matrix4& transform() const noexcept {
+        return _transform;
+    }    
+    constexpr const Matrix4& inv_transform() const noexcept {
+        return _invTransform;
+    }
+    constexpr void setTransform(Matrix4 mat) noexcept {
+        _transform = std::move(mat);
+        _invTransform = inverse(_transform);
+    }
+private: 
+    Matrix4 _transform{ Matrix4Identity };
+    Matrix4 _invTransform{ Matrix4Identity };
+    Color a{};
+    Color b{};
 };
 
 constexpr auto null_pattern() noexcept {
     return NullPattern{};
 };
 
-constexpr auto stripe_pattern(Color a, Color b) noexcept {
-    return StripePattern{ Matrix4Identity, a, b };
+constexpr auto stripe_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexcept {
+    return StripePattern( std::move(m), a, b );
 };
-
-constexpr auto gradient_pattern(Color a, Color b) noexcept {
-    return GradientPattern{ Matrix4Identity, a, b };
+constexpr auto gradient_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexcept {
+    return GradientPattern( std::move(m), a, b );
 };
-
-constexpr auto ring_pattern(Color a, Color b) noexcept {
-    return RingPattern{ Matrix4Identity, a, b };
+constexpr auto ring_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexcept {
+    return RingPattern( std::move(m), a, b );
 };
-
-constexpr auto checkers_pattern(Color a, Color b) noexcept {
-    return CheckersPattern{ Matrix4Identity, a, b };
+constexpr auto checkers_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexcept {
+    return CheckersPattern( std::move(m), a, b );
 };
 
 using Patterns = std::variant<NullPattern, StripePattern, GradientPattern, RingPattern, CheckersPattern>; 
@@ -102,25 +168,25 @@ inline bool operator==(const Patterns& v, const patterns auto& t) {
     return t == v;
 };
 
-constexpr Matrix4& transform(Patterns& variant) noexcept { 
-    return std::visit([](auto& obj) noexcept -> Matrix4& { 
-        return obj.transform;
+constexpr const Matrix4& transform(const Patterns& variant) noexcept { 
+    return std::visit([](const auto& pattern) noexcept -> const Matrix4& { 
+        return pattern.transform();
     }, variant);    
 };
-constexpr const Matrix4& transform(const Patterns& variant) noexcept { 
-    return std::visit([](const auto& obj) noexcept -> const Matrix4& { 
-        return obj.transform;
+constexpr const Matrix4& invTransform(const Patterns& variant) noexcept { 
+    return std::visit([](const auto& pattern) noexcept -> const Matrix4& { 
+        return pattern.inv_transform();
     }, variant);    
 };
 
 Color pattern_at(const Patterns& variant, const Point& p) noexcept {
     assert(!std::holds_alternative<NullPattern>(variant) && "pattern_at: called on NullPattern.");
-    return std::visit([&p](const auto& obj) noexcept -> Color { return obj.at(p); }, variant);
+    return std::visit([&p](const auto& pattern) noexcept -> Color { return pattern.at(p); }, variant);
 };
 
 Color pattern_at(const Patterns& pattern, const /*must be Shapes, but if I name that type here the project won't compile*/ auto& obj, const Point& world_point) noexcept {
     assert(!std::holds_alternative<NullPattern>(pattern) && "pattern_at: called on NullPattern.");
-    const auto object_point = inverse(transform(obj)) * world_point;
-    const auto pattern_point = inverse(transform(pattern)) * object_point;    
+    const auto object_point = invTransform(obj) * world_point;
+    const auto pattern_point = invTransform(pattern) * object_point;    
     return pattern_at(pattern, pattern_point);
 };

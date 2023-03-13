@@ -27,21 +27,21 @@ struct Sphere final {
     }
     constexpr auto operator==(const Sphere& that) const noexcept {
         return position == that.position && math::float_cmp(radius, that.radius)
-            && surface == that.surface && transform == that.transform;
+            && surface == that.surface && _transform == that._transform;
     }
-    constexpr const Matrix4& getTransform() const noexcept {
-        return transform;
+    constexpr const Matrix4& transform() const noexcept {
+        return _transform;
     }
-    constexpr const Matrix4& getInvTransform() const noexcept {
-        return invTransform;
+    constexpr const Matrix4& inv_transform() const noexcept {
+        return _invTransform;
     }
     constexpr void setTransform(Matrix4 mat) noexcept {
-        transform = std::move(mat);
-        invTransform = inverse(transform);
+        _transform = std::move(mat);
+        _invTransform = inverse(_transform);
     }
 private: 
-    Matrix4 transform{ Matrix4Identity };
-    Matrix4 invTransform{ Matrix4Identity };
+    Matrix4 _transform{ Matrix4Identity };
+    Matrix4 _invTransform{ Matrix4Identity };
 };
 
 constexpr Sphere sphere(Point p, Real radius) noexcept {

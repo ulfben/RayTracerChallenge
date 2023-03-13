@@ -10,7 +10,7 @@ TEST(Camera, canBeConstructed) {
     EXPECT_EQ(c.width, 160);
     EXPECT_EQ(c.height, 120);    
     EXPECT_FLOAT_EQ(c.field_of_view, math::PI / 2);
-    EXPECT_EQ(c.getTransform(), Matrix4Identity);
+    EXPECT_EQ(c.transform(), Matrix4Identity);
 }
 
 TEST(Camera, calculatesPixelSizeForHorizontalCanvas) {

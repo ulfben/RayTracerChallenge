@@ -23,8 +23,14 @@ struct World final {
         objects.emplace_back(sphere(DEFAULT_MATERIAL));
         objects.emplace_back(sphere(scaling(0.5f, 0.5f, 0.5f)));        
     }
+    explicit constexpr World(Light l) : World() {                
+        light = std::move(l);
+    }
     explicit constexpr World(std::initializer_list<value_type> list) {        
         objects.append_range(list);        
+    }
+    explicit constexpr World(std::initializer_list<value_type> list, Light l) : World(list) {        
+        light = std::move(l);
     }
     constexpr void push_back(std::initializer_list<value_type> list) {        
         objects.append_range(list);        
@@ -72,11 +78,9 @@ constexpr const Material& get_material(const World& w, size_t i) noexcept{
     return std::visit([](const auto& obj) noexcept -> const Material& {return obj.surface;  }, w[i]);
 }
 
-//constexpr Matrix4& get_transform(World& w, size_t i) noexcept{    
-//    return std::visit([](auto& obj) noexcept -> Matrix4& {return obj.getTransform();  }, w[i]);
-//}
+
 constexpr const Matrix4& get_transform(const World& w, size_t i) noexcept{   
-    return std::visit([](const auto& obj) noexcept -> const Matrix4& {return obj.getTransform();  }, w[i]);
+    return std::visit([](const auto& obj) noexcept -> const Matrix4& {return obj.transform();  }, w[i]);
 }
 
 constexpr Material& get_material(World::iterator iter) noexcept{    
@@ -86,9 +90,6 @@ constexpr const Material& get_material(World::const_iterator iter) noexcept{
     return std::visit([](const auto& obj) noexcept -> const Material& {return obj.surface;  }, *iter);
 }
 
-//constexpr Matrix4& get_transform(World::iterator iter) noexcept{    
-//    return std::visit([](auto& obj) noexcept -> Matrix4& {return obj.getTransform();  }, *iter);
-//}
 constexpr const Matrix4& get_transform(World::const_iterator iter) noexcept{   
-    return std::visit([](const auto& obj) noexcept -> const Matrix4& {return obj.getTransform();  }, *iter);
+    return std::visit([](const auto& obj) noexcept -> const Matrix4& {return obj.transform();  }, *iter);
 }

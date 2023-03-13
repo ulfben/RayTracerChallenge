@@ -93,8 +93,7 @@ TEST(DISABLED_Chapter5, CanRenderSilhouetteOfASphere) {
 TEST(DISABLED_Chapter6, CanRenderPhongShadedSphere) {       
     using size_type = Canvas::size_type;
     auto c = Canvas(100, 100);
-    auto shape = sphere();
-    shape.surface.color = color(1, 0.2f, 1);        
+    const auto shape = sphere(color(1, 0.2f, 1));    
     const auto light = point_light(point(10, 10, -10), WHITE);
     const auto ray_origin = point(0, 0, -5);    
     const auto wall_z = 10.0f;
@@ -124,37 +123,31 @@ TEST(DISABLED_Chapter7, CanRenderScene) {
     const auto c = Camera(400, 200, math::PI / 3, 
         view_transform(point(0.0f, 1.5f, -5.0f), point(0, 1, 0), vector(0, 1, 0)));
     
-    auto floor = sphere(scaling(10, 0.01f, 10));
-    floor.surface = material();
-    floor.surface.color = color(1, 0.9f, 0.9f);    
-    floor.surface.specular = 0;
+    auto floorSurface = material(color(1, 0.9f, 0.9f));       
+    floorSurface.specular = 0;
+    
+    const auto floor = sphere(floorSurface, scaling(10, 0.01f, 10));   
+    const auto left_wall = sphere(floorSurface, translation(0, 0, 5) * rotation_y(-math::PI / 4.0f) * rotation_x(math::PI / 2) * scaling(10.0f, 0.01f, 10.0f));   
+    const auto right_wall = sphere(floorSurface, translation(0, 0, 5) * rotation_y(math::PI / 4.0f) * rotation_x(math::PI / 2) * scaling(10.0f, 0.01f, 10.0f));    
 
-    auto left_wall = sphere(translation(0, 0, 5) * rotation_y(-math::PI / 4.0f) * rotation_x(math::PI / 2) * scaling(10.0f, 0.01f, 10.0f));
-    left_wall.surface = floor.surface;    
+    auto middleSurface = material(color(0.1f, 1, 0.5f));    
+    middleSurface.diffuse = 0.7f;
+    middleSurface.specular = 0.4f;
+    const auto middle = sphere(translation(-0.5f, 1, 0.5f));
+    
+    auto rightSurface = material(color(0.5f, 1, 0.1f));    
+    rightSurface.diffuse = 0.7f;
+    rightSurface.specular = 0.3f;
+    auto right = sphere(rightSurface, translation(1.5f, 0.5f, -0.5f) * scaling(0.5f, 0.5f, 0.5f));
+    
 
-    auto right_wall = sphere(translation(0, 0, 5) * rotation_y(math::PI / 4.0f) * rotation_x(math::PI / 2) * scaling(10.0f, 0.01f, 10.0f));
-    right_wall.surface = floor.surface;    
+    auto leftSurface = material(color(1.0f, 0.8f, 0.1f));
+    leftSurface.diffuse = 0.7f;
+    leftSurface.specular = 0.3f;
+    auto left = sphere(translation(-1.5f, 0.33f, -0.75f) * scaling(0.33f, 0.33f, 0.33f));    
 
-    auto middle = sphere(translation(-0.5f, 1, 0.5f));
-    middle.surface = material();
-    middle.surface.color = color(0.1f, 1, 0.5f);
-    middle.surface.diffuse = 0.7f;
-    middle.surface.specular = 0.4f;
-
-    auto right = sphere(translation(1.5f, 0.5f, -0.5f) * scaling(0.5f, 0.5f, 0.5f));
-    right.surface = material();
-    right.surface.color = color(0.5f, 1, 0.1f);
-    right.surface.diffuse = 0.7f;
-    right.surface.specular = 0.3f;
-
-    auto left = sphere(translation(-1.5f, 0.33f, -0.75f) * scaling(0.33f, 0.33f, 0.33f));
-    left.surface = material();
-    left.surface.color = color(1.0f, 0.8f, 0.1f);
-    left.surface.diffuse = 0.7f;
-    left.surface.specular = 0.3f;
-
-    auto world = World({floor, left_wall, right_wall, left, middle, right});
-    world.light = point_light(point(-10, 10, -10), color(1,1,1));
+    const auto world = World({floor, left_wall, right_wall, left, middle, right}, 
+                              point_light(point(-10, 10, -10), color(1,1,1)));    
     
     const auto img = render(c, world);    
     save_to_file(img, "output/chapter7_1.ppm"sv);    
@@ -164,37 +157,29 @@ TEST(DISABLED_Chapter8, CanRenderSceneWithShadows) {
     const auto c = Camera(400, 200, math::PI / 3, 
         view_transform(point(0.0f, 1.5f, -5.0f), point(0, 1, 0), vector(0, 1, 0)));
 
-    auto floor = sphere(scaling(10, 0.01f, 10));
-    floor.surface = material();
-    floor.surface.color = color(1, 0.9f, 0.9f);
-    floor.surface.specular = 0;
+    auto floorSurface = material(color(1, 0.9f, 0.9f));    
+    floorSurface.specular = 0;
+    const auto floor = sphere(floorSurface, scaling(10, 0.01f, 10));
+    const auto left_wall = sphere(floorSurface, translation(0, 0, 5) * rotation_y(-math::PI / 4.0f) * rotation_x(math::PI / 2) * scaling(10.0f, 0.01f, 10.0f));
+    const auto right_wall = sphere(floorSurface, translation(0, 0, 5) * rotation_y(math::PI / 4.0f) * rotation_x(math::PI / 2) * scaling(10.0f, 0.01f, 10.0f));    
 
-    auto left_wall = sphere(translation(0, 0, 5) * rotation_y(-math::PI / 4.0f) * rotation_x(math::PI / 2) * scaling(10.0f, 0.01f, 10.0f));
-    left_wall.surface = floor.surface;
+    auto middleSurface = material(color(0.1f, 1, 0.5f));    
+    middleSurface.diffuse = 0.7f;
+    middleSurface.specular = 0.4f;
+    auto middle = sphere(middleSurface, translation(-0.5f, 1, 0.5f));
+    
+    auto rightSurface = material(color(0.5f, 1, 0.1f));    
+    rightSurface.diffuse = 0.7f;
+    rightSurface.specular = 0.3f;
+    const auto right = sphere(rightSurface, translation(1.5f, 0.5f, -0.5f) * scaling(0.5f, 0.5f, 0.5f));    
 
-    auto right_wall = sphere(translation(0, 0, 5) * rotation_y(math::PI / 4.0f) * rotation_x(math::PI / 2) * scaling(10.0f, 0.01f, 10.0f));
-    right_wall.surface = floor.surface;
+    auto leftSurface = material(color(1.0f, 0.8f, 0.1f));    
+    leftSurface.diffuse = 0.7f;
+    leftSurface.specular = 0.3f;
+    const auto left = sphere(leftSurface, translation(-1.5f, 0.33f, -0.75f) * scaling(0.33f, 0.33f, 0.33f));
 
-    auto middle = sphere(translation(-0.5f, 1, 0.5f));
-    middle.surface = material();
-    middle.surface.color = color(0.1f, 1, 0.5f);
-    middle.surface.diffuse = 0.7f;
-    middle.surface.specular = 0.4f;
-
-    auto right = sphere(translation(1.5f, 0.5f, -0.5f) * scaling(0.5f, 0.5f, 0.5f));
-    right.surface = material();
-    right.surface.color = color(0.5f, 1, 0.1f);
-    right.surface.diffuse = 0.7f;
-    right.surface.specular = 0.3f;
-
-    auto left = sphere(translation(-1.5f, 0.33f, -0.75f) * scaling(0.33f, 0.33f, 0.33f));
-    left.surface = material();
-    left.surface.color = color(1.0f, 0.8f, 0.1f);
-    left.surface.diffuse = 0.7f;
-    left.surface.specular = 0.3f;
-
-    auto world = World({ floor, left_wall, right_wall, left, middle, right });
-    world.light = point_light(point(-10, 10, -10), color(1, 1, 1));
+    const auto world = World({ floor, left_wall, right_wall, left, middle, right }, 
+                             point_light(point(-10, 10, -10), color(1, 1, 1)));
 
     const auto img = render(c, world);
     save_to_file(img, "output/chapter8_9.ppm"sv);
@@ -204,34 +189,27 @@ TEST(DISABLED_Chapter9, CanRenderPlanes) {
     const auto c = Camera(800, 400, math::PI / 3.0f, 
         view_transform(point(0.0f, 1.5f, -5.0f), point(0, 1, 0), vector(0, 1, 0)));
     
-    auto floor = plane();  
-    floor.surface.color =  color(1, 0.9f, 0.9f);
-    floor.surface.specular = 0.8f;
+    auto floorMat = material(color(1, 0.9f, 0.9f));
+    floorMat.specular = 0.8f;    
+    
+    const auto floor = plane(floorMat);          
+    const auto back_wall = plane(floorMat, translation(0, 0, 5) * rotation_x(math::HALF_PI));    
 
-    auto back_wall = plane(translation(0, 0, 5) * rotation_x(math::HALF_PI));
-    back_wall.surface = floor.surface;    
+    auto middleMat = material(color(0.1f, 1, 0.5f));    
+    middleMat.diffuse = 0.7f;
+    middleMat.specular = 0.4f;
+    const auto middle = sphere(middleMat, translation(-0.5f, 1, 0.5f));
+   
+    auto rightMat = material(color(0.5f, 1, 0.1f));    
+    const auto right = sphere(translation(1.5f, 0.5f, -0.5f) * scaling(0.5f, 0.5f, 0.5f));
+    
+    auto leftMat = material(color(1.0f, 0.8f, 0.1f));    
+    leftMat.diffuse = 0.7f;
+    leftMat.specular = 0.3f;
+    const auto left = sphere(leftMat, translation(-1.5f, 0.33f, -0.75f) * scaling(0.33f, 0.33f, 0.33f));    
 
-    auto middle = sphere(translation(-0.5f, 1, 0.5f));
-    middle.surface = material();
-    middle.surface.color = color(0.1f, 1, 0.5f);
-    middle.surface.diffuse = 0.7f;
-    middle.surface.specular = 0.4f;
-
-    auto right = sphere(translation(1.5f, 0.5f, -0.5f) * scaling(0.5f, 0.5f, 0.5f));
-    right.surface = material();
-    right.surface.color = color(0.5f, 1, 0.1f);
-    right.surface.diffuse = 0.7f;
-    right.surface.specular = 0.3f;
-
-    auto left = sphere(translation(-1.5f, 0.33f, -0.75f) * scaling(0.33f, 0.33f, 0.33f));
-    left.surface = material();
-    left.surface.color = color(1.0f, 0.8f, 0.1f);
-    left.surface.diffuse = 0.7f;
-    left.surface.specular = 0.3f;
-
-    auto world = World({ floor, back_wall, left, middle, right });
-    world.light = point_light(point(-10, 10, -10), color(1, 1, 1));
-
+    const auto world = World({ floor, back_wall, left, middle, right }, 
+                            point_light(point(-10, 10, -10), color(1, 1, 1)));    
     const auto img = render(c, world);
     save_to_file(img, "output/chapter9_0.ppm"sv);
 }
@@ -240,13 +218,12 @@ TEST(DISABLED_Chapter10, CanRenderPatterns) {
     const auto c = Camera(600, 400, math::PI / 3.0f, 
         view_transform(point(1.0f, 3.4f, -2.5f), point(0, 1, 0), vector(0, 1, 0)));
 
-    auto floor = plane(color(1, 0.9f, 0.9f));
-    surface(floor).pattern = ring_pattern(WHITE, BLACK);
-    surface(floor).reflective = 0.08f;
-    
-    auto mat = material();
-    mat.pattern = checkers_pattern(RED, BLUE);    
-    const auto middle = sphere(mat, translation(-0.5f, 1, 0.5f));    
+    auto floorMaterial = material(ring_pattern(WHITE, BLACK));
+    floorMaterial.reflective = 0.08f;
+    const auto floor = plane(floorMaterial);    
+
+    const auto middle = sphere(material(checkers_pattern(RED, BLUE)), 
+                               translation(-0.5f, 1, 0.5f));    
     
     auto green = material(color(0.5f, 1, 0.1f));
     green.diffuse = 0.7f;
@@ -254,28 +231,26 @@ TEST(DISABLED_Chapter10, CanRenderPatterns) {
     green.reflective = 0.3f;
     const auto right = sphere(green, (translation(1.5f, 0.5f, -0.5f) * scaling(0.5f, 0.5f, 0.5f)));    
 
-    auto left = sphere(translation(-1.5f, 0.33f, -0.75f) * scaling(0.33f, 0.33f, 0.33f));
-    left.surface = material();
-    surface(left).pattern = stripe_pattern(GREEN, BLUE);
-    transform(surface(left).pattern) = rotation_y(math::HALF_PI);
-    left.surface.diffuse = 0.7f;
-    left.surface.specular = 0.3f; 
-    left.surface.reflective = 0.3f;
+    auto leftMat = material(stripe_pattern(GREEN, BLUE, rotation_y(math::HALF_PI)));    
+    leftMat.diffuse = 0.7f;
+    leftMat.specular = 0.3f; 
+    leftMat.reflective = 0.3f;
+    const auto left = sphere(leftMat, translation(-1.5f, 0.33f, -0.75f) * scaling(0.33f, 0.33f, 0.33f));    
 
-    auto world = World({ floor, left, middle, right });
-    world.light = point_light(point(-10, 10, -10), color(1, 1, 1));
-
+    const auto world = World({ floor, left, middle, right }, 
+                              point_light(point(-10, 10, -10), color(1, 1, 1)));    
     const auto img = render(c, world);
     save_to_file(img, "output/chapter10_1.ppm"sv);
 }
 
-TEST(DISABLED_Chapter11, CanRenderReflectionsAndRefractions) {    
+TEST(Chapter11, CanRenderReflectionsAndRefractions) {    
     const auto c = Camera(600, 400, math::PI / 3.0f,
         view_transform(point(1.0f, 3.4f, -2.5f), point(0, 1, 0), vector(0, 1, 0)));
 
-    auto floor = plane(color(1, 0.9f, 0.9f));
-    surface(floor).specular = 0.8f;
-    surface(floor).reflective = 0.08f;
+    auto floorMat = material(color(1, 0.9f, 0.9f));
+    floorMat.specular = 0.8f;
+    floorMat.reflective = 0.08f;
+    const auto floor = plane(floorMat);    
     
     auto mat = glass();
     mat.color = color(0.0f, 0.1f, 0.0f); //the more reflective or transparent, the darker the color need to be,
@@ -294,21 +269,18 @@ TEST(DISABLED_Chapter11, CanRenderReflectionsAndRefractions) {
     green.reflective = 0.3f;
     const auto right = sphere(green, (translation(1.5f, 0.5f, -0.5f) * scaling(0.5f, 0.5f, 0.5f)));    
     
-    auto behind = right;
-    surface(behind).color = color(1.0f, 0.8f, 0.1f);
-    behind.setTransform(translation(-1.5f, -0.3f, 4.0f) * scaling(1.2f, 1.2f, 1.2f));    
-    surface(behind).reflective = 0.0f;
+    auto behindMat = material(color(1.0f, 0.8f, 0.1f));
+    behindMat.reflective = 0.0f;    
+    const auto behind = sphere(behindMat, translation(-1.5f, -0.3f, 4.0f) * scaling(1.2f, 1.2f, 1.2f));    
 
-    auto left = sphere(translation(-1.5f, 0.33f, -0.75f) * scaling(0.33f, 0.33f, 0.33f));
-    left.surface = material();
-    left.surface.color = color(1.0f, 0.8f, 0.1f);
-    left.surface.diffuse = 0.7f;
-    left.surface.specular = 0.3f; 
-    left.surface.reflective = 0.3f;
-
-    auto world = World({ floor, left, middle, behind, right });
-    world.light = point_light(point(-10, 10, -10), color(1, 1, 1));
-
+    auto leftMat = material(color(1.0f, 0.8f, 0.1f));    
+    leftMat.diffuse = 0.7f;
+    leftMat.specular = 0.3f; 
+    leftMat.reflective = 0.3f;
+    const auto left = sphere(leftMat, translation(-1.5f, 0.33f, -0.75f) * scaling(0.33f, 0.33f, 0.33f));
+    
+    const auto world = World({ floor, left, middle, behind, right }, 
+                                point_light(point(-10, 10, -10), color(1, 1, 1)));    
     const auto img = render(c, world);
     save_to_file(img, "output/chapter11_5.ppm"sv);
 }

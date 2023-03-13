@@ -4,7 +4,8 @@
 #include "Pattern.h"
 
 struct Material final {
-    Color color{ 1, 1, 1 };
+    Patterns pattern = null_pattern();
+    Color color{ WHITE };
     Real ambient = 0.1f;
     Real diffuse = 0.9f;
     Real specular = 0.9f;
@@ -12,7 +13,12 @@ struct Material final {
     Real reflective = 0.0f;
     Real transparency = 0.0f;
     Real refractive_index = 0.0f;
-    Patterns pattern = null_pattern();
+    
+    constexpr Material() noexcept = default;
+    constexpr Material(Color color_, Real ambient_ = 0.1f, Real diffuse_ = 0.9f, Real specular_ = 0.9f) noexcept : 
+        color{ color_ }, ambient{ ambient_ }, diffuse{ diffuse_ }, specular{specular_} {
+    }
+    constexpr explicit Material(Patterns pattern_) noexcept : pattern{ std::move(pattern_) } {}    
     constexpr bool operator==(const Material& that) const noexcept = default;
 };
 #pragma warning(push)
@@ -26,21 +32,22 @@ constexpr Material material() noexcept {
     return {};
 }
 constexpr Material material(Color c, Real ambient = 0.1f, Real diffuse = 0.9f, Real specular = 0.9f) noexcept {
-    return Material{c, ambient, diffuse, specular};    
+    return Material(c, ambient, diffuse, specular);    
 }
 constexpr Material mirror() noexcept {
-    Material m{};
+    Material m = material();
     m.reflective = 1.0f;
     return m;
 }
 constexpr Material glass(Real refractive = 1.52f) noexcept {
-    Material m{};
+    Material m = material();
     m.transparency = 1.0f;
     m.refractive_index = refractive;
     return m;
 }
-
+constexpr Material material(Patterns pattern) noexcept {    
+    return Material(std::move(pattern)); 
+}
 constexpr bool has_pattern(const Material& mat) noexcept {
     return std::visit([](const auto& obj) noexcept -> bool { return static_cast<bool>(obj); }, mat.pattern);
-
 }

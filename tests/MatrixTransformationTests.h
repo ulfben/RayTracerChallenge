@@ -226,7 +226,13 @@ TEST(view_transform, arbitraryViewTransform) {
         -0.35857f,  0.59761f,   -0.71714f,  0.0f,
         0.0f,       0.0f,       0.0f,       1.0f
     };
-    EXPECT_EQ(t, expected); 
+    constexpr auto actual = Matrix4{ //the book is erroneously not normalizing the the three vectors. 
+        -0.514496f, 0.514496f,  0.685994f,  -2.40098f,
+        0.778924f,  0.61494f,   0.122988f,  -2.86972f,
+        -0.358569f, 0.597614f, -0.717137f,  0.0f,
+        0.0f,       0.0f,       0.0f,       1.0f 
+    };
+    EXPECT_EQ(t, actual); 
 }
 
 

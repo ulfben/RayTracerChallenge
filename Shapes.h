@@ -10,9 +10,9 @@ concept shapes = std::is_same_v<Sphere, T> || std::is_same_v<Plane, T>;
 
 constexpr Vector normal_at(const Shapes& variant, const Point& p) { 
     return std::visit([&p](const auto& obj){         
-        const auto object_space_point = obj.getInvTransform() * p; 
+        const auto object_space_point = obj.inv_transform() * p; 
         const auto object_space_normal = local_normal_at(obj, object_space_point);
-        auto world_space_normal = transpose(obj.getInvTransform()) * object_space_normal;
+        auto world_space_normal = transpose(obj.inv_transform()) * object_space_normal;
         world_space_normal.w = 0; //hack to avoid having to work with the transform submatrix
         return normalize(world_space_normal);               
     }, variant);    
@@ -29,19 +29,14 @@ constexpr bool operator==(const Shapes& v, const Sphere& a) noexcept {
     return a == v;     
 }
 
-//constexpr Matrix4& transform(Shapes& variant) noexcept { 
-//    return std::visit([](auto& obj) -> Matrix4& { 
-//        return obj.getTransform();
-//    }, variant);    
-//}
 constexpr const Matrix4& transform(const Shapes& variant) noexcept { 
     return std::visit([](const auto& obj) -> const Matrix4& { 
-        return obj.getTransform();
+        return obj.transform();
     }, variant);    
 }
 constexpr const Matrix4& invTransform(const Shapes& variant) noexcept { 
     return std::visit([](const auto& obj) -> const Matrix4& { 
-        return obj.getInvTransform();
+        return obj.inv_transform();
     }, variant);    
 }
 constexpr Material& surface(Shapes& variant) noexcept { 
@@ -55,48 +50,31 @@ constexpr const Material& surface(const Shapes& variant) noexcept {
     }, variant);    
 }
 
-constexpr Color& color(Shapes& variant) noexcept { 
-    return std::visit([](auto& obj) -> Color& { 
-        return obj.surface.color;
-    }, variant);    
-}
-
 constexpr const Color& color(const Shapes& variant) noexcept { 
     return std::visit([](const auto& obj) -> const Color& { 
         return obj.surface.color;
     }, variant);    
 }
 
-
-constexpr Material& surface(shapes auto& obj) noexcept {
-    return obj.surface;
-}
 constexpr const Material& color(const shapes auto& obj) noexcept {
     return obj.surface;
 }
-//constexpr Matrix4& transform(shapes auto& obj) noexcept {
-//    return obj.getTransform();
-//}
+
 constexpr const Matrix4& transform(const shapes auto& obj) noexcept {
-    return  obj.getTransform();
+    return  obj.transform();
 }
-//constexpr Matrix4& invTransform(shapes auto& obj) noexcept {
-//    return obj.getInvTransform();
-//}
+
 constexpr const Matrix4& invTransform(const shapes auto& obj) noexcept {
-    return obj.getInvTransform();
+    return obj.inv_transform();
 }
-constexpr Color& color(shapes auto& obj) noexcept {
-    return obj.surface.color;
-}
+
 constexpr const Color& color(const shapes auto& obj) noexcept {
     return obj.surface.color;
 }
 
-std::ostream& operator<<(std::ostream& os, const Shapes& var){
-    const auto print_visitor = [&os](const auto& val) -> std::ostream& {
+std::ostream& operator<<(std::ostream& os, const Shapes& variant){   
+    return std::visit([&os](const auto& val) -> std::ostream& {
         os << val;
         return os;
-    };
-    return std::visit(print_visitor, var);
+    }, variant);
 }
