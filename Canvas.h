@@ -49,9 +49,8 @@ constexpr void ppm_add_linebreaks(std::string& str, size_t max_spaces_per_line) 
     const size_type header_end = str.find_last_of("\n"sv);                    
     const size_type end = str.size();
     size_type space_count = 0;
-    for(size_type i = header_end; i < end; ++i) {
-        if(str[i] != ' ') { continue; }                
-        if (++space_count == max_spaces_per_line) {
+    for(size_type i = header_end; i < end; ++i) {        
+        if (str[i] == ' ' && ++space_count == max_spaces_per_line) {
              str.replace(i, 1, "\n"sv);
              space_count = 0;
         }                

@@ -7,8 +7,7 @@
 
 struct NullPattern final {
     constexpr Color at([[maybe_unused]] const Point& p) const noexcept { return BLACK; }
-    explicit constexpr operator bool() const  { return false; }
-    constexpr bool empty() const  { return true; }
+    explicit constexpr operator bool() const noexcept { return false; }    
     constexpr bool operator==(const NullPattern& that) const noexcept = default;
     constexpr const Matrix4& transform() const noexcept {
         return _transform;
@@ -29,8 +28,7 @@ struct StripePattern final {
     constexpr Color at(const Point& p) const noexcept {
         return (math::int_floor(p.x) % 2 == 0) ? a : b;
     }
-    explicit constexpr operator bool() const  { return true; }
-    constexpr bool empty() const  { return false; }
+    explicit constexpr operator bool() const noexcept { return true; }    
     constexpr bool operator==(const StripePattern& that) const noexcept  = default;    
     constexpr const Matrix4& transform() const noexcept {
         return _transform;
@@ -58,8 +56,7 @@ struct GradientPattern final {
         const auto fraction = p.x - math::floor(p.x);
         return a + distance * fraction;
     }
-    explicit constexpr operator bool() const  { return true; }
-    constexpr bool empty() const  { return false; }
+    explicit constexpr operator bool() const noexcept { return true; }    
     constexpr bool operator==(const GradientPattern& that) const noexcept  = default;
     constexpr const Matrix4& transform() const noexcept {
         return _transform;
@@ -87,8 +84,7 @@ struct RingPattern final {
         }
         return b; 
     }
-    explicit constexpr operator bool() const  { return true; }
-    constexpr bool empty() const  { return false; }
+    explicit constexpr operator bool() const noexcept { return true; }    
     constexpr bool operator==(const RingPattern& that) const noexcept  = default;
     constexpr const Matrix4& transform() const noexcept {
         return _transform;
@@ -111,11 +107,10 @@ struct CheckersPattern final {
         setTransform(std::move(mat));
     }
     constexpr Color at(const Point& p) const noexcept {        
-        const auto val = static_cast<int>(math::abs(p.x) + math::abs(p.y) + math::abs(p.z));
+        const auto val = static_cast<int>(math::floor(p.x) + math::floor(p.y) + math::floor(p.z));
         return (val % 2 == 0) ? a : b; 
     }
-    explicit constexpr operator bool() const  { return true; }
-    constexpr bool empty() const  { return false; }
+    explicit constexpr operator bool() const noexcept { return true; }    
     constexpr bool operator==(const CheckersPattern& that) const noexcept  = default;
     constexpr const Matrix4& transform() const noexcept {
         return _transform;

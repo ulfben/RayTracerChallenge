@@ -214,13 +214,16 @@ TEST(DISABLED_Chapter9, CanRenderPlanes) {
     save_to_file(img, "output/chapter9_0_sRGB.ppm"sv);
 }
 
-TEST(DISABLED_Chapter10, CanRenderPatterns) {    
+TEST(Chapter10, CanRenderPatterns) {    
     const auto c = Camera(600, 400, math::PI / 3.0f, 
-        view_transform(point(1.0f, 3.4f, -2.5f), point(0, 1, 0), vector(0, 1, 0)));
+        view_transform(point(0.0f, 5.0f, -10.0f), point(0, 1, 0), vector(0, 1, 0)));
 
-    auto floorMaterial = material(ring_pattern(WHITE, BLACK));
+    auto floorMaterial = material(stripe_pattern(GREEN, BLUE,  rotation_y(math::HALF_PI)*scaling(2, 2, 2)));
     floorMaterial.reflective = 0.08f;
     const auto floor = plane(floorMaterial);    
+
+    auto back_pattern = checkers_pattern(RED, BLUE);
+    const auto back_wall = plane(material(back_pattern), translation(0, 0, 5) * rotation_x(math::HALF_PI));    
 
     const auto middle = sphere(material(checkers_pattern(RED, BLUE)), 
                                translation(-0.5f, 1, 0.5f));    
@@ -237,10 +240,10 @@ TEST(DISABLED_Chapter10, CanRenderPatterns) {
     leftMat.reflective = 0.3f;
     const auto left = sphere(leftMat, translation(-1.5f, 0.33f, -0.75f) * scaling(0.33f, 0.33f, 0.33f));    
 
-    const auto world = World({ floor, left, middle, right }, 
+    const auto world = World({ floor, back_wall }, 
                               point_light(point(-10, 10, -10), color(1, 1, 1)));    
     const auto img = render(c, world);
-    save_to_file(img, "output/chapter10_2_sRGB.ppm"sv);
+    save_to_file(img, "output/chapter10_3_sRGB.ppm"sv);
 }
 
 TEST(DISABLED_Chapter11, CanRenderReflectionsAndRefractions) {    
