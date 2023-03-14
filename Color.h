@@ -67,7 +67,7 @@ void to_sRGB(Color& c) noexcept {
 
 void to_sRGB(std::span<Color> buffer) noexcept {
     std::for_each(std::execution::par, buffer.begin(), buffer.end(),
-            [](auto& color) { to_sRGB(color); }
+        [](auto& color) { to_sRGB(color); }
     );
 }
 
@@ -118,6 +118,12 @@ constexpr ByteColor_sRGB to_ByteColor_sRGB(const Color& col) noexcept {
 constexpr Color hadamard_product(const Color& a, const Color& b) noexcept {
     return a * b;
 }
+
+constexpr Color lerp(Color start, Color end, Real t) {    
+    return (start*(1.0f - t)) + (end*t);
+    //return start + ((end - start) * t);
+}
+
 
 static constexpr Color BLACK = color(0, 0, 0);
 static constexpr Color WHITE = color(1, 1, 1);

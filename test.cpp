@@ -228,8 +228,12 @@ TEST(Chapter10, CanRenderPatterns) {
     surface = material(ring_pattern(BLACK, WHITE));        
     const auto right_wall = plane(surface, translation(0, 0, 5) * rotation_y(45*math::TO_RAD) * rotation_x(90*math::TO_RAD));    
  
+    surface = material(gradient_pattern(RED, BLACK));        
+    const auto left_wall = plane(surface, translation(0, 0, 5) * rotation_y(-45*math::TO_RAD) * rotation_x(90*math::TO_RAD));    
+        
+    const auto middle = sphere(surface, translation(0, 1.0f, 0));
 
-    const auto world = World({ floor, back_wall, right_wall }, 
+    const auto world = World({ floor, back_wall, middle/*left_wall, right_wall*/ }, 
                               point_light(point(-10, 10, -10), color(1, 1, 1)));    
     const auto img = render(c, world);
     save_to_file(img, "output/chapter10_3_sRGB.ppm"sv);

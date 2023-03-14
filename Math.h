@@ -16,6 +16,10 @@ namespace math {
     constexpr auto TO_DEG = 180.0f / PI;
     constexpr auto TO_RAD = PI / 180.0f;
 
+    constexpr Real lerp(Real start, Real end, Real t) {
+       return (1.0f - t) * start + t * end;
+    }
+
     template<class T>
         requires std::integral<T>
     constexpr bool is_odd(T v) noexcept {

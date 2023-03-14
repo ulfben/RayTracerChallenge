@@ -51,10 +51,8 @@ struct GradientPattern final {
     constexpr GradientPattern(Matrix4 mat, Color a_, Color b_) noexcept : a{ a_ }, b{b_} {
         setTransform(std::move(mat));
     }
-    constexpr Color at(const Point& p) const noexcept {
-        const auto distance = b - a; 
-        const auto fraction = p.x - math::floor(p.x);
-        return a + distance * fraction;
+    constexpr Color at(const Point& p) const noexcept {              
+       return lerp(a, b,  p.x);       
     }
     explicit constexpr operator bool() const noexcept { return true; }    
     constexpr bool operator==(const GradientPattern& that) const noexcept  = default;
