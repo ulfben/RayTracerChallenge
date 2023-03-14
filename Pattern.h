@@ -78,11 +78,9 @@ struct RingPattern final {
     constexpr RingPattern(Matrix4 mat, Color a_, Color b_) noexcept : a{ a_ }, b{b_} {
         setTransform(std::move(mat));
     }
-    constexpr Color at(const Point& p) const noexcept {        
-        if (math::int_floor(math::sqrt((p.x * p.x) + (p.z + p.z))) % 2 == 0) {
-            return a;
-        }
-        return b; 
+    Color at(const Point& p) const noexcept {         
+        const auto even = math::int_floor(math::sqrt((p.x * p.x) + (p.z * p.z))) % 2 == 0;
+        return even ? a : b; 
     }
     explicit constexpr operator bool() const noexcept { return true; }    
     constexpr bool operator==(const RingPattern& that) const noexcept  = default;
