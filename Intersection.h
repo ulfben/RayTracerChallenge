@@ -254,7 +254,7 @@ constexpr Color refracted_color(const World& w, const HitState& state, int remai
 
 constexpr Color shade_hit(const World& w, const HitState& hit, int remaining = 4) noexcept {
     const auto shadowed = is_shadowed(w, hit.over_point);    
-    const auto surface_c = lighting(hit.surface(), hit.object(), w.light, hit.point, hit.eye_v, hit.normal, shadowed);
+    const auto surface_c = lighting(hit.surface(), hit.object(), w.light, hit.over_point, hit.eye_v, hit.normal, shadowed);
     const auto reflected_c = reflected_color(w, hit, remaining);
     const auto refracted_c = refracted_color(w, hit, remaining);
     if (const auto& mat = hit.surface(); mat.reflective > 0 && mat.transparency > 0) {

@@ -3,6 +3,7 @@
 #include "Math.h"
 
 //sRGB conversion routines courtesy of http://www.ericbrasseur.org/gamma.html
+//for explanation of the constants, see; https://en.wikipedia.org/wiki/SRGB
 /*constexpr*/ Real sRGB_to_linear(Real s) noexcept {
     constexpr Real a = 0.055f;
     if (s <= 0.04045f) {
@@ -71,7 +72,6 @@ void to_sRGB(std::span<Color> buffer) noexcept {
     );
 }
 
-
 //bytecolor is an optimization to help us speed up writing the image to files. 
 //the idea is to bulk-convert the image-buffer into a smaller integer buffer, 
 //which we can then split across threads to make strings out of.
@@ -95,6 +95,7 @@ constexpr ByteColor to_byte_color(const Color& col) noexcept {
     return ByteColor(col);
 }
 
+//same as ByteColor, but additionally converts each pixel to the sRGB color space.
 struct ByteColor_sRGB final {
     using value_type = uint8_t;
     static constexpr float MAX = PPM_MAX_BYTE_VALUE;
@@ -120,10 +121,9 @@ constexpr Color hadamard_product(const Color& a, const Color& b) noexcept {
 }
 
 constexpr Color lerp(Color start, Color end, Real t) {    
-    return (start*(1.0f - t)) + (end*t);
-    //return start + ((end - start) * t);
+    //return (start*(1.0f - t)) + (end*t);
+    return start + ((end - start) * t);
 }
-
 
 static constexpr Color BLACK = color(0, 0, 0);
 static constexpr Color WHITE = color(1, 1, 1);

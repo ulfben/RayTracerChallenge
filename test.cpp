@@ -218,25 +218,33 @@ TEST(Chapter10, CanRenderPatterns) {
     const auto c = Camera(600, 400, math::PI / 3.0f, 
         view_transform(point(0.0f, 5.0f, -10.0f), point(0, 1, 0), vector(0, 1, 0)));
 
-    auto surface = material(stripe_pattern(BLACK, WHITE, rotation_y(math::HALF_PI) * scaling(1.5f, 1.5f, 1.5f)));
+    auto surface = material(checkers_pattern(BLACK, WHITE));
     surface.reflective = 0.08f;
     const auto floor = plane(surface);    
 
-    surface = material(checkers_pattern(BLACK, WHITE));
+    surface = material(stripe_pattern(BLACK, WHITE, rotation_y(math::HALF_PI) * scaling(1.5f, 1.5f, 1.5f)));
     const auto back_wall = plane(surface, translation(0, 0, 5) * rotation_x(math::HALF_PI));    
 
-    surface = material(ring_pattern(BLACK, WHITE));        
-    const auto right_wall = plane(surface, translation(0, 0, 5) * rotation_y(45*math::TO_RAD) * rotation_x(90*math::TO_RAD));    
- 
-    surface = material(gradient_pattern(RED, BLACK));        
-    const auto left_wall = plane(surface, translation(0, 0, 5) * rotation_y(-45*math::TO_RAD) * rotation_x(90*math::TO_RAD));    
-        
+    const auto left_wall = plane(material(gradient_pattern(RED, BLACK)), translation(0, 0, 5) * rotation_y(-40*math::TO_RAD) * rotation_x(90*math::TO_RAD));    
+    
+    surface = material(ring_pattern(BLACK, WHITE, scaling(0.1f, .1f, .1f) * rotation(-35*math::TO_RAD, 0.0f, 45*math::TO_RAD)));                
+    surface.reflective = 0.2f;
     const auto middle = sphere(surface, translation(0, 1.0f, 0));
 
-    const auto world = World({ floor, back_wall, middle/*left_wall, right_wall*/ }, 
+    auto mat = glass();
+    mat.color = color(0.0f, 0.0f, 0.1f);
+    mat.diffuse = 0.1f;
+    mat.ambient = 0.1f;
+    mat.specular = 1.0f;
+    mat.reflective = 0.9f;   
+    mat.shininess = 300.0f;
+    mat.transparency = 0.9f;      
+    auto right = sphere(mat, translation(2.5f, 1.0f, -1.5f));
+
+    const auto world = World({ floor, back_wall, middle, right, left_wall }, 
                               point_light(point(-10, 10, -10), color(1, 1, 1)));    
     const auto img = render(c, world);
-    save_to_file(img, "output/chapter10_3_sRGB.ppm"sv);
+    save_to_file(img, "output/chapter10_4_sRGB.ppm"sv);
 }
 
 TEST(DISABLED_Chapter11, CanRenderReflectionsAndRefractions) {    
