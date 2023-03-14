@@ -41,3 +41,9 @@ And refractions:
 
 ![chapter11_5](https://user-images.githubusercontent.com/5237741/224443615-fd7286a2-460f-478c-ba42-3d232b439c04.png)
 
+# Revisiting chapter 10:
+Fixing all patterns and building a better scene to demo patterns, reflection and transparency:
+
+![chapter10_4_sRGB](https://user-images.githubusercontent.com/5237741/224976635-35abb9ab-e755-4575-b1f3-a2c41f94e18a.png)
+
+
