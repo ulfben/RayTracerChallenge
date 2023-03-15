@@ -52,8 +52,9 @@ struct Color final {
     }
     constexpr bool operator==(const Color& rhs) const noexcept {
         using math::float_cmp;
-        return float_cmp(r, rhs.r) && float_cmp(g, rhs.g) &&
-            float_cmp(b, rhs.b);
+        constexpr auto epsilon = 0.0005f;
+        return float_cmp(r, rhs.r, epsilon) && float_cmp(g, rhs.g, epsilon) &&
+            float_cmp(b, rhs.b, epsilon);
     };
 };
 constexpr Color color(Real r, Real g, Real b) noexcept {

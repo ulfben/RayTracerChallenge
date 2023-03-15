@@ -77,7 +77,8 @@ struct RingPattern final {
         setTransform(std::move(mat));
     }
     constexpr Color at(const Point& p) const noexcept {         
-        const auto mod = math::int_floor(math::sqrt((p.x * p.x) + (p.z * p.z))) % 2;        
+        const auto distance_from_center = math::sqrt((p.x * p.x) + (p.z * p.z));
+        const auto mod = math::int_floor(distance_from_center) % 2;        
         return mod == 0 ? a : b; 
     }
     explicit constexpr operator bool() const noexcept { return true; }    
@@ -178,6 +179,6 @@ Color pattern_at(const Patterns& variant, const Point& p) noexcept {
 Color pattern_at(const Patterns& pattern, const /*must be Shapes, but if I name that type here the project won't compile*/ auto& obj, const Point& world_point) noexcept {
     assert(!std::holds_alternative<NullPattern>(pattern) && "pattern_at: called on NullPattern.");
     const auto object_point = invTransform(obj) * world_point;
-    const auto pattern_point = invTransform(pattern) * object_point;    
+    const auto pattern_point = invTransform(pattern) * object_point;        
     return pattern_at(pattern, pattern_point);
 };

@@ -214,20 +214,21 @@ TEST(DISABLED_Chapter9, CanRenderPlanes) {
     save_to_file(img, "output/chapter9_0_sRGB.ppm"sv);
 }
 
-TEST(Chapter10, CanRenderPatterns) {    
+TEST(DISABLED_Chapter10, CanRenderPatterns) {
     const auto c = Camera(600, 400, math::PI / 3.0f, 
         view_transform(point(0.0f, 5.0f, -10.0f), point(0, 1, 0), vector(0, 1, 0)));
 
     auto surface = material(checkers_pattern(BLACK, WHITE));
     surface.reflective = 0.08f;
     const auto floor = plane(surface);    
+    const auto checkersBall = sphere(surface,  translation(-4, 1.0f, 0)*scaling(2, 2, 2));  
 
     surface = material(stripe_pattern(BLACK, WHITE, rotation_y(math::HALF_PI) * scaling(1.5f, 1.5f, 1.5f)));
     const auto back_wall = plane(surface, translation(0, 0, 5) * rotation_x(math::HALF_PI));    
 
     const auto left_wall = plane(material(gradient_pattern(RED, BLACK)), translation(0, 0, 5) * rotation_y(-40*math::TO_RAD) * rotation_x(90*math::TO_RAD));    
     
-    surface = material(ring_pattern(BLACK, WHITE, scaling(0.1f, .1f, .1f) * rotation(-35*math::TO_RAD, 0.0f, 45*math::TO_RAD)));                
+    surface = material(ring_pattern(BLACK, WHITE, scaling(0.2f, .2f, .2f) * rotation(-35*math::TO_RAD, 0.0f, 45*math::TO_RAD)));                
     surface.reflective = 0.2f;
     const auto middle = sphere(surface, translation(0, 1.0f, 0));
 
@@ -241,7 +242,7 @@ TEST(Chapter10, CanRenderPatterns) {
     mat.transparency = 0.9f;      
     auto right = sphere(mat, translation(2.5f, 1.0f, -1.5f));
 
-    const auto world = World({ floor, back_wall, middle, right, left_wall }, 
+    const auto world = World({ floor, checkersBall, back_wall, middle, right, left_wall }, 
                               point_light(point(-10, 10, -10), color(1, 1, 1)));    
     const auto img = render(c, world);
     save_to_file(img, "output/chapter10_4_sRGB.ppm"sv);

@@ -46,7 +46,8 @@ TEST(World, shadeAnIntersectionFromInside) {
     const auto i = intersection(0.5f, w[1]);
     const auto comps = prepare_computations(i, r);
     const auto col = shade_hit(w, comps);
-    EXPECT_EQ(col, color(0.90498f, 0.90498f, 0.90498f));
+    //EXPECT_EQ(col, color(0.90498f, 0.90498f, 0.90498f)); //prior to shadows and SHADOW_BIAS offset. 
+    EXPECT_EQ(col, color(0.90335f, 0.90335f, 0.90335f));
 }
 
 TEST(World, colorWhenRayMisses) {

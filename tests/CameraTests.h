@@ -60,7 +60,8 @@ TEST(Camera, renderWorldWithCamera) {
     const auto img = render(c, w);
     EXPECT_EQ(img.width(), c.height);
     EXPECT_EQ(img.height(), c.width);
-    EXPECT_EQ(img.get(5,5), color(0.38066f, 0.47583f, 0.2855f));    
+    //EXPECT_EQ(img.get(5,5), color(0.38066f, 0.47583f, 0.2855f)); //prior to shadows and SHADOW_BIAS offset.  
+    EXPECT_EQ(img.get(5, 5), color(0.38054222, 0.4756778, 0.28540668));
 }
 
 RESTORE_WARNINGS
