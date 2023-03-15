@@ -46,4 +46,6 @@ Fixing all patterns and building a better scene to demo patterns, reflection and
 
 ![chapter10_4_sRGB](https://user-images.githubusercontent.com/5237741/224976635-35abb9ab-e755-4575-b1f3-a2c41f94e18a.png)
 
+![chapter10_5_sRGB](https://user-images.githubusercontent.com/5237741/225243519-0553eb5d-e921-474c-9eb5-90b8d769eefb.png)
+
 
