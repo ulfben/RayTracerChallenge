@@ -123,7 +123,7 @@ constexpr Color hadamard_product(const Color& a, const Color& b) noexcept {
 
 constexpr Color lerp(Color start, Color end, Real t) {    
     //return (start*(1.0f - t)) + (end*t);
-    return start + ((end - start) * t);
+    return start + (end - start) * t;
 }
 
 static constexpr Color BLACK = color(0, 0, 0);

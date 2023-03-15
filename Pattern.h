@@ -48,7 +48,8 @@ struct GradientPattern final {
         setTransform(std::move(mat));
     }
     constexpr Color at(const Point& p) const noexcept {              
-       return lerp(a, b,  p.x);       
+       const auto dx = p.x - math::floor(p.x);
+       return lerp(a, b,  dx);       
     }
     constexpr void setTransform(Matrix4 mat) noexcept {
         _transform = std::move(mat);
@@ -62,6 +63,33 @@ struct GradientPattern final {
     }
     explicit constexpr operator bool() const noexcept { return true; }    
     constexpr bool operator==(const GradientPattern& that) const noexcept  = default;
+private: 
+    Matrix4 _transform{ Matrix4Identity };
+    Matrix4 _invTransform{ Matrix4Identity };
+    Color a{};
+    Color b{};
+};
+struct RadialGradientPattern final {
+    constexpr RadialGradientPattern(Matrix4 mat, Color a_, Color b_) noexcept : a{ a_ }, b{b_} {
+        setTransform(std::move(mat));
+    }
+    constexpr Color at(const Point& p) const noexcept {              
+        const auto dist_from_center = magnitude(vector(p.x, p.y, p.z));
+        const auto fraction = dist_from_center - math::floor(dist_from_center);
+       return lerp(a, b, fraction);       
+    }
+    constexpr void setTransform(Matrix4 mat) noexcept {
+        _transform = std::move(mat);
+        _invTransform = inverse(_transform);
+    }
+    constexpr const Matrix4& transform() const noexcept {
+        return _transform;
+    }    
+    constexpr const Matrix4& inv_transform() const noexcept {
+        return _invTransform;
+    }
+    explicit constexpr operator bool() const noexcept { return true; }    
+    constexpr bool operator==(const RadialGradientPattern& that) const noexcept  = default;
 private: 
     Matrix4 _transform{ Matrix4Identity };
     Matrix4 _invTransform{ Matrix4Identity };
@@ -132,6 +160,9 @@ constexpr auto stripe_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noe
 constexpr auto gradient_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexcept {
     return GradientPattern( std::move(m), a, b );
 };
+constexpr auto radial_gradient_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexcept {
+    return RadialGradientPattern( std::move(m), a, b );
+};
 constexpr auto ring_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexcept {
     return RingPattern( std::move(m), a, b );
 };
@@ -139,11 +170,11 @@ constexpr auto checkers_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) n
     return CheckersPattern( std::move(m), a, b );
 };
 
-using Patterns = std::variant<NullPattern, StripePattern, GradientPattern, RingPattern, CheckersPattern>; 
+using Patterns = std::variant<NullPattern, StripePattern, GradientPattern, RingPattern, CheckersPattern, RadialGradientPattern>; 
 template<typename T> 
 concept patterns = std::is_same_v<NullPattern, T> || std::is_same_v<StripePattern, T> || 
                    std::is_same_v<GradientPattern, T> || std::is_same_v<RingPattern, T> ||
-                   std::is_same_v<CheckersPattern, T>;
+                   std::is_same_v<CheckersPattern, T> || std::is_same_v<RadialGradientPattern, T>;
 
 template<typename T>
 requires patterns<T>
