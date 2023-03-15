@@ -9,12 +9,8 @@ struct NullPattern final {
     constexpr Color at([[maybe_unused]] const Point& p) const noexcept { return BLACK; }
     explicit constexpr operator bool() const noexcept { return false; }    
     constexpr bool operator==(const NullPattern& that) const noexcept = default;
-    constexpr const Matrix4& transform() const noexcept {
-        return _transform;
-    }    
-    constexpr const Matrix4& inv_transform() const noexcept {
-        return _invTransform;
-    }
+    constexpr const Matrix4& transform() const noexcept { return _transform; }    
+    constexpr const Matrix4& inv_transform() const noexcept { return _invTransform; }
     constexpr void setTransform([[maybe_unused]]Matrix4 mat) noexcept {}
 private: 
     Matrix4 _transform{ Matrix4Identity };
@@ -28,18 +24,18 @@ struct StripePattern final {
     constexpr Color at(const Point& p) const noexcept {
         return (math::int_floor(p.x) % 2 == 0) ? a : b;
     }
-    explicit constexpr operator bool() const noexcept { return true; }    
-    constexpr bool operator==(const StripePattern& that) const noexcept  = default;    
+    constexpr void setTransform(Matrix4 mat) noexcept {
+        _transform = std::move(mat);
+        _invTransform = inverse(_transform);
+    }
     constexpr const Matrix4& transform() const noexcept {
         return _transform;
     }    
     constexpr const Matrix4& inv_transform() const noexcept {
         return _invTransform;
-    }
-    constexpr void setTransform(Matrix4 mat) noexcept {
-        _transform = std::move(mat);
-        _invTransform = inverse(_transform);
-    }
+    }    
+    explicit constexpr operator bool() const noexcept { return true; }    
+    constexpr bool operator==(const StripePattern& that) const noexcept  = default; 
 private: 
     Matrix4 _transform{ Matrix4Identity };
     Matrix4 _invTransform{ Matrix4Identity };
@@ -54,18 +50,18 @@ struct GradientPattern final {
     constexpr Color at(const Point& p) const noexcept {              
        return lerp(a, b,  p.x);       
     }
-    explicit constexpr operator bool() const noexcept { return true; }    
-    constexpr bool operator==(const GradientPattern& that) const noexcept  = default;
+    constexpr void setTransform(Matrix4 mat) noexcept {
+        _transform = std::move(mat);
+        _invTransform = inverse(_transform);
+    }
     constexpr const Matrix4& transform() const noexcept {
         return _transform;
     }    
     constexpr const Matrix4& inv_transform() const noexcept {
         return _invTransform;
     }
-    constexpr void setTransform(Matrix4 mat) noexcept {
-        _transform = std::move(mat);
-        _invTransform = inverse(_transform);
-    }
+    explicit constexpr operator bool() const noexcept { return true; }    
+    constexpr bool operator==(const GradientPattern& that) const noexcept  = default;
 private: 
     Matrix4 _transform{ Matrix4Identity };
     Matrix4 _invTransform{ Matrix4Identity };
@@ -76,23 +72,23 @@ struct RingPattern final {
     constexpr RingPattern(Matrix4 mat, Color a_, Color b_) noexcept : a{ a_ }, b{b_} {
         setTransform(std::move(mat));
     }
+    constexpr void setTransform(Matrix4 mat) noexcept {
+        _transform = std::move(mat);
+        _invTransform = inverse(_transform);
+    }
     constexpr Color at(const Point& p) const noexcept {         
         const auto distance_from_center = math::sqrt((p.x * p.x) + (p.z * p.z));
         const auto mod = math::int_floor(distance_from_center) % 2;        
         return mod == 0 ? a : b; 
-    }
-    explicit constexpr operator bool() const noexcept { return true; }    
-    constexpr bool operator==(const RingPattern& that) const noexcept  = default;
+    }   
     constexpr const Matrix4& transform() const noexcept {
         return _transform;
     }    
     constexpr const Matrix4& inv_transform() const noexcept {
         return _invTransform;
     }
-    constexpr void setTransform(Matrix4 mat) noexcept {
-        _transform = std::move(mat);
-        _invTransform = inverse(_transform);
-    }
+    explicit constexpr operator bool() const noexcept { return true; }    
+    constexpr bool operator==(const RingPattern& that) const noexcept  = default;    
 private: 
     Matrix4 _transform{ Matrix4Identity };
     Matrix4 _invTransform{ Matrix4Identity };
@@ -107,18 +103,18 @@ struct CheckersPattern final {
         const auto val = static_cast<int>(math::floor(p.x) + math::floor(p.y) + math::floor(p.z));
         return (val % 2 == 0) ? a : b; 
     }
-    explicit constexpr operator bool() const noexcept { return true; }    
-    constexpr bool operator==(const CheckersPattern& that) const noexcept  = default;
+    constexpr void setTransform(Matrix4 mat) noexcept {
+        _transform = std::move(mat);
+        _invTransform = inverse(_transform);
+    }
     constexpr const Matrix4& transform() const noexcept {
         return _transform;
     }    
     constexpr const Matrix4& inv_transform() const noexcept {
         return _invTransform;
     }
-    constexpr void setTransform(Matrix4 mat) noexcept {
-        _transform = std::move(mat);
-        _invTransform = inverse(_transform);
-    }
+    explicit constexpr operator bool() const noexcept { return true; }    
+    constexpr bool operator==(const CheckersPattern& that) const noexcept  = default;    
 private: 
     Matrix4 _transform{ Matrix4Identity };
     Matrix4 _invTransform{ Matrix4Identity };
