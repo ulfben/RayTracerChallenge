@@ -92,6 +92,27 @@ static constexpr auto Matrix4Identity = Matrix4::identity();
 static_assert(is_matrix<Matrix4>, "Constraint test failed. Matrix4 should be identified as a Matrix");
 static_assert(!is_matrix<Tuple>, "Constraint test failed. Tuple shouldn't be identified as a Matrix.");
 
+
+template <class Matrix>
+    requires (is_matrix<Matrix>)
+struct std::formatter<Matrix> : std::formatter<string_view> {
+    auto format(const Matrix& obj, std::format_context& ctx) const {
+        std::string temp;
+        std::format_to(std::back_inserter(temp), "(MATRIX_FORMATER_PLACEHOLDER {})"sv, 
+                       obj.columns());
+        return std::formatter<string_view>::format(temp, ctx);
+    }
+};
+#pragma warning(push)
+#pragma warning( disable : 26481 ) //spurious warning; "don't use pointer arithmetic" 
+template <class Matrix, typename size_type = Matrix::size_type>
+    requires (is_matrix<Matrix>)
+std::ostream& operator<<(std::ostream& os, const Matrix& m) {
+    os << std::format("MATRIX_PLACEHOLDER"sv); 
+    return os;
+}
+#pragma warning(pop)
+
 template <class Matrix, typename size_type = Matrix::size_type>
     requires (is_matrix<Matrix>)
 constexpr size_type index_to_column(const Matrix& m, size_type index) noexcept {    

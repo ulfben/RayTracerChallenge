@@ -87,15 +87,15 @@ constexpr auto intersections(std::initializer_list<Intersection> is) noexcept {
     return Intersections(is);
 }
 
-constexpr Vector local_intersect(const Cube& cube, const Ray& r) noexcept {
+constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Cube& cube, const Ray& r) noexcept {
     using std::max, std::min;
     const auto [xtmin, xtmax] = check_axis(r.origin.x, r.direction.x);
     const auto [ytmin, ytmax] = check_axis(r.origin.y, r.direction.y);
     const auto [ztmin, ztmax] = check_axis(r.origin.z, r.direction.z);
-    const auto tmin = max(xtmin, ytmin, ztmin);
-    const auto tmax = min(xtmax, ytmax, ztmax);
-    return (tmin > tmax) ? intersections() : 
-        intersections(intersection(tmin, cube), intersection(tmax, cube));
+    const auto tmin = max({ xtmin, ytmin, ztmin });
+    const auto tmax = min({xtmax, ytmax, ztmax });
+    if (tmin > tmax) return { 0.0f, 0.0f };
+    return {tmin, tmax};
 }
 
 constexpr std::pair<Real, Real> local_intersect([[maybe_unused]]const Plane& p, const Ray& local_ray)  {
@@ -107,7 +107,7 @@ constexpr std::pair<Real, Real> local_intersect([[maybe_unused]]const Plane& p, 
 };
 
 //https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
-constexpr std::pair<Real, Real> local_intersect(const Sphere& s, const Ray& local_ray)  {
+constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Sphere& s, const Ray& local_ray)  {
     constexpr Real SPHERE_RADIUS = 1.0f; //assuming unit spheres for now    
     const Vector sphere_to_ray = local_ray.origin;/* -s.position; sphere is always located at 0,0,0*/
     const auto a = dot(local_ray.direction, local_ray.direction);

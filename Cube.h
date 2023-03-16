@@ -37,9 +37,9 @@ constexpr Cube cube() noexcept {
     return {};
 }
 
-constexpr Vector local_normal_at(const Cube& c, const Point& p) noexcept {
-    using std::max, std::abs;
-    const auto max_component = max(abs(p.x), abs(p.y), abs(p.z));
+constexpr Vector local_normal_at([[maybe_unused]]const Cube& c, const Point& p) noexcept {
+    using std::max, math::abs;
+    const auto max_component = max({ abs(p.x), abs(p.y), abs(p.z) });
     if (max_component == abs(p.x)) {
         return vector(p.x, 0, 0);
     }
@@ -53,7 +53,7 @@ constexpr std::pair<Real, Real> check_axis(Real origin, Real direction) noexcept
     const auto tmin_numerator = (-1 - origin);
     const auto tmax_numerator = (1 - origin);
     Real tmin, tmax; 
-    if (std::abs(direction) >= math::BOOK_EPSILON) {
+    if (math::abs(direction) >= math::BOOK_EPSILON) {
         tmin = tmin_numerator / direction;
         tmax = tmax_numerator / direction;
     }
