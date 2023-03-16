@@ -25,7 +25,7 @@ TEST(Ray, canComputePointFromDistance) {
 
 TEST(Ray, intersectSphereAtTwoPoints) {
     const auto r = ray(point(0,0,-5), vector(0,0,1));    
-    const auto s = sphere(ORIGO, 1.0f);
+    const auto s = sphere();
     const auto xs = intersect(s, r);
 
     EXPECT_EQ(xs.size(), 2);
@@ -35,7 +35,7 @@ TEST(Ray, intersectSphereAtTwoPoints) {
 
 TEST(Ray, intersectSphereAtATangent) {
     const auto r = ray(point(0,1,-5), vector(0,0,1));    
-    const auto s = sphere(ORIGO, 1.0f);
+    const auto s = sphere();
     const auto xs = intersect(s, r);
 
     EXPECT_TRUE(xs);
@@ -46,7 +46,7 @@ TEST(Ray, intersectSphereAtATangent) {
 
 TEST(Ray, intersectMissingASphere) {
     const auto r = ray(point(0,2,-5), vector(0,0,1));    
-    const auto s = sphere(ORIGO, 1.0f);
+    const auto s = sphere();
     const auto xs = intersect(s, r);
     EXPECT_FALSE(xs);
     EXPECT_EQ(xs.size(), 0);
@@ -54,7 +54,7 @@ TEST(Ray, intersectMissingASphere) {
 
 TEST(Ray, intersectWhenOriginInsideSphere) {
     const auto r = ray(ORIGO, vector(0,0,1));    
-    const auto s = sphere(ORIGO, 1.0f);
+    const auto s = sphere();
     const auto xs = intersect(s, r);
 
     EXPECT_EQ(xs.size(), 2);
@@ -64,7 +64,7 @@ TEST(Ray, intersectWhenOriginInsideSphere) {
 
 TEST(Ray, intersectWhenSphereBehindRay) {
     const auto r = ray(point(0,0,5), vector(0,0,1));    
-    const auto s = sphere(ORIGO, 1.0f);
+    const auto s = sphere();
     const auto xs = intersect(s, r);
 
     EXPECT_EQ(xs.size(), 2);
@@ -73,7 +73,7 @@ TEST(Ray, intersectWhenSphereBehindRay) {
 }
 
 TEST(Intersection, encapsulatesTandObject) {    
-    const Shapes s{ std::in_place_type<Sphere>, ORIGO, 1.0f };
+    const Shapes s{ std::in_place_type<Sphere> };
     const auto i = intersection(3.5f, s);
     EXPECT_TRUE(i);
     EXPECT_EQ(i, i);    
@@ -82,7 +82,7 @@ TEST(Intersection, encapsulatesTandObject) {
 }
 
 TEST(Intersections, aggregatesIntersection) {    
-    const auto s = sphere(ORIGO, 1.0f);
+    const auto s = sphere();
     const auto i1 = intersection(1, s);
     const auto i2 = intersection(2, s);    
     const auto xs = intersections(i1, i2);
@@ -94,7 +94,7 @@ TEST(Intersections, aggregatesIntersection) {
 
 TEST(intersect, setsTheObjectOnTheIntersections) {
     const auto r = ray(point(0,0,-5), vector(0,0,1));    
-    const Sphere s = sphere(ORIGO, 1.0f);
+    const Sphere s = sphere();
     const auto xs = intersect(s, r);
     EXPECT_EQ(xs.size(), 2);
     EXPECT_FLOAT_EQ(xs[0].t, 4.0f);
@@ -105,7 +105,7 @@ TEST(intersect, setsTheObjectOnTheIntersections) {
 }
 
 TEST(closest, returnsClosestIntersection) {    
-    const auto s = sphere(ORIGO, 1.0f);
+    const auto s = sphere();
     const auto i1 = intersection(1, s);
     const auto i2 = intersection(2, s);
     const auto xs = intersections(i1, i2);
@@ -115,7 +115,7 @@ TEST(closest, returnsClosestIntersection) {
 }
 
 TEST(closest, returnsClosestPositiveIntersection) {    
-    const auto s = sphere(ORIGO, 1.0f);
+    const auto s = sphere();
     const auto i1 = intersection(-1, s);
     const auto i2 = intersection(1, s);
     const auto xs = intersections(i1, i2);
@@ -124,7 +124,7 @@ TEST(closest, returnsClosestPositiveIntersection) {
 }
 
 TEST(closest, returnsEmptyIntersectionIfAllAreNegative) {    
-    const auto s = sphere(ORIGO, 1.0f);
+    const auto s = sphere();
     const auto i1 = intersection(-2, s);
     const auto i2 = intersection(-1, s);
     const auto xs = intersections(i1, i2);
@@ -134,7 +134,7 @@ TEST(closest, returnsEmptyIntersectionIfAllAreNegative) {
 }
 
 TEST(closest, canHandleMultipleIntersections) {    
-    const auto s = sphere(ORIGO, 1.0f);
+    const auto s = sphere();
     const auto i1 = intersection(5, s);
     const auto i2 = intersection(7, s);
     const auto i3 = intersection(-3, s);
@@ -164,7 +164,7 @@ TEST(Ray, canBeScaled) {
 
 TEST(intersect, aScaledSphere) {    
     const auto r = ray(point(0,0,-5), vector(0,0,1));
-    const auto s = sphere(ORIGO, 1.0f, scaling(2, 2, 2));
+    const auto s = sphere(scaling(2, 2, 2));
     const auto xs = intersect(s, r);    
     EXPECT_EQ(xs.count(), 2);
     EXPECT_FLOAT_EQ(xs[0].t, 3.0f);
@@ -173,7 +173,7 @@ TEST(intersect, aScaledSphere) {
 
 //TEST(intersect, aScaledShape) {    
 //    const auto r = ray(point(0,0,-5), vector(0,0,1));
-//    auto s = sphere(ORIGO, 1.0f);
+//    auto s = sphere()
 //    s.transform = scaling(2, 2, 2);    
 //    const auto xs = intersect(s, r);    
 //    EXPECT_EQ(s.saved_ray.origin, point(0, 0, -2.5f));
@@ -188,7 +188,7 @@ TEST(intersect, aScaledSphere) {
 //
 //TEST(intersect, aTranslatedShape) {    
 //    const auto r = ray(point(0,0,-5), vector(0,0,1));
-//    auto s = sphere(ORIGO, 1.0f);
+//    auto s = sphere()
 //    s.transform = translation(5,0,0);    
 //    const auto xs = intersect(s, r);    
 //    EXPECT_EQ(s.saved_ray.origin, point(-5.0f, 0, -5.0f));
@@ -203,7 +203,7 @@ TEST(intersect, aScaledSphere) {
 
 TEST(Intersections, precomputeIntersectionState) {    
     const auto r = ray(point(0,0,-5), vector(0,0,1));
-    const Shapes s = sphere(ORIGO, 1.0f);
+    const Shapes s = sphere();
     const auto i1 = intersection(4, s);
     const auto hit = prepare_computations(i1, r);
     EXPECT_FLOAT_EQ(i1.t, hit.t);    
@@ -215,7 +215,7 @@ TEST(Intersections, precomputeIntersectionState) {
 
 TEST(Intersections, stateIncludesInside) {    
     const auto r = ray(point(0,0,-5), vector(0,0,1));
-    const Shapes s = sphere(ORIGO, 1.0f);
+    const Shapes s = sphere();
     const auto i1 = intersection(4, s);
     const auto hit = prepare_computations(i1, r);
     EXPECT_FALSE(hit.inside);        
@@ -223,7 +223,7 @@ TEST(Intersections, stateIncludesInside) {
 
 TEST(Intersections, stateIncludesInside2) {    
     const auto r = ray(point(0,0, 0), vector(0,0,1));
-    const Shapes s = sphere(ORIGO, 1.0f);
+    const Shapes s = sphere();
     const auto i1 = intersection(1, s);
     const auto hit = prepare_computations(i1, r);
     EXPECT_TRUE(hit.inside);

@@ -3,10 +3,10 @@
 #include <variant>
 #include "Sphere.h"
 #include "Plane.h"
-
-using Shapes = std::variant<Sphere, Plane>;
+#include "Cube.h"
+using Shapes = std::variant<Sphere, Plane, Cube>;
 template<typename T> 
-concept shapes = std::is_same_v<Sphere, T> || std::is_same_v<Plane, T>;
+concept shapes = std::is_same_v<Sphere, T> || std::is_same_v<Plane, T> || std::is_same_v<Cube, T>;
 
 constexpr Vector normal_at(const Shapes& variant, const Point& p) { 
     return std::visit([&p](const auto& obj){         

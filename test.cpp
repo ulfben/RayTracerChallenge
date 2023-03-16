@@ -214,7 +214,7 @@ TEST(DISABLED_Chapter9, CanRenderPlanes) {
     save_to_file(img, "output/chapter9_0_sRGB.ppm"sv);
 }
 
-TEST(Chapter10, CanRenderPatterns) {
+TEST(DISABLED_Chapter10, CanRenderPatterns) {
     const auto c = Camera(600, 400, math::PI / 3.0f, 
         view_transform(point(0.0f, 5.0f, -10.0f), point(0, 1, 0), vector(0, 1, 0)));
 

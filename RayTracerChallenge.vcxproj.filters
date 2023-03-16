@@ -75,6 +75,7 @@
       <Filter>tests</Filter>
     </ClInclude>
     <ClInclude Include="Color.h" />
+    <ClInclude Include="Cube.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
