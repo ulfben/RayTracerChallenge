@@ -21,6 +21,7 @@
 #include "tests/ReflectionTests.h"
 #include "tests/TransparencyTests.h"
 #include "tests/PatternTests.h"
+#include "tests/CubeTests.h"
 
 TEST(DISABLED_Chapter2, CanOutputPPM) {    
     auto c = Canvas(300, 300);
