@@ -1,5 +1,5 @@
 # RayTracerChallenge
-A side-project for 2023, following along Jamis Buck's "[The Ray Tracer Challenge](http://raytracerchallenge.com/)".
+A side-project for 2023, following along Jamis Buck's "[The Ray Tracer Challenge](http://raytracerchallenge.com/)". I'm working in modern C++ and aiming to use only static polymorphism and value semantics throughout (ie: no inheritance or pointers).
 
 # Chapter 5:
 Coloring pixels.
@@ -47,5 +47,11 @@ Fixing all patterns and building a better scene to demo patterns, reflection and
 ![chapter10_4_sRGB](https://user-images.githubusercontent.com/5237741/224976635-35abb9ab-e755-4575-b1f3-a2c41f94e18a.png)
 
 ![chapter10_5_sRGB](https://user-images.githubusercontent.com/5237741/225243519-0553eb5d-e921-474c-9eb5-90b8d769eefb.png)
+
+# Chapter 12
+Adding cubes to the world. 
+
+![chapter12_1](https://user-images.githubusercontent.com/5237741/225836412-1199027f-5797-4562-9d98-f64234889f18.png)
+
 
 
