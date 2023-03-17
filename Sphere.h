@@ -35,6 +35,9 @@ private:
     Matrix4 _invTransform{ Matrix4Identity };
 };
 
+constexpr Sphere sphere() noexcept {
+    return Sphere{};
+}
 constexpr Sphere sphere(Color col) noexcept {
     return Sphere( material(col) );    
 }
@@ -47,9 +50,7 @@ constexpr Sphere sphere(Matrix4 transform) noexcept {
 constexpr Sphere sphere(Material m, Matrix4 transform) noexcept {
     return Sphere(std::move(m), std::move(transform));    
 }
-constexpr Sphere sphere() noexcept {
-    return Sphere{};
-}
+
 
 #pragma warning(push)
 #pragma warning( disable : 26481 ) //spurious warning; "don't use pointer arithmetic" 

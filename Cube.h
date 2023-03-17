@@ -4,7 +4,7 @@
 #include "Matrix.h"
 #include "Material.h"
 #include "Ray.h"
-
+/*A unit AABB, always positioned at 0, 0, 0 and extending from -1 to +1f*/
 struct Cube {
     Material surface{ material() };          
     constexpr Cube() noexcept = default;    
@@ -35,6 +35,18 @@ private:
 
 constexpr Cube cube() noexcept {
     return {};
+}
+constexpr Cube cube(Color col) noexcept {
+    return Cube( material(col) );    
+}
+constexpr Cube cube(Material m) noexcept {
+    return Cube( std::move(m) );    
+}
+constexpr Cube sphcubeere(Matrix4 transform) noexcept {
+    return Cube(std::move(transform));    
+}
+constexpr Cube cube(Material m, Matrix4 transform) noexcept {
+    return Cube(std::move(m), std::move(transform));    
 }
 
 constexpr Vector local_normal_at([[maybe_unused]]const Cube& c, const Point& p) noexcept {
