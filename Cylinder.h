@@ -8,8 +8,8 @@
 /*A unit AABB, always positioned at 0, 0, 0 and extending from -1 to +1f*/
 struct Cylinder {
     Material surface{ material() };
-    Real maximum; 
-    Real minimum; 
+    Real maximum = math::INF; //cylinder extents on the Y-axis. Up-to but not including this value.
+    Real minimum = math::NEG_INF; 
     constexpr Cylinder() noexcept = default;    
     explicit constexpr Cylinder(Material m) noexcept : surface(std::move(m)) {}
     explicit constexpr Cylinder(Matrix4 transf) noexcept {

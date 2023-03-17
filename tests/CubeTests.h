@@ -29,9 +29,8 @@ TEST(Cube, rayIntersectsACube) {
     const auto c = cube();
     EXPECT_EQ(c.transform(), Matrix4Identity);
     EXPECT_EQ(c.inv_transform(), inverse(c.transform()));
-    for (size_t i = 0; i < rays.size(); i++) {
-        const auto r = rays[i];
-        const auto xs = local_intersect(c, r);
+    for (size_t i = 0; i < rays.size(); i++) {        
+        const auto xs = local_intersect(c, rays[i]); //TODO: the ray lifetime is messed up in release mode!
         EXPECT_FLOAT_EQ(xs.first, expected[i].first);
         EXPECT_FLOAT_EQ(xs.second, expected[i].second);        
     }
@@ -48,9 +47,8 @@ TEST(Cube, rayMissesACube) {
         {point(0, 2, 2), vector(0,-1,0)},  
         {point(2, 2, 0), vector(-1, 0, 0)}
     };    
-    for (size_t i = 0; i < rays.size(); i++) {
-        const auto r = rays[i];
-        const auto xs = local_intersect(c, r);
+    for (size_t i = 0; i < rays.size(); i++) {        
+        const auto xs = local_intersect(c, rays[i]);
         EXPECT_FLOAT_EQ(xs.first, 0);
         EXPECT_FLOAT_EQ(xs.second, 0);
     }

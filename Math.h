@@ -15,6 +15,8 @@ namespace math {
     constexpr auto HALF_PI = math::PI / 2.0f;
     constexpr auto TO_DEG = 180.0f / PI;
     constexpr auto TO_RAD = PI / 180.0f;
+    constexpr auto INF = std::numeric_limits<Real>::infinity();
+    constexpr auto NEG_INF = -std::numeric_limits<Real>::infinity();
 
     constexpr Real lerp(Real start, Real end, Real t) {
        return (1.0f - t) * start + t * end;
@@ -55,6 +57,10 @@ namespace math {
                 : std::numeric_limits<Real>::quiet_NaN();
         }
         return std::sqrt(x);
+    }
+
+    constexpr Real square(Real x) noexcept {
+        return x * x;
     }
      
     constexpr int int_ceil(Real f) noexcept {

@@ -22,6 +22,7 @@
 #include "tests/TransparencyTests.h"
 #include "tests/PatternTests.h"
 #include "tests/CubeTests.h"
+#include "tests/CylinderTests.h"
 
 TEST(DISABLED_Chapter2, CanOutputPPM) {    
     auto c = Canvas(300, 300);
@@ -295,7 +296,7 @@ TEST(DISABLED_Chapter11, CanRenderReflectionsAndRefractions) {
     save_to_file(img, "output/chapter11_5_sRGB.ppm"sv);
 }
 
-TEST(Chapter12, CanRenderCubes) {    
+TEST(DISABLED_Chapter12, CanRenderCubes) {    
     const auto c = Camera(600, 400, math::PI / 3.0f, 
         view_transform(point(0.0f, 5.0f, -10.0f), point(0, 1, 0), vector(0, 1, 0)));
 

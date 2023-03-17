@@ -69,8 +69,8 @@ constexpr std::pair<Real, Real> check_axis(Real origin, Real direction) noexcept
         tmax = tmax_numerator / direction;
     }
     else {
-        tmin = tmin_numerator * INFINITY;
-        tmax = tmax_numerator * INFINITY;
+        tmin = tmin_numerator * math::INF;
+        tmax = tmax_numerator * math::INF;
     }
     if (tmin > tmax) {
         std::swap(tmin, tmax);

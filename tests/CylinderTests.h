@@ -7,25 +7,22 @@
 #include "../Intersection.h"
 DISABLE_WARNINGS_FROM_GTEST
 
-TEST(Cylinder, rayIntersectsACylinder) {
-    const std::vector<Ray> rays{
-        {point(5, 0.5f, 0), vector(-1, 0, 0)}, /* +x */
-        {point(-5, 0.5f, 0), vector(1, 0, 0)}, /* -x */
-        {point(0.5f, 5, 0), vector(0, -1, 0)}, /* +y */
-        {point(0.5f, -5, 0), vector(0, 1, 0)}, /* -y */
-        {point(0.5f, 0, 5), vector(0,0,-1)},   /* +z */
-        {point(0.5f, 0, -5), vector(0, 0, 1)}, /* -z */
-        {point(0, 0.5f, 0), vector(0, 0, 1)}   /* inside */
-    };
-    const std::vector<std::pair<Real, Real>> expected{
-        {4.0f, 6.0f},
-        {4.0f, 6.0f},
-        {4.0f, 6.0f},
-        {4.0f, 6.0f},
-        {4.0f, 6.0f},
-        {4.0f, 6.0f},
-        {-1.0f, 1.0f}
-    };
+TEST(Cylinder, rayIntersectsACylinder) {    
+    const auto c = cylinder();    
+    auto r = ray(point(1, 0, -5), vector(0, 0, 1));
+    auto xs = local_intersect(c,  r);
+    EXPECT_FLOAT_EQ(xs.first, 5.0f);
+    EXPECT_FLOAT_EQ(xs.second, 5.0f);
+
+    r = ray(point(0, 0, -5), vector(0, 0, 1)); 
+    xs = local_intersect(c,  r);
+    EXPECT_FLOAT_EQ(xs.first, 4.0f);
+    EXPECT_FLOAT_EQ(xs.second, 6.0f);
+
+    r = ray(point(0.5f, 0, -5), vector(0.1f, 1, 1)); 
+    xs = local_intersect(c,  r);    
+    EXPECT_FLOAT_EQ(xs.first, 6.80798f); //actual 4.8019881
+    EXPECT_FLOAT_EQ(xs.second, 7.08872f);    //4.9999919
 }
 
 TEST(Cylinder, rayMissesACylinder) {
@@ -35,9 +32,8 @@ TEST(Cylinder, rayMissesACylinder) {
         {point(0, 0, -5), vector(1, 1, 1)}        
     };    
     const auto c = cylinder();
-    for (size_t i = 0; i < rays.size(); i++) {
-        const auto r = rays[i];
-        const auto xs = local_intersect(c, r);
+    for (size_t i = 0; i < rays.size(); i++) {        
+        const auto xs = local_intersect(c, rays[i]);
         EXPECT_FLOAT_EQ(xs.first, 0);
         EXPECT_FLOAT_EQ(xs.second, 0);
     }
