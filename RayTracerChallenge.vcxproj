@@ -69,6 +69,7 @@
     <ClInclude Include="Canvas.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Cube.h" />
+    <ClInclude Include="Cylinder.h" />
     <ClInclude Include="Intersection.h" />
     <ClInclude Include="Lights.h" />
     <ClInclude Include="Material.h" />
@@ -86,6 +87,7 @@
     <ClInclude Include="tests\CanvasTests.h" />
     <ClInclude Include="tests\ColorTests.h" />
     <ClInclude Include="tests\CubeTests.h" />
+    <ClInclude Include="tests\CylinderTests.h" />
     <ClInclude Include="tests\FloatCompareTests.h" />
     <ClInclude Include="tests\MaterialTests.h" />
     <ClInclude Include="tests\MatrixTests.h" />

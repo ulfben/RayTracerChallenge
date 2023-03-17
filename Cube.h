@@ -3,7 +3,6 @@
 #include "Tuple.h"
 #include "Matrix.h"
 #include "Material.h"
-#include "Ray.h"
 /*A unit AABB, always positioned at 0, 0, 0 and extending from -1 to +1f*/
 struct Cube {
     Material surface{ material() };          

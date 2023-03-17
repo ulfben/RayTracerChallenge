@@ -79,6 +79,10 @@
     <ClInclude Include="tests\CubeTests.h">
       <Filter>tests</Filter>
     </ClInclude>
+    <ClInclude Include="tests\CylinderTests.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Cylinder.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
