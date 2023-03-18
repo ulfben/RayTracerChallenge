@@ -15,18 +15,22 @@ namespace math {
     constexpr auto HALF_PI = math::PI / 2.0f;
     constexpr auto TO_DEG = 180.0f / PI;
     constexpr auto TO_RAD = PI / 180.0f;
-    constexpr auto INF = std::numeric_limits<Real>::infinity();
-    constexpr auto NEG_INF = -std::numeric_limits<Real>::infinity();
+    constexpr auto MAX = std::numeric_limits<Real>::max();
+    constexpr auto MIN = std::numeric_limits<Real>::lowest();  
 
-    template<class T>
-        requires std::is_arithmetic_v<T>
+    template<class T>        
     constexpr T max(T a, T b, T c) noexcept {
         return (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);
     }
-    template<class T>
-    requires std::is_arithmetic_v<T>
+    
+    template<class T>        
     constexpr T min(T a, T b, T c) noexcept {
        return (a < b) ? ((a < c) ? a : c) : ((b < c) ? b : c);
+    }
+
+    template <typename T>        
+    constexpr bool is_between(T in, T min, T max) noexcept {
+        return (in > min) && (in < max);
     }
 
     constexpr Real lerp(Real start, Real end, Real t) {
@@ -103,7 +107,7 @@ namespace math {
     static constexpr auto GTEST_EPSILON = 0.000001f;// 1.0e-6f; //from Google Test
     static constexpr auto MACHINE_EPSILON = 0.000000119209f; //1.19209e-7f, == std::numeric_limits<Real>::epsilon();
 
-    //from the book. fails on big, bigneg, infinities, oppoite, small, smallneg, ulp and zero
+    //from the book. fails on big, bigneg, infinities, opposite, small, smallneg, ulp and zero
     template<class T>
         requires std::is_arithmetic_v<T>
     constexpr bool almost_equal(T a, T b, T epsilon) noexcept {
@@ -115,7 +119,7 @@ namespace math {
     template<class T>
         requires std::is_arithmetic_v<T>
     constexpr bool qt_fuzzy_compare(T a, T b, [[maybe_unused]] T) noexcept {
-        return (math::abs(a - b) * 100000.f <= std::min(std::abs(a), math::abs(b)));
+        return (math::abs(a - b) * 100000.f <= std::min(math::abs(a), math::abs(b)));
     }
 
     //ported from Java implementation at https://floating-point-gui.de/errors/comparison/
@@ -147,11 +151,11 @@ namespace math {
         if (is_nan(expected) || is_nan(actual)) {
             return false;
         }
-        const T abs_diff = std::abs(expected - actual);
+        const T abs_diff = math::abs(expected - actual);
         if (abs_diff <= max_abs_error) {
             return true;
         }
-        const T abs_max = std::max(std::abs(expected), std::abs(actual));
+        const T abs_max = std::max(math::abs(expected), math::abs(actual));
         return abs_diff <= abs_max * max_abs_error;
     }
 

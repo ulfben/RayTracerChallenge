@@ -18,19 +18,32 @@ TEST(Cylinder, rayIntersectsACylinder) {
     xs = local_intersect(c,  r);
     EXPECT_FLOAT_EQ(xs.first, 4.0f);
     EXPECT_FLOAT_EQ(xs.second, 6.0f);
+ 
+    r = ray(point(0.5f, 0, -5), normalize(vector(0.1f, 1, 1))); //hit the cylinder at an angle
+    xs = local_intersect(c,  r); 
 
-    //hit the cylinder at an angle
-    r = ray(point(0.5f, 0, -5), vector(0.1f, 1, 1)); //the vector is from the book, but must be normalized for this test to match even a little bit.
-    xs = local_intersect(c,  r);    
-    EXPECT_FLOAT_EQ(xs.first, 6.8080058f); //book oracle: 6.80798f
-    EXPECT_FLOAT_EQ(xs.second, 7.0886984f); //book oracle: 7.08872f
+    //using the book comparison, epsilon and expected:
+    EXPECT_TRUE(math::almost_equal(xs.first, 6.80798f, math::BOOK_EPSILON));
+    EXPECT_TRUE(math::almost_equal(xs.second, 7.08872f, math::BOOK_EPSILON));
+
+    //using the universal float comparison:
+    EXPECT_TRUE(math::float_cmp(xs.first, 6.80798f));
+    EXPECT_TRUE(math::float_cmp(xs.second, 7.08872f));
+
+    ////succeeds only in debug mode:
+    //EXPECT_FLOAT_EQ(xs.first, 6.8080058f);
+    //EXPECT_FLOAT_EQ(xs.second, 7.0886984f);
+
+    ////succeeds only in release mode:
+    //EXPECT_FLOAT_EQ(xs.first, 6.8079991);
+    //EXPECT_FLOAT_EQ(xs.second, 7.0887051);
 }
 
 TEST(Cylinder, rayMissesACylinder) {
     const std::vector<Ray> rays{
-        {point(1, 0, 0), vector(0, 1, 0)}, //on the surface, pointing up. Ergo: perpendicular to the cylinder
-        {point(0, 0, 0), vector(0, 1, 0)}, //inside the the cylinder, pointing up
-        {point(0, 0, -5), vector(1, 1, 1)} //far away from the cylinder, pointer wherever
+        {point(1, 0, 0), normalize(vector(0, 1, 0))}, //on the surface, pointing up. Ergo: perpendicular to the cylinder
+        {point(0, 0, 0), normalize(vector(0, 1, 0))}, //inside the the cylinder, pointing up
+        {point(0, 0, -5), normalize(vector(1, 1, 1))} //far away from the cylinder, pointer wherever
     };    
     const auto c = cylinder();
     for (size_t i = 0; i < rays.size(); i++) {        
@@ -60,6 +73,40 @@ TEST(Cylinder, normalOnTheSurfaceOfACylinder) {
         const auto normal = local_normal_at(c, p);
         EXPECT_EQ(normal, normals[i]);        
     }
+}
+
+TEST(Cylinder, defaultCylinderIsNearInfinite) {       
+    const auto c = cylinder();
+    EXPECT_FLOAT_EQ(c.minimum, math::MIN);
+    EXPECT_FLOAT_EQ(c.maximum, math::MAX); 
+    EXPECT_FALSE(is_bounded(c));
+}
+
+TEST(Cylinder, intersectingATruncatedCylinder) {           
+    const auto c = cylinder(1.0f, 2.0f);
+    EXPECT_TRUE(is_bounded(c));
+    const std::vector<Ray> rays{
+        {point(0, 1.5f, 0), normalize(vector(0.1f, 1, 0))}, //from inside, heading up and escaping the cylinder
+        {point(0, 3, -5), normalize(vector(0, 0, 1))}, // perpendicular to the y-axis, but above the cylinder
+        {point(0, 0, -5), normalize(vector(0, 0, 1))}, // perpendicular to the y-axis, but below the cylinder
+        {point(0, 2, -5), normalize(vector(0, 0, 1))}, //edge case: the maximum extent is *excluded*
+        {point(0, 1, -5), normalize(vector(0, 0, 1))}, //edge case: the minimum extent is *excluded*
+        {point(0, 1.5f, -2), normalize(vector(0, 0, 1))} //perpendicular to the cylinder, at the middle of it. 
+    }; 
+    const std::vector<std::pair<Real, Real>> points{
+        {0.0f,0.0f},
+        {0.0f,0.0f},
+        {0.0f,0.0f},
+        {0.0f,0.0f},
+        {0.0f,0.0f},
+        {1.0f,3.0f} 
+    };
+    
+    for (size_t i = 0; i < rays.size(); i++) {        
+        const auto xs = local_intersect(c, rays[i]);
+        EXPECT_FLOAT_EQ(xs.first, points[i].first);
+        EXPECT_FLOAT_EQ(xs.second, points[i].second);
+    }         
 }
 
 RESTORE_WARNINGS

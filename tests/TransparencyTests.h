@@ -150,7 +150,7 @@ TEST(Transparency, shadeHitWithAReflectiveTransparentMaterial) {
     const auto state = prepare_computations(xs[0], r, xs);
     const auto c = shade_hit(w, state, 5);
     //color(0.93391f, 0.69643f, 0.69243f) //book oracle         
-    EXPECT_EQ(c, color(0.9339515, 0.6964796, 0.692458)); 
+    EXPECT_EQ(c, color(0.9339515f, 0.6964796f, 0.692458f)); 
 }
 
 RESTORE_WARNINGS

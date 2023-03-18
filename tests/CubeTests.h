@@ -33,9 +33,8 @@ TEST(Cube, rayIntersectsACube) {
         {-1.0f, 1.0f}
     };
     const auto c = cube();    
-    for (size_t i = 0; i < rays.size(); i++) {               
-        const auto r = rays[i]; //local copy necessary to avoid undefined behavior in release mode. For some reason.
-        const auto xs = local_intersect(c, r); 
+    for (size_t i = 0; i < rays.size(); i++) {                     
+        const auto xs = local_intersect(c, rays[i]); 
         EXPECT_FLOAT_EQ(xs.first, expected[i].first);
         EXPECT_FLOAT_EQ(xs.second, expected[i].second);        
     }
@@ -51,9 +50,8 @@ TEST(Cube, rayMissesACube) {
         {point(0, 2, 2), vector(0,-1,0)},  
         {point(2, 2, 0), vector(-1, 0, 0)}
     };    
-    for (size_t i = 0; i < rays.size(); i++) {        
-        const auto r = rays[i]; //local copy necessary to avoid undefined behavior in release mode. For some reason.
-        const auto xs = local_intersect(c, r);
+    for (size_t i = 0; i < rays.size(); i++) {                
+        const auto xs = local_intersect(c, rays[i]);
         EXPECT_FLOAT_EQ(xs.first, 0);
         EXPECT_FLOAT_EQ(xs.second, 0);
     }
@@ -62,12 +60,11 @@ TEST(Cube, rayMissesACube) {
 
 TEST(Cube, normalOnTheSurfaceOfACube) {
     const auto c = cube();
-
     const std::vector<Point> points{
         point(1, 0.5f, -0.8f),
         point(-1, -0.2f, 0.9f),
         point(-0.4f, 1, -0.1f),
-        point(0.3, -1, -0.7f),
+        point(0.3f, -1, -0.7f),
         point(-0.6f, 0.3f, 1),
         point(0.4f, 0.4f, -1),
         point(1, 1, 1),

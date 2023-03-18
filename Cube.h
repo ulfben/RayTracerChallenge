@@ -60,21 +60,18 @@ constexpr Vector local_normal_at([[maybe_unused]]const Cube& c, const Point& p) 
     return vector(0, 0, p.z);
 }
 
-constexpr std::pair<Real, Real> check_axis(Real origin, Real direction) noexcept {
-    const auto tmin_numerator = (-1 - origin);
-    const auto tmax_numerator = (1 - origin);
+constexpr std::pair<Real, Real> check_axis(Real origin, Real direction, Real min = -1.0f, Real max = 1.0f) noexcept {
+    const auto tmin_numerator = (min - origin);
+    const auto tmax_numerator = (max - origin);
     Real tmin, tmax; 
     if (math::abs(direction) >= math::BOOK_EPSILON) {
         tmin = tmin_numerator / direction;
         tmax = tmax_numerator / direction;
     }
     else {
-        tmin = tmin_numerator * math::INF;
-        tmax = tmax_numerator * math::INF;
+        tmin = tmin_numerator * math::MAX; //arbitrary large-ish value. used to be INFINITY, but that breaks when compiled
+        tmax = tmax_numerator * math::MAX; //with /fp:fast. I just multiply with *something* to keep the signs correct.
     }
-    if (tmin > tmax) {
-        std::swap(tmin, tmax);
-    }
-    return { tmin, tmax };
+    return (tmin > tmax) ?  std::pair{ tmax, tmin } : std::pair{ tmin, tmax };
 }
 

@@ -8,10 +8,10 @@ struct Intersection final {
     const Shapes* objPtr = nullptr;
     Real t{ 0 };
 
-    explicit constexpr operator bool() const  {
+    explicit constexpr operator bool() const {
         return objPtr != nullptr;
     }
-    constexpr const Shapes& object() const  {
+    constexpr const Shapes& object() const {
         assert(objPtr != nullptr);
         return *objPtr;
     }
@@ -20,10 +20,10 @@ struct Intersection final {
     }
     constexpr bool operator<(const Intersection& that) const noexcept {
         return t < that.t;
-    }  
+    }
     constexpr bool operator==(const Intersection& that) const noexcept {
         return object() == that.object() && math::float_cmp(t, that.t);
-    }       
+    }
     constexpr auto operator<(Real time) const noexcept {
         return t < time;
     }
@@ -31,7 +31,7 @@ struct Intersection final {
 
 struct Intersections final {
     using size_type = uint8_t;
-    using value_type = Intersection; 
+    using value_type = Intersection;
     using container = std::vector<value_type>;
     using reference = container::reference;
     using const_reference = container::const_reference;
@@ -41,7 +41,10 @@ struct Intersections final {
     using const_iterator = container::const_iterator;
     container xs;
 
-    explicit constexpr Intersections(std::initializer_list<value_type> intersections) noexcept : xs(intersections) {};
+    explicit constexpr Intersections(size_t capacity) {
+        xs.reserve(capacity);
+    };
+    explicit constexpr Intersections(std::initializer_list<value_type> intersections) : xs(intersections) {};
 
     constexpr const_reference operator[](size_type i) const noexcept {
         assert(i < size() && "Intersection::operator[i] index is out of bounds");
@@ -80,6 +83,9 @@ constexpr auto intersection(Real t, const Shapes& obj) noexcept {
 constexpr auto intersections() noexcept {
     return Intersections{};
 }
+constexpr auto intersections(size_t capacity) noexcept {
+    return Intersections(capacity);
+}
 constexpr auto intersections(Intersection i1, Intersection i2) noexcept {
     return Intersections{ std::move(i1), std::move(i2) };
 }
@@ -88,10 +94,10 @@ constexpr auto intersections(std::initializer_list<Intersection> is) noexcept {
 }
 
 constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Cylinder& cylinder, Ray local_ray) noexcept {
-    using math::square, math::sqrt;
+    using math::square, math::sqrt, math::is_between;
     const auto a = square(local_ray.direction.x) + square(local_ray.direction.z);
     if (a < math::BOOK_EPSILON) { //close to 0
-        return { 0.0f, 0.0f }; //ray is ~parallel to the Y axis
+        return { 0.0f, 0.0f }; //ray is ~parallel to the Y axis so we can't collide.
     }
     const auto b = 2.0f * local_ray.origin.x * local_ray.direction.x +
                    2.0f * local_ray.origin.z * local_ray.direction.z;
@@ -100,31 +106,45 @@ constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Cylinder&
     if (discriminant < 0.0f) {
         return { 0.0f, 0.0f }; //ray does not intersect with the cylinder
     }
-    const auto t1 = (-b - sqrt(discriminant)) / (2.0f * a);
-    const auto t2 = (-b + sqrt(discriminant)) / (2.0f * a);
-    return {t1, t2};
+    auto t1 = (-b - sqrt(discriminant)) / (2.0f * a);
+    auto t2 = (-b + sqrt(discriminant)) / (2.0f * a);
+    //if (t1 > t2) {
+    //    std::swap(t1, t2);
+    //}
+    std::pair result = { t1, t2 };
+    if (is_bounded(cylinder)) { //let's compute the height of each intersection
+        const auto y1 = local_ray.origin.y + t1 * local_ray.direction.y;
+        if (!is_between(y1, cylinder.minimum, cylinder.maximum)) {
+            result.first = 0.0f; //the first intersection happened above or below the cylinder limits.
+        }
+        const auto y2 = local_ray.origin.y + t2 * local_ray.direction.y;
+        if (!is_between(y2, cylinder.minimum, cylinder.maximum)) {
+            result.second = 0.0f; //the second intersection happened above or below the cylinder limits.
+        }        
+    }
+    return result;
 }
 
-constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Cube& cube, const Ray& local_ray) noexcept {    
+constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Cube& cube, const Ray& local_ray) noexcept {
     const auto [xtmin, xtmax] = check_axis(local_ray.origin.x, local_ray.direction.x);
     const auto [ytmin, ytmax] = check_axis(local_ray.origin.y, local_ray.direction.y);
     const auto [ztmin, ztmax] = check_axis(local_ray.origin.z, local_ray.direction.z);
     const auto tmin = math::max(xtmin, ytmin, ztmin);
     const auto tmax = math::min(xtmax, ytmax, ztmax);
     if (tmin > tmax) return { 0.0f, 0.0f };
-    return {tmin, tmax};
+    return { tmin, tmax };
 }
 
-constexpr std::pair<Real, Real> local_intersect([[maybe_unused]]const Plane& p, const Ray& local_ray)  {
+constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Plane& p, const Ray& local_ray) {
     if (math::abs(local_ray.direction.y) < math::BOOK_EPSILON) {
-        return {0.0f, 0.0f};
+        return { 0.0f, 0.0f };
     }
     const auto t1 = -local_ray.origin.y / local_ray.direction.y;
-    return {t1, t1};
+    return { t1, t1 };
 };
 
 //https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
-constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Sphere& s, const Ray& local_ray)  {
+constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Sphere& s, const Ray& local_ray) {
     constexpr Real SPHERE_RADIUS = 1.0f; //assuming unit spheres for now    
     const Vector sphere_to_ray = local_ray.origin;/* -s.position; sphere is always located at 0,0,0*/
     const auto a = dot(local_ray.direction, local_ray.direction);
@@ -132,36 +152,40 @@ constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Sphere& s
     const auto col = dot(sphere_to_ray, sphere_to_ray) - SPHERE_RADIUS;
     const auto discriminant = (b * b) - (4.0f * a * col);
     if (discriminant < 0) {
-        return {0.0f, 0.0f};
+        return { 0.0f, 0.0f };
     }
     const auto sqrtOfDiscriminant = math::sqrt(discriminant);
     const auto t1 = (-b - sqrtOfDiscriminant) / (2 * a);
     const auto t2 = (-b + sqrtOfDiscriminant) / (2 * a);
-    return {t1, t2};   
+    return { t1, t2 };
 };
 
-constexpr auto intersect(const Shapes& variant, const Ray& r)  {     
+constexpr auto intersect(const Shapes& variant, const Ray& r) {
     const auto [t1, t2] = std::visit([&r](const auto& obj) {
         const auto local_ray = transform(r, obj.inv_transform());
-        return local_intersect(obj, local_ray);  }, variant 
+        return local_intersect(obj, local_ray);  }, variant
     );
-    if (t1 || t2) {
-        return intersections({ intersection(t1, variant), intersection(t2, variant) });
+    auto xs = intersections(2);
+    if (t1 != 0.0f) {
+        xs.push_back(intersection(t1, variant));
     }
-    return intersections();  
+    if (t2 != 0.0f) {
+        xs.push_back(intersection(t2, variant));
+    }
+    return xs;
 };
 
 constexpr auto intersect(const World& world, const Ray& r) {
-    Intersections result = intersections();     
-    for (const auto& variant : world) {        
+    Intersections result = intersections(world.size() * 2);//reserve space to store 2 intersections per object in the world
+    for (const auto& variant : world) {
         result.push_back(intersect(variant, r));
-    }    
+    }
     result.sort();
     return result;
 };
 
 //TODO: consider an alternative algorithm: remove + min_element
-constexpr auto closest(const Intersections& xs) noexcept {    
+constexpr auto closest(const Intersections& xs) noexcept {
     const auto iter = std::ranges::min_element(xs,
         // This comparison function allows us to find the smallest positive number 
         // by considering negative numbers as larger than positive numbers. 
@@ -190,7 +214,7 @@ struct HitState final {
     Real n2{ 1.0f }; //refractive index of the material we entered
     bool inside = false;
 
-    constexpr HitState(const Intersection& i, const Ray& r) noexcept 
+    constexpr HitState(const Intersection& i, const Ray& r) noexcept
         : objectPtr{ i.objPtr }, point{ position(r, i.t) }, eye_v{ -r.direction }, t{ i.t } {
         normal = normal_at(object(), point);
         if (dot(normal, eye_v) < 0.0f) {
@@ -204,22 +228,23 @@ struct HitState final {
         reflectv = reflect(r.direction, normal);
     }
 
-    constexpr HitState(const Intersection& closest, const Ray& r, const Intersections& xs) : HitState(closest, r){
+    constexpr HitState(const Intersection& closest, const Ray& r, const Intersections& xs) : HitState(closest, r) {
         std::vector<const Shapes*> containers;
         for (const auto& i : xs) {
             const auto is_the_hit = i == closest;
-            if (is_the_hit) {            
-                n1 = containers.empty() ? 1.0f : ::surface(*containers.back()).refractive_index;            
+            if (is_the_hit) {
+                n1 = containers.empty() ? 1.0f : ::surface(*containers.back()).refractive_index;
             }
-            
+
             if (const auto iter = std::ranges::find(containers, i.objPtr); iter != containers.end()) {
                 containers.erase(iter); //this intersection must be exiting the object, remove it from the lists
-            } else {
+            }
+            else {
                 containers.push_back(i.objPtr); //the intersection is entering the object, add it to the list
             }
 
-            if (is_the_hit) {            
-                n2 = containers.empty() ? 1.0f : ::surface(*containers.back()).refractive_index;                 
+            if (is_the_hit) {
+                n2 = containers.empty() ? 1.0f : ::surface(*containers.back()).refractive_index;
                 break; //terminate the loop
             }
         }
@@ -228,7 +253,7 @@ struct HitState final {
     explicit constexpr operator bool() const noexcept {
         return t != 0;
     }
-    constexpr const Material& surface() const noexcept {        
+    constexpr const Material& surface() const noexcept {
         return ::surface(object());
     }
     constexpr const Shapes& object() const noexcept {
@@ -272,7 +297,7 @@ constexpr bool is_shadowed(const World& w, const Point& p) noexcept {
         const auto hit = closest(intersect(w, r)); //intersect allocates
         return (hit && (hit.t * hit.t) < distanceSq); //something is between us and the light.
     }
-    catch (...) {}    
+    catch (...) {}
     return false;
 }
 
@@ -280,7 +305,7 @@ constexpr Color reflected_color(const World& w, const HitState& state, int remai
 constexpr Color refracted_color(const World& w, const HitState& state, int remaining) noexcept;
 
 constexpr Color shade_hit(const World& w, const HitState& hit, int remaining = 4) noexcept {
-    const auto shadowed = is_shadowed(w, hit.over_point);    
+    const auto shadowed = is_shadowed(w, hit.over_point);
     const auto surface_c = lighting(hit.surface(), hit.object(), w.light, hit.over_point, hit.eye_v, hit.normal, shadowed);
     const auto reflected_c = reflected_color(w, hit, remaining);
     const auto refracted_c = refracted_color(w, hit, remaining);
@@ -291,29 +316,29 @@ constexpr Color shade_hit(const World& w, const HitState& hit, int remaining = 4
     return surface_c + reflected_c + refracted_c;
 }
 
-constexpr Color color_at(const World& w, const Ray& r, int remaining = 4) noexcept{    
+constexpr Color color_at(const World& w, const Ray& r, int remaining = 4) noexcept {
     try {
         const auto xs = intersect(w, r); //allocates.
         const auto closestHit = closest(xs);
         if (closestHit) {
             const auto calcs = prepare_computations(closestHit, r, xs);
             return shade_hit(w, calcs, remaining);
-        }    
+        }
     }
-    catch (...) {}        
+    catch (...) {}
     return BLACK;
 }
 
-constexpr Color reflected_color(const World& w, const HitState& state, int remaining) noexcept {        
+constexpr Color reflected_color(const World& w, const HitState& state, int remaining) noexcept {
     if (remaining <= 0 || state.surface().reflective == 0) {
         return BLACK;
     }
     const auto reflect_ray = ray(state.over_point, state.reflectv);
-    const auto c = color_at(w, reflect_ray, remaining-1);
+    const auto c = color_at(w, reflect_ray, remaining - 1);
     return c * state.surface().reflective;
 }
 
-constexpr Color refracted_color(const World& w, const HitState& state, int remaining) noexcept {        
+constexpr Color refracted_color(const World& w, const HitState& state, int remaining) noexcept {
     if (remaining <= 0 || state.surface().transparency == 0) {
         return BLACK;
     }
