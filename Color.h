@@ -60,6 +60,9 @@ struct Color final {
 constexpr Color color(Real r, Real g, Real b) noexcept {
     return Color{ r, g, b };
 }
+constexpr Color color(Real rgb) noexcept {
+    return color(rgb, rgb, rgb);
+}
 
 void to_sRGB(Color& c) noexcept {
     c.r = linear_to_sRGB(std::clamp(c.r, 0.0f, 1.0f));

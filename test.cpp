@@ -296,6 +296,50 @@ TEST(DISABLED_Chapter11, CanRenderReflectionsAndRefractions) {
     save_to_file(img, "output/chapter11_5_sRGB.ppm"sv);
 }
 
+TEST(Chapter11, CanRenderBookScene) {    
+    using math::TO_RAD;
+    const auto c = Camera(200, 200, 0.5f/*math::PI / 3.0f*/,
+        view_transform(point(-4.5f, 0.85f, -4.0f), point(0, 0.85, 0), vector(0, 1, 0)));
+      
+    auto wallpaper = material(checkers_pattern(BLACK, color(0.75f), scaling(0.5f)));
+    wallpaper.specular = 0;
+    
+    auto floor_material = wallpaper;
+    floor_material.ambient = 0.5f;
+    floor_material.diffuse = 0.4f;
+    floor_material.specular = 0.8f;
+    floor_material.reflective = 0.1f;
+    const auto floor = plane(floor_material, rotation_y(0.31415f));    
+
+    auto ceiling_material = material(checkers_pattern(color(0.85f), WHITE, scaling(0.2f)));
+    ceiling_material.ambient = 0.5f;
+    ceiling_material.specular = 0;
+
+    auto transf = translation(0, 5, 0);
+    const auto ceiling = plane(ceiling_material, transf);
+
+    transf = translation(-5, 0, 0)*rotation(0.0f, 1.5708f, 1.5708f); 
+    const auto west_wall = plane(wallpaper,  transf);
+
+    transf = translation(5, 0, 0)*rotation(0.0f, 1.5708f, 1.5708f);
+    const auto east_wall = plane(wallpaper, transf);
+
+    transf = translation(0, 0, 5) * rotation_x(1.5708f);
+    const auto north_wall = plane(wallpaper, transf);
+
+    transf = translation(0, 0, -5) * rotation_x(1.5708f);
+    const auto south_wall = plane(wallpaper, transf);
+
+    transf = translation(4, 1, 4);
+    auto background_sphere = sphere(color(0.8f, 0.1f, 0.3f), transf);
+    background_sphere.surface.specular = 0;
+
+    const auto world = World({ floor, background_sphere, ceiling, west_wall, east_wall, north_wall, south_wall }, 
+                                point_light(point(-4.9, 4.9, 1), color(1, 1, 1)));    
+    const auto img = render(c, world);
+    save_to_file(img, "output/chapter11_bookscene.ppm"sv);
+}
+
 TEST(DISABLED_Chapter12, CanRenderCubes) {    
     const auto c = Camera(600, 400, math::PI / 3.0f, 
         view_transform(point(0.0f, 5.0f, -10.0f), point(0, 1, 0), vector(0, 1, 0)));
@@ -334,7 +378,7 @@ TEST(DISABLED_Chapter12, CanRenderCubes) {
     save_to_file(img, "output/chapter12_1.ppm"sv);
 }
 
-TEST(Chapter13, CanRenderCylinders) {    
+TEST(DISABLED_Chapter13, CanRenderCylinders) {    
     const auto mighty_slate = BLACK;// color(85, 98, 112);
     const auto pacifica = WHITE;// color(78, 206, 196);
     const auto c = Camera(600, 400, math::PI / 3.0f, 
