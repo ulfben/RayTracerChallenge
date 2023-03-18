@@ -7,6 +7,12 @@
 #include "../Intersection.h"
 DISABLE_WARNINGS_FROM_GTEST
 
+TEST(Cube, hasTransformAndInverseTransform) {
+    const auto c = cube();
+    EXPECT_EQ(c.transform(), Matrix4Identity);
+    EXPECT_EQ(c.inv_transform(), inverse(c.transform()));
+}
+
 TEST(Cube, rayIntersectsACube) {
     const std::vector<Ray> rays{
         {point(5, 0.5f, 0), vector(-1, 0, 0)}, /* +x */
@@ -26,11 +32,10 @@ TEST(Cube, rayIntersectsACube) {
         {4.0f, 6.0f},
         {-1.0f, 1.0f}
     };
-    const auto c = cube();
-    EXPECT_EQ(c.transform(), Matrix4Identity);
-    EXPECT_EQ(c.inv_transform(), inverse(c.transform()));
-    for (size_t i = 0; i < rays.size(); i++) {        
-        const auto xs = local_intersect(c, rays[i]); //TODO: the ray lifetime is messed up in release mode!
+    const auto c = cube();    
+    for (size_t i = 0; i < rays.size(); i++) {               
+        const auto r = rays[i]; //local copy necessary to avoid undefined behavior in release mode. For some reason.
+        const auto xs = local_intersect(c, r); 
         EXPECT_FLOAT_EQ(xs.first, expected[i].first);
         EXPECT_FLOAT_EQ(xs.second, expected[i].second);        
     }
@@ -38,7 +43,6 @@ TEST(Cube, rayIntersectsACube) {
 
 TEST(Cube, rayMissesACube) {
     const auto c = cube();
-
     const std::vector<Ray> rays{
         {point(-2, 0, 0), vector(0.2673f, 0.5345f, 0.8018f)},
         {point(0, -2, 0), vector(0.8018f, 0.2673f, 0.5345f)},
@@ -48,7 +52,8 @@ TEST(Cube, rayMissesACube) {
         {point(2, 2, 0), vector(-1, 0, 0)}
     };    
     for (size_t i = 0; i < rays.size(); i++) {        
-        const auto xs = local_intersect(c, rays[i]);
+        const auto r = rays[i]; //local copy necessary to avoid undefined behavior in release mode. For some reason.
+        const auto xs = local_intersect(c, r);
         EXPECT_FLOAT_EQ(xs.first, 0);
         EXPECT_FLOAT_EQ(xs.second, 0);
     }

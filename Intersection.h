@@ -87,31 +87,30 @@ constexpr auto intersections(std::initializer_list<Intersection> is) noexcept {
     return Intersections(is);
 }
 
-constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Cylinder& cylinder, const Ray& local_ray) noexcept {
+constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Cylinder& cylinder, Ray local_ray) noexcept {
     using math::square, math::sqrt;
     const auto a = square(local_ray.direction.x) + square(local_ray.direction.z);
-    if (math::float_cmp(a, 0.0f)) { 
+    if (a < math::BOOK_EPSILON) { //close to 0
         return { 0.0f, 0.0f }; //ray is ~parallel to the Y axis
     }
-    const auto b = 2 * local_ray.origin.x * local_ray.direction.x +
-                   2 * local_ray.origin.z * local_ray.direction.z;
-    const auto c = square(local_ray.origin.x) + square(local_ray.origin.z) - 1;
+    const auto b = 2.0f * local_ray.origin.x * local_ray.direction.x +
+                   2.0f * local_ray.origin.z * local_ray.direction.z;
+    const auto c = square(local_ray.origin.x) + square(local_ray.origin.z) - 1.0f;
     const auto discriminant = square(b) - 4.0f * a * c;
-    if (discriminant < 0) {
+    if (discriminant < 0.0f) {
         return { 0.0f, 0.0f }; //ray does not intersect with the cylinder
     }
-    const auto t1 = (-b - sqrt(discriminant)) / (2 * a);
-    const auto t2 = (-b + sqrt(discriminant)) / (2 * a);
+    const auto t1 = (-b - sqrt(discriminant)) / (2.0f * a);
+    const auto t2 = (-b + sqrt(discriminant)) / (2.0f * a);
     return {t1, t2};
 }
 
-constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Cube& cube, const Ray& local_ray) noexcept {
-    using std::max, std::min;
+constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Cube& cube, const Ray& local_ray) noexcept {    
     const auto [xtmin, xtmax] = check_axis(local_ray.origin.x, local_ray.direction.x);
     const auto [ytmin, ytmax] = check_axis(local_ray.origin.y, local_ray.direction.y);
     const auto [ztmin, ztmax] = check_axis(local_ray.origin.z, local_ray.direction.z);
-    const auto tmin = max({ xtmin, ytmin, ztmin });
-    const auto tmax = min({xtmax, ytmax, ztmax });
+    const auto tmin = math::max(xtmin, ytmin, ztmin);
+    const auto tmax = math::min(xtmax, ytmax, ztmax);
     if (tmin > tmax) return { 0.0f, 0.0f };
     return {tmin, tmax};
 }

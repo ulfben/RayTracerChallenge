@@ -3,6 +3,16 @@
 #include "Tuple.h"
 #include "Pattern.h"
 
+struct IoR { //index of refraction
+    constexpr static auto vacuum = 1.0f;
+    constexpr static auto air = 1.00029f;
+    constexpr static auto water = 1.333f;
+    constexpr static auto ice = 1.31f;
+    constexpr static auto plexiglass = 1.49f;
+    constexpr static auto glass = 1.52f;
+    constexpr static auto diamond = 2.417f;
+};
+
 struct Material final {
     Patterns pattern = null_pattern();
     Color color{ WHITE };
@@ -39,7 +49,7 @@ constexpr Material mirror() noexcept {
     m.reflective = 1.0f;
     return m;
 }
-constexpr Material glass(Real refractive = 1.52f) noexcept {
+constexpr Material glass(Real refractive = IoR::glass) noexcept {
     Material m = material();
     m.transparency = 1.0f;
     m.refractive_index = refractive;

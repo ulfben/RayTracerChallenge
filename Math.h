@@ -18,6 +18,17 @@ namespace math {
     constexpr auto INF = std::numeric_limits<Real>::infinity();
     constexpr auto NEG_INF = -std::numeric_limits<Real>::infinity();
 
+    template<class T>
+        requires std::is_arithmetic_v<T>
+    constexpr T max(T a, T b, T c) noexcept {
+        return (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);
+    }
+    template<class T>
+    requires std::is_arithmetic_v<T>
+    constexpr T min(T a, T b, T c) noexcept {
+       return (a < b) ? ((a < c) ? a : c) : ((b < c) ? b : c);
+    }
+
     constexpr Real lerp(Real start, Real end, Real t) {
        return (1.0f - t) * start + t * end;
     }
