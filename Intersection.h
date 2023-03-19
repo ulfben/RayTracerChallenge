@@ -93,38 +93,6 @@ constexpr auto intersections(std::initializer_list<Intersection> is) noexcept {
     return Intersections(is);
 };
 
-constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Cylinder& cylinder, Ray local_ray) noexcept {
-    using math::square, math::sqrt, math::is_between;
-    const auto a = square(local_ray.direction.x) + square(local_ray.direction.z);
-    if (a < math::BOOK_EPSILON) { //close to 0
-        return { 0.0f, 0.0f }; //ray is ~parallel to the Y axis so we can't collide.
-    }
-    const auto b = 2.0f * local_ray.origin.x * local_ray.direction.x +
-        2.0f * local_ray.origin.z * local_ray.direction.z;
-    const auto c = square(local_ray.origin.x) + square(local_ray.origin.z) - 1.0f;
-    const auto discriminant = square(b) - 4.0f * a * c;
-    if (discriminant < 0.0f) {
-        return { 0.0f, 0.0f }; //ray does not intersect with the cylinder
-    }
-    auto t1 = (-b - sqrt(discriminant)) / (2.0f * a);
-    auto t2 = (-b + sqrt(discriminant)) / (2.0f * a);
-    //if (t1 > t2) {
-    //    std::swap(t1, t2);
-    //}
-    std::pair result = { t1, t2 };
-    if (is_bounded(cylinder)) { //let's compute the height of each intersection
-        const auto y1 = local_ray.origin.y + t1 * local_ray.direction.y;
-        if (!is_between(y1, cylinder.minimum, cylinder.maximum)) {
-            result.first = 0.0f; //the first intersection happened above or below the cylinder limits.
-        }
-        const auto y2 = local_ray.origin.y + t2 * local_ray.direction.y;
-        if (!is_between(y2, cylinder.minimum, cylinder.maximum)) {
-            result.second = 0.0f; //the second intersection happened above or below the cylinder limits.
-        }
-    }
-    return result;
-};
-
 constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Cube& cube, const Ray& local_ray) noexcept {
     const auto [xtmin, xtmax] = check_axis(local_ray.origin.x, local_ray.direction.x);
     const auto [ytmin, ytmax] = check_axis(local_ray.origin.y, local_ray.direction.y);
