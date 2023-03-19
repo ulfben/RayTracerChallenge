@@ -63,15 +63,17 @@ constexpr Cylinder cylinder(Real min, Real max, Material m, Matrix4 transform) n
 }
 
 constexpr Vector local_normal_at([[maybe_unused]]const Cylinder& c, const Point& p) noexcept {
-    using std::max, math::abs;
-    const auto dist = (p.x * p.x + p.z * p.z); //the square of the distance from the y-axis
-    if (dist < 1.0f && p.y >= c.maximum-math::BOOK_EPSILON) {
-        return vector(0, 1, 0);
+    using std::max, math::abs, math::square;
+    const auto dist = square(p.x) + square(p.z); //the square of the distance from the y-axis
+    if (dist < 1.0f) {
+        if (p.y >= c.maximum - math::BOOK_EPSILON) {
+            return vector(0, 1, 0);
+        }
+        if (p.y >= c.minimum + math::BOOK_EPSILON) {
+            return vector(0, -1, 0);
+        }
     }
-    if (dist < 1.0f && p.y >= c.minimum + math::BOOK_EPSILON) {
-        return vector(0, -1, 0);
-    }
-    return vector(p.x, 0, p.z);
+    return normalize(vector(p.x, 0, p.z));
 }
 
 constexpr bool is_bounded(const Cylinder& c) noexcept {
