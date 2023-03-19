@@ -3,7 +3,6 @@
 #include "Ray.h"
 #include "Shapes.h"
 #include "Intersection.h"
-
 struct HitState final {
     const Shapes* objectPtr = nullptr; //the object variant we hit    
     Point point{}; //the point in world-space where the intersection occurs

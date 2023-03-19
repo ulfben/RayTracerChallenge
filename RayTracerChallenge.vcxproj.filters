@@ -83,6 +83,7 @@
       <Filter>tests</Filter>
     </ClInclude>
     <ClInclude Include="Cylinder.h" />
+    <ClInclude Include="HitState.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
