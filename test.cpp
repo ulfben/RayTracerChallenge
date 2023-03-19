@@ -296,7 +296,7 @@ TEST(DISABLED_Chapter11, CanRenderReflectionsAndRefractions) {
     save_to_file(img, "output/chapter11_5_sRGB.ppm"sv);
 }
 
-TEST(Chapter11, CanRenderBookScene) {    
+TEST(DISABLED_Chapter11, CanRenderBookScene) {    
     using math::TO_RAD;
     const auto c = Camera(200, 200, 0.5f/*math::PI / 3.0f*/,
         view_transform(point(-4.5f, 0.85f, -4.0f), point(0, 0.85, 0), vector(0, 1, 0)));

@@ -16,6 +16,18 @@ private:
     Matrix4 _invTransform{ Matrix4Identity };
 };
 
+struct TestPattern final {
+    constexpr Color at([[maybe_unused]] const Point& p) const noexcept { return color(p.x, p.y, p.z); }
+    explicit constexpr operator bool() const noexcept { return false; }    
+    constexpr bool operator==(const TestPattern& that) const noexcept = default;
+    constexpr const Matrix4& transform() const noexcept { return _transform; }    
+    constexpr const Matrix4& inv_transform() const noexcept { return _invTransform; }
+    constexpr void setTransform([[maybe_unused]]Matrix4 mat) noexcept {}
+private: 
+    Matrix4 _transform{ Matrix4Identity };
+    Matrix4 _invTransform{ Matrix4Identity };
+};
+
 struct StripePattern final {
     constexpr StripePattern(Matrix4 mat, Color a_, Color b_) noexcept : a{ a_ }, b{b_} {
         setTransform(std::move(mat));
@@ -152,6 +164,9 @@ private:
 constexpr auto null_pattern() noexcept {
     return NullPattern{};
 };
+constexpr auto test_pattern() noexcept {
+    return TestPattern{};
+};
 
 constexpr auto stripe_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexcept {
     return StripePattern( std::move(m), a, b );
@@ -169,11 +184,12 @@ constexpr auto checkers_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) n
     return CheckersPattern( std::move(m), a, b );
 };
 
-using Patterns = std::variant<NullPattern, StripePattern, GradientPattern, RingPattern, CheckersPattern, RadialGradientPattern>; 
+using Patterns = std::variant<NullPattern, TestPattern, StripePattern, GradientPattern, RingPattern, CheckersPattern, RadialGradientPattern>; 
 template<typename T> 
-concept is_pattern = std::is_same_v<NullPattern, T> || std::is_same_v<StripePattern, T> || 
-                   std::is_same_v<GradientPattern, T> || std::is_same_v<RingPattern, T> ||
-                   std::is_same_v<CheckersPattern, T> || std::is_same_v<RadialGradientPattern, T>;
+concept is_pattern = std::is_same_v<NullPattern, T> ||  std::is_same_v<TestPattern, T> ||
+                    std::is_same_v<StripePattern, T> || std::is_same_v<GradientPattern, T> || 
+                    std::is_same_v<RingPattern, T> || std::is_same_v<CheckersPattern, T> || 
+                    std::is_same_v<RadialGradientPattern, T>;
 
 template<typename T>
 requires is_pattern<T>
