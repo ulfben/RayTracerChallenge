@@ -2,6 +2,7 @@
 #include "../pch.h"
 #include "../Tuple.h"
 #include "../Lights.h"
+#include "../Lighting.h"
 
 class Phong : public ::testing::Test {
  protected:

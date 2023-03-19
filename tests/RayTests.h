@@ -3,6 +3,7 @@
 #include "../Ray.h"
 #include "../Intersection.h"
 #include "../Shapes.h"
+#include "../HitState.h"
 
 DISABLE_WARNINGS_FROM_GTEST
 

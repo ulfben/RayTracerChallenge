@@ -1,8 +1,8 @@
 #pragma once
 #include "pch.h"
-#include "World.h"
 #include "Ray.h"
 #include "Shapes.h"
+#include "World.h"
 
 struct Intersection final {
     const Shapes* objPtr = nullptr;
@@ -79,19 +79,19 @@ struct Intersections final {
 
 constexpr auto intersection(Real t, const Shapes& obj) noexcept {
     return Intersection{ &obj, t };
-}
+};
 constexpr auto intersections() noexcept {
     return Intersections{};
-}
+};
 constexpr auto intersections(size_t capacity) noexcept {
     return Intersections(capacity);
-}
+};
 constexpr auto intersections(Intersection i1, Intersection i2) noexcept {
     return Intersections{ std::move(i1), std::move(i2) };
-}
+};
 constexpr auto intersections(std::initializer_list<Intersection> is) noexcept {
     return Intersections(is);
-}
+};
 
 constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Cylinder& cylinder, Ray local_ray) noexcept {
     using math::square, math::sqrt, math::is_between;
@@ -100,7 +100,7 @@ constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Cylinder&
         return { 0.0f, 0.0f }; //ray is ~parallel to the Y axis so we can't collide.
     }
     const auto b = 2.0f * local_ray.origin.x * local_ray.direction.x +
-                   2.0f * local_ray.origin.z * local_ray.direction.z;
+        2.0f * local_ray.origin.z * local_ray.direction.z;
     const auto c = square(local_ray.origin.x) + square(local_ray.origin.z) - 1.0f;
     const auto discriminant = square(b) - 4.0f * a * c;
     if (discriminant < 0.0f) {
@@ -120,10 +120,10 @@ constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Cylinder&
         const auto y2 = local_ray.origin.y + t2 * local_ray.direction.y;
         if (!is_between(y2, cylinder.minimum, cylinder.maximum)) {
             result.second = 0.0f; //the second intersection happened above or below the cylinder limits.
-        }        
+        }
     }
     return result;
-}
+};
 
 constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Cube& cube, const Ray& local_ray) noexcept {
     const auto [xtmin, xtmax] = check_axis(local_ray.origin.x, local_ray.direction.x);
@@ -133,7 +133,7 @@ constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Cube& cub
     const auto tmax = math::min(xtmax, ytmax, ztmax);
     if (tmin > tmax) return { 0.0f, 0.0f };
     return { tmin, tmax };
-}
+};
 
 constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Plane& p, const Ray& local_ray) {
     if (math::abs(local_ray.direction.y) < math::BOOK_EPSILON) {

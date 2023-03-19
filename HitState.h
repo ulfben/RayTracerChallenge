@@ -1,6 +1,8 @@
 #pragma once
 #include "pch.h"
+#include "Tuple.h"
 #include "Ray.h"
+#include "Material.h"
 #include "Shapes.h"
 #include "Intersection.h"
 
@@ -75,8 +77,8 @@ struct HitState final {
 
 constexpr HitState prepare_computations(const Intersection& i, const Ray& r) noexcept {
     return HitState(i, r);
-}
+};
 
 constexpr HitState prepare_computations(const Intersection& i, const Ray& r, const Intersections& xs)  noexcept {
     return HitState(i, r, xs);
-}
+};
