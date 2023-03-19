@@ -133,4 +133,3 @@ constexpr auto closest(const Intersections& xs) noexcept {
     }
     return *iter;
 };
-

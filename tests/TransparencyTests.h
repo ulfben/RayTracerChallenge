@@ -45,12 +45,11 @@ TEST(Transparency, theRefractedColorWithAnOpaqueSurface) {
 
 
 TEST(Transparency, theRefractedColorAtMaximumRecursiveDepth) {
-    auto w = World();
-    auto& shape = w[0];
-    surface(shape).transparency = 1.0f;
-    surface(shape).refractive_index = 1.5f;
+    auto w = World();    
+    get_material(w, 0).transparency = 1.0;    
+    get_material(w, 0).refractive_index = 1.5f;
     const auto r = ray(point(0, 0, -5), vector(0, 0, 1));
-    const auto xs = intersections(intersection(4.0f, shape), intersection(6.0f,shape));
+    const auto xs = intersections(intersection(4.0f, w[0]), intersection(6.0f,w[0]));
     const auto state = prepare_computations(xs[0], r, xs);
     const auto c = refracted_color(w, state, 0);
     EXPECT_EQ(c, BLACK); 
@@ -59,11 +58,10 @@ TEST(Transparency, theRefractedColorAtMaximumRecursiveDepth) {
 TEST(Transparency, theRefractedColorUnderTotalInternalReflection) {
     constexpr auto halfSqrt = math::sqrt(2.0f) / 2.0f;
     auto w = World();
-    auto& shape = w[0];
-    surface(shape).transparency = 1.0f;
-    surface(shape).refractive_index = 1.5f;
+    get_material(w, 0).transparency = 1.0;    
+    get_material(w, 0).refractive_index = 1.5f;
     const auto r = ray(point(0, 0,halfSqrt), vector(0, 1, 0));
-    const auto xs = intersections(intersection(-halfSqrt, shape), intersection(halfSqrt,shape));
+    const auto xs = intersections(intersection(-halfSqrt, w[0]), intersection(halfSqrt,w[0]));
     const auto state = prepare_computations(xs[1], r, xs);
     const auto c = refracted_color(w, state, 5);
     EXPECT_EQ(c, BLACK); 

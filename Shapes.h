@@ -5,9 +5,14 @@
 #include "Plane.h"
 #include "Cube.h"
 #include "Cylinder.h"
+
+#include "Matrix.h"
+#include "Color.h"
+#include "Material.h"
+
 using Shapes = std::variant<Sphere, Plane, Cube, Cylinder>;
 template<typename T> 
-concept shapes = std::is_same_v<Sphere, T> || std::is_same_v<Plane, T> || std::is_same_v<Cube, T> || std::is_same_v<Cylinder, T>;
+concept is_shape = std::is_same_v<Sphere, T> || std::is_same_v<Plane, T> || std::is_same_v<Cube, T> || std::is_same_v<Cylinder, T>;
 
 constexpr Vector normal_at(const Shapes& variant, const Point& p) { 
     return std::visit([&p](const auto& obj){         
@@ -18,17 +23,16 @@ constexpr Vector normal_at(const Shapes& variant, const Point& p) {
         return normalize(world_space_normal);               
     }, variant);    
 }
-constexpr bool operator==(const Plane& a, const Shapes& v) noexcept {
-    const Plane* b = std::get_if<Plane>(&v);
-    return b && *b == a; //true if v contains a T that compares equal to t
+template<typename T>
+requires is_shape<T>
+constexpr bool operator==(const T& t, const Shapes& v) {
+    const T* c = std::get_if<T>(&v);
+    return c && *c == t; // true if v contains a pattern that compares equal to v
 }
-constexpr bool operator==(const Sphere& a, const Shapes& v) noexcept {
-    const Sphere* b = std::get_if<Sphere>(&v);
-    return b && *b == a; //true if v contains a T that compares equal to t
-}
-constexpr bool operator==(const Shapes& v, const Sphere& a) noexcept {
-    return a == v;     
-}
+
+constexpr bool operator==(const Patterns& v, const is_shape auto& t) {
+    return t == v;
+};
 
 constexpr const Matrix4& transform(const Shapes& variant) noexcept { 
     return std::visit([](const auto& obj) -> const Matrix4& { 
@@ -40,36 +44,30 @@ constexpr const Matrix4& invTransform(const Shapes& variant) noexcept {
         return obj.inv_transform();
     }, variant);    
 }
-constexpr Material& surface(Shapes& variant) noexcept { 
-    return std::visit([](auto& obj) -> Material& { 
-        return obj.surface;
-    }, variant);    
-}
 constexpr const Material& surface(const Shapes& variant) noexcept { 
     return std::visit([](const auto& obj) -> const Material& { 
         return obj.surface;
     }, variant);    
 }
-
 constexpr const Color& color(const Shapes& variant) noexcept { 
     return std::visit([](const auto& obj) -> const Color& { 
         return obj.surface.color;
     }, variant);    
 }
 
-constexpr const Material& color(const shapes auto& obj) noexcept {
+constexpr const Material& color(const is_shape auto& obj) noexcept {
     return obj.surface;
 }
 
-constexpr const Matrix4& transform(const shapes auto& obj) noexcept {
+constexpr const Matrix4& transform(const is_shape auto& obj) noexcept {
     return  obj.transform();
 }
 
-constexpr const Matrix4& invTransform(const shapes auto& obj) noexcept {
+constexpr const Matrix4& invTransform(const is_shape auto& obj) noexcept {
     return obj.inv_transform();
 }
 
-constexpr const Color& color(const shapes auto& obj) noexcept {
+constexpr const Color& color(const is_shape auto& obj) noexcept {
     return obj.surface.color;
 }
 

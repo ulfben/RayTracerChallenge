@@ -1,9 +1,8 @@
 #pragma once
-#pragma once
 #include "pch.h"
 #include "Tuple.h"
+#include "Color.h"
 #include "Matrix.h"
-#include "Shapes.h"
 
 struct NullPattern final {
     constexpr Color at([[maybe_unused]] const Point& p) const noexcept { return BLACK; }
@@ -172,18 +171,18 @@ constexpr auto checkers_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) n
 
 using Patterns = std::variant<NullPattern, StripePattern, GradientPattern, RingPattern, CheckersPattern, RadialGradientPattern>; 
 template<typename T> 
-concept patterns = std::is_same_v<NullPattern, T> || std::is_same_v<StripePattern, T> || 
+concept is_pattern = std::is_same_v<NullPattern, T> || std::is_same_v<StripePattern, T> || 
                    std::is_same_v<GradientPattern, T> || std::is_same_v<RingPattern, T> ||
                    std::is_same_v<CheckersPattern, T> || std::is_same_v<RadialGradientPattern, T>;
 
 template<typename T>
-requires patterns<T>
+requires is_pattern<T>
 inline bool operator==(const T& t, const Patterns& v) {
     const T* c = std::get_if<T>(&v);
     return c && *c == t; // true if v contains a pattern that compares equal to v
 }
 
-inline bool operator==(const Patterns& v, const patterns auto& t) {
+inline bool operator==(const Patterns& v, const is_pattern auto& t) {
     return t == v;
 };
 
@@ -203,7 +202,10 @@ Color pattern_at(const Patterns& variant, const Point& p) noexcept {
     return std::visit([&p](const auto& pattern) noexcept -> Color { return pattern.at(p); }, variant);
 };
 
-Color pattern_at(const Patterns& pattern, const /*must be Shapes, but if I name that type here the project won't compile*/ auto& obj, const Point& world_point) noexcept {
+//#include "Shapes.h"
+//template<typename T>
+//requires is_shape<T>
+Color pattern_at(const Patterns& pattern, const auto& obj, const Point& world_point) noexcept {
     assert(!std::holds_alternative<NullPattern>(pattern) && "pattern_at: called on NullPattern.");
     const auto object_point = invTransform(obj) * world_point;
     const auto pattern_point = invTransform(pattern) * object_point;        

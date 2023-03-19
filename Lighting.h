@@ -4,6 +4,7 @@
 #include "Color.h"
 #include "Lights.h"
 #include "Material.h"
+#include "Shapes.h"
 #include "Pattern.h"
 #include "HitState.h"
 
