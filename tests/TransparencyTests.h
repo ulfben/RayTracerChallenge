@@ -77,8 +77,8 @@ TEST(Transparency, theRefractedColorWithRefractedRay) {
     const auto xs = intersections({
             intersection(-0.9899f, w[0]),
             intersection(-0.4899f, w[1]),
-            intersection(-0.4899f, w[1]),
-            intersection(-0.9899f, w[0]),
+            intersection(0.4899f, w[1]),
+            intersection(0.9899f, w[0]),
         });
     const auto state = prepare_computations(xs[2], r, xs);
     const auto c = refracted_color(w, state, 5);

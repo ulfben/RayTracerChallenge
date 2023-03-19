@@ -105,7 +105,7 @@ constexpr Color color_at(const World& w, const Ray& r, int remaining = 4) noexce
 }
 
 constexpr Color reflected_color(const World& w, const HitState& state, int remaining) noexcept {
-    if (remaining <= 0 || state.reflective() == 0) {
+    if (remaining < 1 || state.reflective() == 0) {
         return BLACK;
     }
     const auto reflect_ray = ray(state.over_point, state.reflectv);
@@ -114,7 +114,7 @@ constexpr Color reflected_color(const World& w, const HitState& state, int remai
 }
 
 constexpr Color refracted_color(const World& w, const HitState& state, int remaining) noexcept {
-    if (remaining <= 0 || state.transparency() == 0) {
+    if (remaining < 1 || state.transparency() == 0) {
         return BLACK;
     }
     const auto n_ratio = state.n1 / state.n2;

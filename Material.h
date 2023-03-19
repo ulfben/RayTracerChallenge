@@ -22,7 +22,7 @@ struct Material final {
     Real shininess = 200.0f;
     Real reflective = 0.0f;
     Real transparency = 0.0f;
-    Real refractive_index = 0.0f;
+    Real refractive_index = IoR::vacuum;
     
     constexpr Material() noexcept = default;
     constexpr Material(Color color_, Real ambient_ = 0.1f, Real diffuse_ = 0.9f, Real specular_ = 0.9f) noexcept : 

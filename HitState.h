@@ -52,7 +52,7 @@ struct HitState final {
                 n2 = containers.empty() ? 1.0f : ::surface(*containers.back()).refractive_index;
                 break; //terminate the loop
             }
-        }
+        }        
     }
 
     constexpr Real reflective() const noexcept {
