@@ -18,7 +18,7 @@ private:
 
 struct TestPattern final {
     constexpr Color at([[maybe_unused]] const Point& p) const noexcept { return color(p.x, p.y, p.z); }
-    explicit constexpr operator bool() const noexcept { return false; }    
+    explicit constexpr operator bool() const noexcept { return true; }    
     constexpr bool operator==(const TestPattern& that) const noexcept = default;
     constexpr const Matrix4& transform() const noexcept { return _transform; }    
     constexpr const Matrix4& inv_transform() const noexcept { return _invTransform; }

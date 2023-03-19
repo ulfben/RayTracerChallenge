@@ -378,7 +378,7 @@ TEST(DISABLED_Chapter12, CanRenderCubes) {
     save_to_file(img, "output/chapter12_1.ppm"sv);
 }
 
-TEST(Chapter13, CanRenderCylinders) {    
+TEST(DISABLED_Chapter13, CanRenderCylinders) {    
     const auto mighty_slate = BLACK;// color(85, 98, 112);
     const auto pacifica = WHITE;// color(78, 206, 196);
     const auto c = Camera(600, 400, math::PI / 3.0f, 
