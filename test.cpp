@@ -254,7 +254,7 @@ TEST(DISABLED_Chapter10, CanRenderPatterns) {
     save_to_file(img, "output/chapter10_5_sRGB.ppm"sv);
 }
 
-TEST(DISABLED_Chapter11, CanRenderReflectionsAndRefractions) {    
+TEST(Chapter11, CanRenderReflectionsAndRefractions) {    
     const auto c = Camera(600, 400, math::PI / 3.0f,
         view_transform(point(1.0f, 3.4f, -2.5f), point(0, 1, 0), vector(0, 1, 0)));
 

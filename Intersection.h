@@ -230,6 +230,7 @@ struct HitState final {
 
     constexpr HitState(const Intersection& closest, const Ray& r, const Intersections& xs) : HitState(closest, r) {
         std::vector<const Shapes*> containers;
+        containers.reserve(2);
         for (const auto& i : xs) {
             const auto is_the_hit = i == closest;
             if (is_the_hit) {
@@ -248,6 +249,13 @@ struct HitState final {
                 break; //terminate the loop
             }
         }
+    }
+
+    constexpr Real reflective() const noexcept {
+        return surface().reflective; //TODO: consider caching material properties in the hitstate object.
+    }
+    constexpr Real transparency() const noexcept {
+        return surface().transparency;
     }
 
     explicit constexpr operator bool() const noexcept {
@@ -309,7 +317,7 @@ constexpr Color shade_hit(const World& w, const HitState& hit, int remaining = 4
     const auto surface_c = lighting(hit.surface(), hit.object(), w.light, hit.over_point, hit.eye_v, hit.normal, shadowed);
     const auto reflected_c = reflected_color(w, hit, remaining);
     const auto refracted_c = refracted_color(w, hit, remaining);
-    if (const auto& mat = hit.surface(); mat.reflective > 0 && mat.transparency > 0) {
+    if (hit.reflective() > 0 && hit.transparency() > 0) {
         const auto reflectance = schlick(hit);
         return surface_c + (reflected_c * reflectance) + (refracted_c * (1.0f - reflectance));
     }
@@ -330,26 +338,26 @@ constexpr Color color_at(const World& w, const Ray& r, int remaining = 4) noexce
 }
 
 constexpr Color reflected_color(const World& w, const HitState& state, int remaining) noexcept {
-    if (remaining <= 0 || state.surface().reflective == 0) {
+    if (remaining <= 0 || state.reflective() == 0) {
         return BLACK;
     }
     const auto reflect_ray = ray(state.over_point, state.reflectv);
     const auto c = color_at(w, reflect_ray, remaining - 1);
-    return c * state.surface().reflective;
+    return c * state.reflective();
 }
 
 constexpr Color refracted_color(const World& w, const HitState& state, int remaining) noexcept {
-    if (remaining <= 0 || state.surface().transparency == 0) {
+    if (remaining <= 0 || state.transparency() == 0) {
         return BLACK;
     }
     const auto n_ratio = state.n1 / state.n2;
     const auto cos_i = dot(state.eye_v, state.normal);
-    const auto sin2_t = (n_ratio * n_ratio) * (1 - (cos_i * cos_i));
+    const auto sin2_t = math::square(n_ratio) * (1 - math::square(cos_i));
     if (sin2_t > 1.0f) {
         return BLACK; //total internal reflection
     }
     const auto cos_t = math::sqrt(1.0f - sin2_t);
-    const auto direction = state.normal * ((n_ratio * cos_i) - cos_t) - state.eye_v * n_ratio;
+    const auto direction = state.normal * (n_ratio * cos_i - cos_t) - state.eye_v * n_ratio;
     const auto refract_ray = ray(state.under_point, direction);
-    return color_at(w, refract_ray, remaining - 1) * state.surface().transparency;
+    return color_at(w, refract_ray, remaining - 1) * state.transparency();
 }
