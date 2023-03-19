@@ -3,6 +3,8 @@
 #include "Math.h"
 #include "Matrix.h"
 #include "Ray.h"
+#include "Lights.h"
+#include "Lighting.h"
 #include "World.h"
 #include "Canvas.h"
 #include "WorkQue.h"

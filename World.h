@@ -1,7 +1,9 @@
 #pragma once
 #include "pch.h"
+#include "Matrix.h"
 #include "Lights.h"
 #include "Shapes.h"
+#include "Material.h"
 
 struct World final {
     static constexpr auto DEFAULT_MATERIAL = material(color(0.8f, 1.0f, 0.6f), 0.1f, 0.7f, 0.2f);   
@@ -77,7 +79,6 @@ constexpr Material& get_material(World& w, size_t i) noexcept{
 constexpr const Material& get_material(const World& w, size_t i) noexcept{   
     return std::visit([](const auto& obj) noexcept -> const Material& {return obj.surface;  }, w[i]);
 }
-
 
 constexpr const Matrix4& get_transform(const World& w, size_t i) noexcept{   
     return std::visit([](const auto& obj) noexcept -> const Matrix4& {return obj.transform();  }, w[i]);

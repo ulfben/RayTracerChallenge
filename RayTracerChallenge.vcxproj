@@ -72,6 +72,7 @@
     <ClInclude Include="Cylinder.h" />
     <ClInclude Include="HitState.h" />
     <ClInclude Include="Intersection.h" />
+    <ClInclude Include="Lighting.h" />
     <ClInclude Include="Lights.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Math.h" />
