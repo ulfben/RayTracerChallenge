@@ -93,31 +93,6 @@ constexpr auto intersections(std::initializer_list<Intersection> is) noexcept {
     return Intersections(is);
 };
 
-constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Plane& p, const Ray& local_ray) {
-    if (math::abs(local_ray.direction.y) < math::BOOK_EPSILON) {
-        return { 0.0f, 0.0f };
-    }
-    const auto t1 = -local_ray.origin.y / local_ray.direction.y;
-    return { t1, t1 };
-};
-
-//https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
-constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Sphere& s, const Ray& local_ray) {
-    constexpr Real SPHERE_RADIUS = 1.0f; //assuming unit spheres for now    
-    const Vector sphere_to_ray = local_ray.origin;/* -s.position; sphere is always located at 0,0,0*/
-    const auto a = dot(local_ray.direction, local_ray.direction);
-    const auto b = 2 * dot(local_ray.direction, sphere_to_ray);
-    const auto col = dot(sphere_to_ray, sphere_to_ray) - SPHERE_RADIUS;
-    const auto discriminant = (b * b) - (4.0f * a * col);
-    if (discriminant < 0) {
-        return { 0.0f, 0.0f };
-    }
-    const auto sqrtOfDiscriminant = math::sqrt(discriminant);
-    const auto t1 = (-b - sqrtOfDiscriminant) / (2 * a);
-    const auto t2 = (-b + sqrtOfDiscriminant) / (2 * a);
-    return { t1, t2 };
-};
-
 constexpr auto intersect(const Shapes& variant, const Ray& r) {
     const auto [t1, t2] = std::visit([&r](const auto& obj) {
         const auto local_ray = transform(r, obj.inv_transform());

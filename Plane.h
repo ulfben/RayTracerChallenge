@@ -56,3 +56,11 @@ constexpr Plane plane(Material surface, Matrix4 transform) noexcept {
 constexpr Vector local_normal_at([[maybe_unused]]const Plane& s, [[maybe_unused]] const Point& local_point) noexcept {     
     return vector(0.0f, 1.0f, 0.0f);
 }
+
+constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Plane& p, const Ray& local_ray) {
+    if (math::abs(local_ray.direction.y) < math::BOOK_EPSILON) {
+        return { 0.0f, 0.0f };
+    }
+    const auto t1 = -local_ray.origin.y / local_ray.direction.y;
+    return { t1, t1 };
+};
