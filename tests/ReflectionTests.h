@@ -11,7 +11,6 @@ TEST(Reflection, materialHasDefaultReflectivity) {
    const auto m = material();
   EXPECT_FLOAT_EQ(m.reflective, .0f);  
 }
-
 TEST(Reflection, isComputedByHitState) {
     constexpr auto halfSqrt = math::sqrt(2.0f) / 2.0f;
     const Shapes p = plane();

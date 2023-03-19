@@ -66,12 +66,13 @@ TEST(Transparency, theRefractedColorUnderTotalInternalReflection) {
     EXPECT_EQ(c, BLACK);
 }
 
+//page 158
 TEST(Transparency, theRefractedColorWithRefractedRay) {
     auto w = World();
-    get_material(w, 0).ambient = 1.0;
+    get_material(w, 0).ambient = 1.0f;
     get_material(w, 0).pattern = test_pattern();
-    get_material(w, 1).transparency = 1.0;
-    get_material(w, 1).refractive_index = 1.5;
+    get_material(w, 1).transparency = 1.0f;
+    get_material(w, 1).refractive_index = 1.5f;
     const auto r = ray(point(0, 0, 0.1f), vector(0, 1, 0));
     const auto xs = intersections({
             intersection(-0.9899f, w[0]),

@@ -22,7 +22,10 @@ struct TestPattern final {
     constexpr bool operator==(const TestPattern& that) const noexcept = default;
     constexpr const Matrix4& transform() const noexcept { return _transform; }    
     constexpr const Matrix4& inv_transform() const noexcept { return _invTransform; }
-    constexpr void setTransform([[maybe_unused]]Matrix4 mat) noexcept {}
+    constexpr void setTransform(Matrix4 mat) noexcept {
+        _transform = std::move(mat);
+        _invTransform = inverse(_transform);
+    }
 private: 
     Matrix4 _transform{ Matrix4Identity };
     Matrix4 _invTransform{ Matrix4Identity };
@@ -165,7 +168,7 @@ constexpr auto null_pattern() noexcept {
     return NullPattern{};
 };
 constexpr auto test_pattern() noexcept {
-    return TestPattern{};
+    return TestPattern();
 };
 
 constexpr auto stripe_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexcept {
@@ -186,7 +189,7 @@ constexpr auto checkers_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) n
 
 using Patterns = std::variant<NullPattern, TestPattern, StripePattern, GradientPattern, RingPattern, CheckersPattern, RadialGradientPattern>; 
 template<typename T> 
-concept is_pattern = std::is_same_v<NullPattern, T> ||  std::is_same_v<TestPattern, T> ||
+concept is_pattern = std::is_same_v<NullPattern, T> || std::is_same_v<TestPattern, T> || 
                     std::is_same_v<StripePattern, T> || std::is_same_v<GradientPattern, T> || 
                     std::is_same_v<RingPattern, T> || std::is_same_v<CheckersPattern, T> || 
                     std::is_same_v<RadialGradientPattern, T>;

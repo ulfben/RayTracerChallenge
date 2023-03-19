@@ -12,6 +12,7 @@ TEST(Pattern, testPatternWithAnObjectTransform) {
     EXPECT_EQ(c, color(1, 1.5f, 2));    
 }
 
+//page 134
 TEST(Pattern, testPatternWithAPatternTransform) {
     const auto shape = sphere();    
     auto p = test_pattern();
@@ -24,7 +25,7 @@ TEST(Pattern, testPatternWithBothObjectAndAPatternTransform) {
     auto shape = sphere();
     shape.setTransform(scaling(2, 2, 2));  
     auto p = test_pattern();
-    p.setTransform(scaling(0.5f, 1, 1.5f));
+    p.setTransform(translation(0.5f, 1, 1.5f));
     const auto c = pattern_at(p, shape, point(2.5f, 3, 3.5f));
     EXPECT_EQ(c, color(0.75f, 0.5f, 0.25f));    
 }
