@@ -47,12 +47,12 @@ TEST(Plane, intersectWithRayFromAbove) {
     const auto r = ray(point(0, 1, 0), vector(0,-1, 0));
     const auto xs = local_intersect(p, r);    
     EXPECT_EQ(xs.first, 1.0f);
-    EXPECT_EQ(xs.second, 1.0f);
-
-    //TODO: rethink this interface. 
+    EXPECT_EQ(xs.second, 0.0f);
+         
     const auto xs2 = intersect(p, r);
-    EXPECT_FALSE(xs2.empty());    
-    EXPECT_EQ(xs2.begin()->object(), p);
+    EXPECT_FALSE(xs2.empty()); 
+    EXPECT_EQ(xs2.size(), 1);       
+    EXPECT_EQ(xs2.object_at(0), p);
 }
 
 TEST(Plane, intersectWithRayFromBelow) {
@@ -60,12 +60,12 @@ TEST(Plane, intersectWithRayFromBelow) {
     const auto r = ray(point(0, -1, 0), vector(0,1, 0));
     const auto xs = local_intersect(p, r);    
     EXPECT_EQ(xs.first, 1.0f);
-    EXPECT_EQ(xs.second, 1.0f);
+    EXPECT_EQ(xs.second, 0.0f);
  
-    //TODO: rethink this interface. 
     const auto xs2 = intersect(p, r);
-    EXPECT_FALSE(xs2.empty());    
-    EXPECT_EQ(xs2.begin()->object(), p);
+    EXPECT_FALSE(xs2.empty()); 
+    EXPECT_EQ(xs2.size(), 1);       
+    EXPECT_EQ(xs2.object_at(0), p);
 }
 
 RESTORE_WARNINGS

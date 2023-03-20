@@ -62,5 +62,5 @@ constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Plane& p,
         return { 0.0f, 0.0f };
     }
     const auto t1 = -local_ray.origin.y / local_ray.direction.y;
-    return { t1, t1 };
+    return { t1, 0.0f };
 };

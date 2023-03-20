@@ -63,7 +63,10 @@ struct Intersections final {
     constexpr void push_back(Intersections val) {
         xs.append_range(val);
     }
-
+    constexpr const Shapes& object_at(size_type i) const {
+        assert(i < size() && "Intersection::operator[i] index is out of bounds");
+        return xs[i].object();        
+    }
     constexpr void sort() noexcept { std::ranges::sort(xs, std::less<value_type>{}); }
     constexpr pointer data() noexcept { return xs.data(); }
     constexpr const_pointer data() const noexcept { return xs.data(); }

@@ -517,7 +517,7 @@ constexpr Matrix4 scaling(Real xyz) noexcept {
 }
 
 /*constexpr*/ Matrix4 rotation(Real radians_x, Real radians_y, Real radians_z) noexcept {    
-    //= return rotation_x(radians_x) * rotation_y(radians_y) * rotation_z(radians_z);   
+    //return rotation_x(radians_x) * rotation_y(radians_y) * rotation_z(radians_z);   
     const auto cos_x = std::cos(radians_x);
     const auto sin_x = -std::sin(radians_x);
     const auto cos_y = std::cos(radians_y);

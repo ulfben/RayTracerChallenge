@@ -298,8 +298,8 @@ TEST(DISABLED_Chapter11, CanRenderReflectionsAndRefractions) {
 
 TEST(Chapter11, CanRenderBookScene) {    
     using math::TO_RAD;
-    const auto c = Camera(200, 200, 90*TO_RAD/*math::PI / 3.0f*/,
-        view_transform(point(-4.5f, 0.85f, -4.0f), point(0, 0.85, 0), vector(0, 1, 0)));
+    const auto c = Camera(400, 400, 90*TO_RAD/*0.5f*/,
+        view_transform(point(-4.5f, 0.85f, -4.0f), point(0, 0.85f, 0), vector(0, 1, 0)));
       
     auto wallpaper = material(checkers_pattern(BLACK, color(0.75f), scaling(0.5f)));
     wallpaper.specular = 0;
@@ -335,7 +335,7 @@ TEST(Chapter11, CanRenderBookScene) {
     background_sphere.surface.specular = 0;
 
     const auto world = World({ floor, background_sphere, ceiling, west_wall, east_wall, north_wall, south_wall }, 
-                                point_light(point(-4.9, 4.9, 1), color(1, 1, 1)));    
+                                point_light(point(-4.9f, 4.9f, 1), color(1, 1, 1)));    
     const auto img = render(c, world);
     save_to_file(img, "output/chapter11_bookscene.ppm"sv);
 }
