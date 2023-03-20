@@ -57,10 +57,10 @@ constexpr Vector local_normal_at([[maybe_unused]]const Plane& s, [[maybe_unused]
     return vector(0.0f, 1.0f, 0.0f);
 }
 
-constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Plane& p, const Ray& local_ray) {
+constexpr auto local_intersect([[maybe_unused]] const Plane& p, const Ray& local_ray) {
     if (math::abs(local_ray.direction.y) < math::BOOK_EPSILON) {
         return MISS;
     }
     const auto t1 = -local_ray.origin.y / local_ray.direction.y;
-    return { t1, T_MISS };
+    return std::vector{ t1 };
 };

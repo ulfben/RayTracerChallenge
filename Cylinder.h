@@ -80,7 +80,7 @@ constexpr bool is_bounded(const Cylinder& c) noexcept {
     return !(c.maximum == math::MAX && c.minimum == math::MIN);    
 }
 
-constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Cylinder& cylinder, Ray local_ray) noexcept {
+constexpr auto local_intersect([[maybe_unused]] const Cylinder& cylinder, Ray local_ray) noexcept {
     using math::square, math::sqrt, math::is_between;
     const auto a = square(local_ray.direction.x) + square(local_ray.direction.z);
     if (a < math::BOOK_EPSILON) { //close to 0
@@ -98,16 +98,18 @@ constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Cylinder&
     //if (t1 > t2) {
     //    std::swap(t1, t2);
     //}
-    std::pair result = { t1, t2 };
-    if (is_bounded(cylinder)) { //let's compute the height of each intersection
-        const auto y1 = local_ray.origin.y + t1 * local_ray.direction.y;
-        if (!is_between(y1, cylinder.minimum, cylinder.maximum)) {
-            result.first = T_MISS; //the first intersection happened above or below the cylinder limits.
-        }
-        const auto y2 = local_ray.origin.y + t2 * local_ray.direction.y;
-        if (!is_between(y2, cylinder.minimum, cylinder.maximum)) {
-            result.second = T_MISS; //the second intersection happened above or below the cylinder limits.
-        }
+    if (!is_bounded(cylinder)) {
+        return std::vector{ t1, t2 };
     }
+    std::vector<Real> result;
+     //let's compute the height of each intersection
+    const auto y1 = local_ray.origin.y + t1 * local_ray.direction.y;
+    if (is_between(y1, cylinder.minimum, cylinder.maximum)) {
+        result.push_back(t1); 
+    }
+    const auto y2 = local_ray.origin.y + t2 * local_ray.direction.y;
+    if (is_between(y2, cylinder.minimum, cylinder.maximum)) {
+        result.push_back(t2); 
+    }    
     return result;
 };

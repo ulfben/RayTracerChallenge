@@ -11,32 +11,32 @@ TEST(Cylinder, rayIntersectsACylinder) {
     const auto c = cylinder();    
     auto r = ray(point(1, 0, -5), vector(0, 0, 1)); //hit cylinder at a tangent 
     auto xs = local_intersect(c,  r);
-    EXPECT_FLOAT_EQ(xs.first, 5.0f);
-    EXPECT_FLOAT_EQ(xs.second, 5.0f);
+    EXPECT_FLOAT_EQ(xs[0], 5.0f);
+    EXPECT_FLOAT_EQ(xs[1], 5.0f);
 
     r = ray(point(0, 0, -5), vector(0, 0, 1)); //hit cylinder perpendicular, through the middle.
     xs = local_intersect(c,  r);
-    EXPECT_FLOAT_EQ(xs.first, 4.0f);
-    EXPECT_FLOAT_EQ(xs.second, 6.0f);
+    EXPECT_FLOAT_EQ(xs[0], 4.0f);
+    EXPECT_FLOAT_EQ(xs[1], 6.0f);
  
     r = ray(point(0.5f, 0, -5), normalize(vector(0.1f, 1, 1))); //hit the cylinder at an angle
     xs = local_intersect(c,  r); 
 
     //using the book comparison, epsilon and expected:
-    EXPECT_TRUE(math::almost_equal(xs.first, 6.80798f, math::BOOK_EPSILON));
-    EXPECT_TRUE(math::almost_equal(xs.second, 7.08872f, math::BOOK_EPSILON));
+    EXPECT_TRUE(math::almost_equal(xs[0], 6.80798f, math::BOOK_EPSILON));
+    EXPECT_TRUE(math::almost_equal(xs[1], 7.08872f, math::BOOK_EPSILON));
 
     //using the universal float comparison:
-    EXPECT_TRUE(math::float_cmp(xs.first, 6.80798f));
-    EXPECT_TRUE(math::float_cmp(xs.second, 7.08872f));
+    EXPECT_TRUE(math::float_cmp(xs[0], 6.80798f));
+    EXPECT_TRUE(math::float_cmp(xs[1], 7.08872f));
 
     ////succeeds only in debug mode:
-    //EXPECT_FLOAT_EQ(xs.first, 6.8080058f);
-    //EXPECT_FLOAT_EQ(xs.second, 7.0886984f);
+    //EXPECT_FLOAT_EQ(xs[0], 6.8080058f);
+    //EXPECT_FLOAT_EQ(xs[1], 7.0886984f);
 
     ////succeeds only in release mode:
-    //EXPECT_FLOAT_EQ(xs.first, 6.8079991);
-    //EXPECT_FLOAT_EQ(xs.second, 7.0887051);
+    //EXPECT_FLOAT_EQ(xs[0], 6.8079991);
+    //EXPECT_FLOAT_EQ(xs[1], 7.0887051);
 }
 
 TEST(Cylinder, rayMissesACylinder) {
@@ -48,9 +48,7 @@ TEST(Cylinder, rayMissesACylinder) {
     const auto c = cylinder();
     for (size_t i = 0; i < rays.size(); i++) {        
         const auto xs = local_intersect(c, rays[i]);
-        EXPECT_EQ(xs, MISS);
-        EXPECT_FLOAT_EQ(xs.first, T_MISS);
-        EXPECT_FLOAT_EQ(xs.second, T_MISS);
+        EXPECT_EQ(xs, MISS);       
     }
 }
 
@@ -94,7 +92,7 @@ TEST(Cylinder, intersectingATruncatedCylinder) {
         {point(0, 1, -5), normalize(vector(0, 0, 1))}, //edge case: the minimum extent is *excluded*
         {point(0, 1.5f, -2), normalize(vector(0, 0, 1))} //perpendicular to the cylinder, at the middle of it. 
     }; 
-    const std::vector<std::pair<Real, Real>> points{
+    const std::vector<std::vector<Real>> points{
         MISS,
         MISS,
         MISS,
@@ -104,9 +102,8 @@ TEST(Cylinder, intersectingATruncatedCylinder) {
     };
     
     for (size_t i = 0; i < rays.size(); i++) {        
-        const auto xs = local_intersect(c, rays[i]);
-        EXPECT_FLOAT_EQ(xs.first, points[i].first);
-        EXPECT_FLOAT_EQ(xs.second, points[i].second);
+        const auto xs = local_intersect(c, rays[i]);        
+        EXPECT_EQ(xs, points[i]);        
     }         
 }
 

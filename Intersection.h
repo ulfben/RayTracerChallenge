@@ -6,7 +6,7 @@
 
 struct Intersection final {
     const Shapes* objPtr = nullptr;
-    Real t{ T_MISS };
+    Real t{ 0.0f };
 
     explicit constexpr operator bool() const {
         return objPtr != nullptr;
@@ -95,20 +95,27 @@ constexpr auto intersections(Intersection i1, Intersection i2) noexcept {
 constexpr auto intersections(std::initializer_list<Intersection> is) noexcept {
     return Intersections(is);
 };
+constexpr auto intersections(std::span<Real> ts, const Shapes& shape) noexcept {
+    auto xs = intersections(ts.size());
+    for (auto t : ts) {
+        xs.push_back(intersection(t, shape));
+    }
+    return xs;
+};
 
 constexpr auto intersect(const Shapes& variant, const Ray& r) {
-    const auto [t1, t2] = std::visit([&r](const auto& obj) {
+    std::vector<Real> ts = std::visit([&r](const auto& obj) {
         const auto local_ray = transform(r, obj.inv_transform());
         return local_intersect(obj, local_ray);  }, variant
     );
-    auto xs = intersections(2);
-    if (t1 != T_MISS) {
+    return intersections(ts, variant);
+    /*if (t1 != T_MISS) {
         xs.push_back(intersection(t1, variant));
     }
     if (t2 != T_MISS) {
         xs.push_back(intersection(t2, variant));
     }
-    return xs;
+    return xs;*/
 };
 
 constexpr auto intersect(const World& world, const Ray& r) {

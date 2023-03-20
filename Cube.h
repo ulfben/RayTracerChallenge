@@ -76,12 +76,12 @@ constexpr std::pair<Real, Real> check_axis(Real origin, Real direction, Real min
     return (tmin > tmax) ?  std::pair{ tmax, tmin } : std::pair{ tmin, tmax };
 }
 
-constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Cube& cube, const Ray& local_ray) noexcept {
+constexpr auto local_intersect([[maybe_unused]] const Cube& cube, const Ray& local_ray) noexcept {
     const auto [xtmin, xtmax] = check_axis(local_ray.origin.x, local_ray.direction.x);
     const auto [ytmin, ytmax] = check_axis(local_ray.origin.y, local_ray.direction.y);
     const auto [ztmin, ztmax] = check_axis(local_ray.origin.z, local_ray.direction.z);
     const auto tmin = math::max(xtmin, ytmin, ztmin);
     const auto tmax = math::min(xtmax, ytmax, ztmax);
     if (tmin > tmax) return MISS;
-    return { tmin, tmax };
+    return  std::vector{ tmin, tmax };
 };

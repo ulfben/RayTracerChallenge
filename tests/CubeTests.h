@@ -35,8 +35,8 @@ TEST(Cube, rayIntersectsACube) {
     const auto c = cube();    
     for (size_t i = 0; i < rays.size(); i++) {                     
         const auto xs = local_intersect(c, rays[i]); 
-        EXPECT_FLOAT_EQ(xs.first, expected[i].first);
-        EXPECT_FLOAT_EQ(xs.second, expected[i].second);        
+        EXPECT_FLOAT_EQ(xs[0], expected[i].first);
+        EXPECT_FLOAT_EQ(xs[1], expected[i].second);        
     }
 }
 
@@ -52,9 +52,7 @@ TEST(Cube, rayMissesACube) {
     };    
     for (size_t i = 0; i < rays.size(); i++) {                
         const auto xs = local_intersect(c, rays[i]);
-        EXPECT_EQ(xs, MISS);
-        EXPECT_FLOAT_EQ(xs.first, T_MISS);
-        EXPECT_FLOAT_EQ(xs.second, T_MISS);
+        EXPECT_EQ(xs, MISS);       
     }
 }
 

@@ -64,7 +64,7 @@ constexpr Vector local_normal_at([[maybe_unused]]const Sphere& s, const Point& o
 }
 
 //https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
-constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Sphere& s, const Ray& local_ray) {
+constexpr auto local_intersect([[maybe_unused]] const Sphere& s, const Ray& local_ray) {
     using math::square, math::sqrt;
     constexpr Real SPHERE_RADIUS = 1.0f; //assuming unit spheres for now    
     const Vector sphere_to_ray = local_ray.origin;/* -s.position; sphere is always located at 0,0,0*/
@@ -78,5 +78,5 @@ constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Sphere& s
     const auto sqrtOfDiscriminant = sqrt(discriminant);
     const auto t1 = (-b - sqrtOfDiscriminant) / (2 * a);
     const auto t2 = (-b + sqrtOfDiscriminant) / (2 * a);
-    return { t1, t2 };
+    return std::vector{ t1, t2 };
 };
