@@ -6,7 +6,7 @@
 
 struct Intersection final {
     const Shapes* objPtr = nullptr;
-    Real t{ 0 };
+    Real t{ T_MISS };
 
     explicit constexpr operator bool() const {
         return objPtr != nullptr;
@@ -102,10 +102,10 @@ constexpr auto intersect(const Shapes& variant, const Ray& r) {
         return local_intersect(obj, local_ray);  }, variant
     );
     auto xs = intersections(2);
-    if (t1 != 0.0f) {
+    if (t1 != T_MISS) {
         xs.push_back(intersection(t1, variant));
     }
-    if (t2 != 0.0f) {
+    if (t2 != T_MISS) {
         xs.push_back(intersection(t2, variant));
     }
     return xs;

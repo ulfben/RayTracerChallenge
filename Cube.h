@@ -82,6 +82,6 @@ constexpr std::pair<Real, Real> local_intersect([[maybe_unused]] const Cube& cub
     const auto [ztmin, ztmax] = check_axis(local_ray.origin.z, local_ray.direction.z);
     const auto tmin = math::max(xtmin, ytmin, ztmin);
     const auto tmax = math::min(xtmax, ytmax, ztmax);
-    if (tmin > tmax) return { 0.0f, 0.0f };
+    if (tmin > tmax) return MISS;
     return { tmin, tmax };
 };

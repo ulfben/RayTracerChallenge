@@ -31,6 +31,8 @@ struct Tuple;
 using Real = float;
 using Vector = Tuple;
 using Point = Tuple;
+static constexpr auto T_MISS = -1.0f; //magic value to denote an invalid t for intersections
+static constexpr auto MISS = std::pair<Real, Real>(T_MISS, T_MISS);
 static constexpr auto PPM_VERSION = "P3"sv;
 static constexpr uint16_t PPM_MAX_LINE_LENGTH = 70;
 static constexpr uint16_t PPM_MAX_BYTE_VALUE = 255; //max value of color components in PPM file. 

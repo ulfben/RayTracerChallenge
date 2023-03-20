@@ -28,18 +28,18 @@ TEST(Plane, intersectWithParallelRay) {
     constexpr auto p = plane();
     const auto r = ray(point(0, 10, 0), vector(0, 0, 1));
     const auto xs = local_intersect(p, r);
-    //EXPECT_TRUE(xs.empty());    
-    EXPECT_EQ(xs.first, 0.0f);
-    EXPECT_EQ(xs.second, 0.0f);
+    EXPECT_EQ(xs, MISS);    
+    EXPECT_EQ(xs.first, T_MISS);
+    EXPECT_EQ(xs.second, T_MISS);
 }
 
 TEST(Plane, intersectWithCoplanarRay) {
     constexpr auto p = plane();
     const auto r = ray(ORIGO, vector(0, 0, 1));
     const auto xs = local_intersect(p, r);
-    //EXPECT_TRUE(xs.empty());    
-    EXPECT_EQ(xs.first, 0.0f);
-    EXPECT_EQ(xs.second, 0.0f);
+    EXPECT_EQ(xs, MISS);    
+    EXPECT_EQ(xs.first, T_MISS);
+    EXPECT_EQ(xs.second, T_MISS);
 }
 
 TEST(Plane, intersectWithRayFromAbove) {
@@ -47,7 +47,7 @@ TEST(Plane, intersectWithRayFromAbove) {
     const auto r = ray(point(0, 1, 0), vector(0,-1, 0));
     const auto xs = local_intersect(p, r);    
     EXPECT_EQ(xs.first, 1.0f);
-    EXPECT_EQ(xs.second, 0.0f);
+    EXPECT_EQ(xs.second, T_MISS);
          
     const auto xs2 = intersect(p, r);
     EXPECT_FALSE(xs2.empty()); 
@@ -60,7 +60,7 @@ TEST(Plane, intersectWithRayFromBelow) {
     const auto r = ray(point(0, -1, 0), vector(0,1, 0));
     const auto xs = local_intersect(p, r);    
     EXPECT_EQ(xs.first, 1.0f);
-    EXPECT_EQ(xs.second, 0.0f);
+    EXPECT_EQ(xs.second, T_MISS);
  
     const auto xs2 = intersect(p, r);
     EXPECT_FALSE(xs2.empty()); 

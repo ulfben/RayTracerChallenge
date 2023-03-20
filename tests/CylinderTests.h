@@ -48,8 +48,9 @@ TEST(Cylinder, rayMissesACylinder) {
     const auto c = cylinder();
     for (size_t i = 0; i < rays.size(); i++) {        
         const auto xs = local_intersect(c, rays[i]);
-        EXPECT_FLOAT_EQ(xs.first, 0);
-        EXPECT_FLOAT_EQ(xs.second, 0);
+        EXPECT_EQ(xs, MISS);
+        EXPECT_FLOAT_EQ(xs.first, T_MISS);
+        EXPECT_FLOAT_EQ(xs.second, T_MISS);
     }
 }
 
@@ -94,11 +95,11 @@ TEST(Cylinder, intersectingATruncatedCylinder) {
         {point(0, 1.5f, -2), normalize(vector(0, 0, 1))} //perpendicular to the cylinder, at the middle of it. 
     }; 
     const std::vector<std::pair<Real, Real>> points{
-        {0.0f,0.0f},
-        {0.0f,0.0f},
-        {0.0f,0.0f},
-        {0.0f,0.0f},
-        {0.0f,0.0f},
+        MISS,
+        MISS,
+        MISS,
+        MISS,
+        MISS,
         {1.0f,3.0f} 
     };
     
