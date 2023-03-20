@@ -378,7 +378,7 @@ TEST(DISABLED_Chapter12, CanRenderCubes) {
     save_to_file(img, "output/chapter12_1.ppm"sv);
 }
 
-TEST(Chapter13, CanRenderCylinders) {    
+TEST(DISABLE_Chapter13, CanRenderCylinders) {    
     const auto mighty_slate = BLACK;// color(85, 98, 112);
     const auto pacifica = WHITE;// color(78, 206, 196);
     const auto c = Camera(600, 400, math::PI / 3.0f, 
@@ -394,10 +394,10 @@ TEST(Chapter13, CanRenderCylinders) {
     
     surface = material(stripe_pattern(BLACK, WHITE, scaling(0.3f, 0.3f, 0.3f)));    
     surface.transparency = 0.0f;
-    const auto left = cylinder(1.0f, 3.0f, surface, translation(-4, 0, 0.01f));    
+    const auto left = cylinder(1.0f, 3.0f, surface, translation(-4, 0.01f, 0.01f)*rotation_z(22*math::TO_RAD));    
 
     surface.reflective = 0.2f;
-    const auto right = cylinder(1.0f, 3.0f, surface, translation(3, 0, 0.01f));
+    const auto right = cylinder(1.0f, 3.0f, surface, translation(3, -0.01f, 0.01f));
 
 
     const auto world = World({ floor, left, middle, right}, 
