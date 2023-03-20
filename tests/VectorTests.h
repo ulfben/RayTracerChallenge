@@ -13,9 +13,9 @@ TEST(Vector, hasMagnitude) {
   v = vector(0, 0, 1);
   EXPECT_FLOAT_EQ(magnitude(v), 1.0f);
   v = vector(1, 2, 3);
-  EXPECT_FLOAT_EQ(magnitude(v), math::sqrt(14));
+  EXPECT_FLOAT_EQ(magnitude(v), math::sqrt(14.0f));
   v = vector(-1, -2, -3);
-  EXPECT_FLOAT_EQ(magnitude(v), math::sqrt(14));
+  EXPECT_FLOAT_EQ(magnitude(v), math::sqrt(14.0f));
   EXPECT_TRUE(is_vector(v));
 }
 
@@ -49,7 +49,7 @@ TEST(Vector, canBeReflectedAt45DegAngle) {
 }
 TEST(Vector, canBeReflectedAtSlantedAngle) {
   const auto v = vector(0, -1, 0);
-  const auto n = vector(math::sqrt(2)/2, math::sqrt(2)/2, 0);
+  const auto n = vector(math::sqrt(2.0f)/2.0f, math::sqrt(2.0f)/2.0f, 0);
   const auto result = reflect(v, n);
   EXPECT_EQ(result,vector(1, 0, 0));
 }

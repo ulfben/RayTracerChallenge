@@ -42,7 +42,7 @@ TEST(Sphere, normalAtANonAxialPoint) {
 }
 TEST(Sphere, normalIsANormalizedVector) {
     constexpr auto s = sphere();
-    constexpr auto v = math::sqrt(3) / 3.0f;
+    constexpr auto v = math::sqrt(3.0f) / 3.0f;
     const auto result = normal_at(s, point(v, v, v));
     const auto expected = normalize(result);
     EXPECT_EQ(result, expected);

@@ -224,7 +224,7 @@ Color pattern_at(const Patterns& variant, const Point& p) noexcept {
 //#include "Shapes.h"
 //template<typename T>
 //requires is_shape<T>
-Color pattern_at(const Patterns& pattern, const auto& obj, const Point& world_point) noexcept {
+Color pattern_at(const Patterns& pattern, const /*must be is_shapes but I can't name that here. got some circular dependency going on.*/ auto& obj, const Point& world_point) noexcept {
     assert(!std::holds_alternative<NullPattern>(pattern) && "pattern_at: called on NullPattern.");
     const auto object_point = invTransform(obj) * world_point;
     const auto pattern_point = invTransform(pattern) * object_point;        

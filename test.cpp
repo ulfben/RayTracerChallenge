@@ -296,9 +296,9 @@ TEST(DISABLED_Chapter11, CanRenderReflectionsAndRefractions) {
     save_to_file(img, "output/chapter11_5_sRGB.ppm"sv);
 }
 
-TEST(DISABLED_Chapter11, CanRenderBookScene) {    
+TEST(Chapter11, CanRenderBookScene) {    
     using math::TO_RAD;
-    const auto c = Camera(200, 200, 0.5f/*math::PI / 3.0f*/,
+    const auto c = Camera(200, 200, 90*TO_RAD/*math::PI / 3.0f*/,
         view_transform(point(-4.5f, 0.85f, -4.0f), point(0, 0.85, 0), vector(0, 1, 0)));
       
     auto wallpaper = material(checkers_pattern(BLACK, color(0.75f), scaling(0.5f)));
@@ -378,7 +378,7 @@ TEST(DISABLED_Chapter12, CanRenderCubes) {
     save_to_file(img, "output/chapter12_1.ppm"sv);
 }
 
-TEST(DISABLED_Chapter13, CanRenderCylinders) {    
+TEST(Chapter13, CanRenderCylinders) {    
     const auto mighty_slate = BLACK;// color(85, 98, 112);
     const auto pacifica = WHITE;// color(78, 206, 196);
     const auto c = Camera(600, 400, math::PI / 3.0f, 
@@ -392,10 +392,11 @@ TEST(DISABLED_Chapter13, CanRenderCylinders) {
     surface.reflective = 0.1f;
     const auto middle = cylinder(surface);  
     
-    surface = material(stripe_pattern(BLACK, WHITE, scaling(0.3f, 0.3f, 0.3f)));
-    surface.reflective = 0.1f;
+    surface = material(stripe_pattern(BLACK, WHITE, scaling(0.3f, 0.3f, 0.3f)));    
     surface.transparency = 0.0f;
     const auto left = cylinder(1.0f, 3.0f, surface, translation(-4, 0, 0.01f));    
+
+    surface.reflective = 0.2f;
     const auto right = cylinder(1.0f, 3.0f, surface, translation(3, 0, 0.01f));
 
 

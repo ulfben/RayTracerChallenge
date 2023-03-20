@@ -81,7 +81,7 @@ TEST(Transparency, theRefractedColorWithRefractedRay) {
         });
     const auto state = prepare_computations(xs[2], r, xs);
     const auto c = refracted_color(w, state, 5);
-    // EXPECT_EQ(c, color(0.0f, 0.99888f, 0.04725f));    //book oracle
+    // EXPECT_EQ(c, color(0.0f, 0.99888f, 0.04725f));    //book oracle    
     EXPECT_EQ(c, color(0.0f, 0.99381787f, 0.048488345f));
 }
 

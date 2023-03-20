@@ -2,9 +2,11 @@
 #include "pch.h"
 #include <numbers>
 namespace Detail {
-    Real constexpr sqrtNewtonRaphson(Real x, Real curr, Real prev) {
+    template<class T>
+        requires std::is_arithmetic_v<T>
+    T constexpr sqrtNewtonRaphson(T x, T curr, T prev) {        
         return curr == prev ? curr
-            : sqrtNewtonRaphson(x, 0.5f * (curr + x / curr), curr);
+            : sqrtNewtonRaphson(x, T(0.5) * (curr + x / curr), curr);
     }
 }
 
@@ -28,13 +30,14 @@ namespace math {
        return (a < b) ? ((a < c) ? a : c) : ((b < c) ? b : c);
     }
 
-    template <typename T>        
+    template<class T>    
     constexpr bool is_between(T in, T min, T max) noexcept {
         return (in > min) && (in < max);
     }
 
-    constexpr Real lerp(Real start, Real end, Real t) {
-       return (1.0f - t) * start + t * end;
+    template<class T>        
+    constexpr T lerp(T start, T end, T t) {        
+       return (T(1.0) - t) * start + t * end;
     }
 
     template<class T>
@@ -58,27 +61,35 @@ namespace math {
         return std::abs(x);
     }
 
-    constexpr bool is_nan(Real x) noexcept {
+    template<class T>
+        requires std::is_arithmetic_v<T>
+    constexpr bool is_nan(T x) noexcept {
         if (std::is_constant_evaluated()) {
             return x != x; //in use until std::is_nan becomes constexpr.
         }
         return std::isnan(x);
     }
 
-    constexpr Real sqrt(Real x) noexcept {
-        if (std::is_constant_evaluated()) {
-            return x >= 0.0f && x < std::numeric_limits<Real>::infinity()
-                ? Detail::sqrtNewtonRaphson(x, x, 0.0f)
-                : std::numeric_limits<Real>::quiet_NaN();
+    template<class T>
+        requires std::is_arithmetic_v<T>
+    constexpr T sqrt(T x) noexcept {
+        if (std::is_constant_evaluated()) {            
+            return x >= T(0.0) && x < std::numeric_limits<T>::infinity()
+                ? Detail::sqrtNewtonRaphson(x, x, T(0.0))
+                : std::numeric_limits<T>::quiet_NaN();
         }
-        return std::sqrt(x);
+        return static_cast<T>(std::sqrt(x));
     }
 
-    constexpr Real square(Real x) noexcept {
+    template<class T>
+        requires std::is_arithmetic_v<T>
+    constexpr T square(T x) noexcept {
         return x * x;
     }
-     
-    constexpr int int_ceil(Real f) noexcept {
+    
+    template<class T>
+        requires std::is_arithmetic_v<T>
+    constexpr int int_ceil(T f) noexcept {
         if (std::is_constant_evaluated()) {
             const int i = static_cast<int>(f);
             return f > i ? i + 1 : i;
@@ -86,19 +97,25 @@ namespace math {
         return static_cast<int>(std::ceil(f));
 
     }
-    constexpr int int_floor(Real f) noexcept {
+    
+    template<class T>
+        requires std::is_arithmetic_v<T>
+    constexpr int int_floor(T f) noexcept {
         if (std::is_constant_evaluated()) {
             const auto i = static_cast<int>(f);
             return f < i ? i - 1 : i;
         }
         return static_cast<int>(std::floor(f));
     }
-    constexpr Real floor(Real f) noexcept {
+
+    template<class T>
+        requires std::is_arithmetic_v<T>
+    constexpr T floor(T f) noexcept {
         if (std::is_constant_evaluated()) {
-            const auto i = static_cast<Real>(f);
+            const auto i = static_cast<T>(f);
             return f < i ? i - 1 : i;
         }
-        return static_cast<Real>(std::floor(f));
+        return static_cast<T>(std::floor(f));
     }
 
     static constexpr auto SHADOW_BIAS = 0.005f; //to avoid shadow acne due to spurious self-intersections
@@ -160,20 +177,27 @@ namespace math {
     }
 
     //borrowed from Paul Floyd, https://accu.org/journals/overload/31/173/floyd/
-    constexpr bool cmpEq(float a, float b, float epsilon = 1.0e-7f, float abstol = 1.0e-12f) noexcept {
+    template<class T>
+        requires std::is_arithmetic_v<T>
+    constexpr bool cmpEq(T a, T b, T epsilon = 1.0e-7f, T abstol = 1.0e-12f) noexcept {
         if (a == b) {
             return true;
         }
-        const float diff = std::fabs(a - b);
-        const float reltol = std::max(std::fabs(a), std::fabs(b)) * epsilon;
+        const auto diff = std::fabs(a - b);
+        const auto reltol = std::max(std::fabs(a), std::fabs(b)) * epsilon;
         return diff < reltol || diff < abstol;
     }
 
     //facade to let me swap the tested function and epsilon easily
-    static constexpr bool float_cmp(Real a, Real b, Real epsilon) noexcept {
+    template<class T>
+        requires std::is_arithmetic_v<T>
+    static constexpr bool float_cmp(T a, T b, T epsilon) noexcept {
         return math::brazzy_nearly_equal(a, b, epsilon);
     }
-    static constexpr bool float_cmp(Real a, Real b) noexcept {
+
+    template<class T>
+       requires std::is_arithmetic_v<T>
+    static constexpr bool float_cmp(T a, T b) noexcept {
         return float_cmp(a, b, math::BRAZZY_EPSILON);
     }
 }
