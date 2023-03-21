@@ -4,47 +4,47 @@
 
 DISABLE_WARNINGS_FROM_GTEST
 
-TEST(Tuple, canBeDefaultConstructed) {
-  const Tuple a;
+TEST(Point, canBeDefaultConstructed) {
+  const Point a;
   EXPECT_FLOAT_EQ(a.x, .0f);
   EXPECT_FLOAT_EQ(a.y, .0f);
   EXPECT_FLOAT_EQ(a.z, .0f);
-  EXPECT_FLOAT_EQ(a.w, .0f);
+  EXPECT_FLOAT_EQ(a.w, 1.0f);
 }
 
-TEST(Tuple, W1isPoint) {
-  const Tuple t{4.3f, -4.2f, 3.1f, 1.0f};
+TEST(Point, W1isPoint) {
+  const Point t{4.3f, -4.2f, 3.1f, 1.0f};
   EXPECT_EQ(t.x, 4.3f);
   EXPECT_EQ(t.y, -4.2f);
   EXPECT_EQ(t.z, 3.1f);
   EXPECT_TRUE(is_point(t));
-  EXPECT_FALSE(is_vector(t));
+  //EXPECT_FALSE(is_vector(t));
 }
 
-TEST(Tuple, W0isVector) {
-  const Tuple t{4.3f, -4.2f, 3.1f, 0.0f};
+TEST(Vector, W0isVector) {
+  const Vector t{4.3f, -4.2f, 3.1f, 0.0f};
   EXPECT_EQ(t.x, 4.3f);
   EXPECT_EQ(t.y, -4.2f);
   EXPECT_EQ(t.z, 3.1f);
-  EXPECT_FALSE(is_point(t));
+  //EXPECT_FALSE(is_point(t));
   EXPECT_TRUE(is_vector(t));
 }
-TEST(Tuple, vectorFactoryMakesVectors) {
-  const Tuple t = vector(4.3f, -4.2f, 3.1f);
-  EXPECT_FALSE(is_point(t));
+TEST(Vector, vectorFactoryMakesVectors) {
+  const Vector t = vector(4.3f, -4.2f, 3.1f);
+  
   EXPECT_TRUE(is_vector(t));
 }
-TEST(Tuple, pointFactoryMakesPoints) {
-  const Tuple t = point(4.3f, -4.2f, 3.1f);
+TEST(Point, pointFactoryMakesPoints) {
+  const Point t = point(4.3f, -4.2f, 3.1f);
   EXPECT_TRUE(is_point(t));
-  EXPECT_FALSE(is_vector(t));
+  
 }
 
-TEST(Tuples, canBeAdded) {
-  const Tuple t1{3, -2, 5, 1};
-  const Tuple t2{-2, 3, 1, 0};
-  const Tuple res = t1 + t2;
-  const Tuple expected{1, 1, 6, 1};
+TEST(Vector, canBeAdded) {
+  const Vector t1{3, -2, 5, 1};
+  const Vector t2{-2, 3, 1, 0};
+  const Vector res = t1 + t2;
+  const Vector expected{1, 1, 6, 1};
   EXPECT_TRUE(res == expected);
 }
 
@@ -96,23 +96,23 @@ TEST(Tuples, canBeNegated) {
 }
 
 TEST(Tuples, canBeMultiplied) {
-  const auto t1 = Tuple{3, 2, 1, 1};
+  //const auto t1 = point(3, 2, 1);
   const auto t2 = vector(5, 6, 7);
-  const auto expected = Tuple{9, 6, 3, 3};
-  EXPECT_EQ(t1 * 3, expected);
+  const auto expected = point(9, 6, 3);
+  //EXPECT_EQ(t1 * 3, expected);
   EXPECT_EQ(t2 * 3, vector(15, 18, 21));
 }
 
-TEST(Tuples, canBeMultipliedByFraction) {
-  const auto t1 = Tuple{1, -2, 3, -4};
-  const auto expected = Tuple{0.5, -1, 1.5, -2};
-  EXPECT_EQ(t1 * 0.5f, expected);
-}
+//TEST(Tuples, canBeMultipliedByFraction) {
+//  const auto t1 = Tuple{1, -2, 3, -4};
+//  const auto expected = Tuple{0.5, -1, 1.5, -2};
+//  EXPECT_EQ(t1 * 0.5f, expected);
+//}
 
-TEST(Tuples, canBeDividedByScalar) {
-  const auto t1 = Tuple{1, -2, 3, -4};
-  const auto expected = Tuple{0.5, -1, 1.5, -2};
-  EXPECT_EQ(t1 / 2, expected);
-}
+//TEST(Tuples, canBeDividedByScalar) {
+//  const auto t1 = Tuple{1, -2, 3, -4};
+//  const auto expected = Tuple{0.5, -1, 1.5, -2};
+//  EXPECT_EQ(t1 / 2, expected);
+//}
 
 RESTORE_WARNINGS

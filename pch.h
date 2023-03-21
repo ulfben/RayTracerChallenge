@@ -27,10 +27,7 @@
 #define RESTORE_WARNINGS __pragma(warning(pop))
 
 using namespace std::string_view_literals;
-struct Tuple;
 using Real = float;
-using Vector = Tuple;
-using Point = Tuple;
 //static constexpr auto T_MISS = std::numeric_limits<Real>::max(); //magic value to denote an invalid t for intersections
 static const std::vector<Real> MISS = {};// std::pair<Real, Real>(T_MISS, T_MISS);
 static constexpr auto PPM_VERSION = "P3"sv;

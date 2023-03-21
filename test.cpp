@@ -48,8 +48,8 @@ TEST(DISABLED_Chapter4, CanDrawTwelveOClock) {
     const auto origo = point(c.widthf() / 2, c.heightf() / 2, 0);        
     c.set(origo, GREEN);        
     const auto dist = c.widthf() * 0.375f;        
-    const auto twelve = point(0, -dist, 0);
-    c.set(twelve+origo, RED);        
+    const auto twelve = vector(0, -dist, 0);
+    c.set(origo+twelve, RED);        
     save_to_file(c, "output/chapter4_1.ppm"sv);      
 }
 

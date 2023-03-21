@@ -2,14 +2,57 @@
 #include "pch.h"
 #include "Math.h"
 
-struct Tuple final {    
+struct Point final {    
     Real x{};
     Real y{};            
     Real z{};
-    Real w{};
+    Real w = 1.0f;
 
-    constexpr Tuple operator*(Real scalar) const noexcept {
-        return Tuple{ x * scalar, y * scalar, z * scalar, w * scalar };
+    //constexpr Point operator*(Real scalar) const noexcept {
+    //    return Point{ x * scalar, y * scalar, z * scalar, w * scalar };
+    //}
+    //constexpr void operator*=(Real scalar) noexcept {
+    //    x *= scalar;
+    //    y *= scalar;
+    //    z *= scalar;
+    //    w *= scalar;
+    //}
+    constexpr Point operator/(Real scalar) const noexcept {
+        return Point{ x / scalar, y / scalar, z / scalar, w / scalar };
+    }
+    constexpr Point operator-() const noexcept { return Point{ -x, -y, -z, w }; }
+    constexpr bool operator==(const Point& rhs) const noexcept {
+        using math::float_cmp;
+        return float_cmp(x, rhs.x) && float_cmp(y, rhs.y) &&
+            float_cmp(z, rhs.z) && float_cmp(w, rhs.w);
+    };
+    
+    /*constexpr Point operator+(const Vector& rhs) const noexcept {
+        return Point{ x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w };
+    }
+    constexpr void operator+=(const Vector& rhs) noexcept {
+        x += rhs.x;
+        y += rhs.y;
+        z += rhs.z;
+        w += rhs.w;
+    };
+    constexpr Vector operator-(const Point& rhs) const noexcept {
+        return Vector{ x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w };
+    }
+    constexpr Point operator-(const Vector& rhs) const noexcept {
+        return Point{ x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w };
+    }*/
+    
+};
+
+struct Vector final {    
+    Real x{};
+    Real y{};            
+    Real z{};
+    Real w = 0;
+
+    constexpr Vector operator*(Real scalar) const noexcept {
+        return Vector{ x * scalar, y * scalar, z * scalar, w * scalar };
     }
     constexpr void operator*=(Real scalar) noexcept {
         x *= scalar;
@@ -17,32 +60,49 @@ struct Tuple final {
         z *= scalar;
         w *= scalar;
     }
-    constexpr Tuple operator/(Real scalar) const noexcept {
-        return Tuple{ x / scalar, y / scalar, z / scalar, w / scalar };
+    constexpr Vector operator/(Real scalar) const noexcept {
+        return Vector{ x / scalar, y / scalar, z / scalar, w / scalar };
     }
-    constexpr Tuple operator+(const Tuple& rhs) const noexcept {
-        return Tuple{ x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w };
+    constexpr Vector operator+(const Vector& rhs) const noexcept {
+        return Vector{ x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w };
     }
-    constexpr void operator+=(const Tuple& rhs) noexcept {
+    constexpr void operator+=(const Vector& rhs) noexcept {
         x += rhs.x;
         y += rhs.y;
         z += rhs.z;
         w += rhs.w;
     };
-    constexpr Tuple operator-(const Tuple& rhs) const noexcept {
-        return Tuple{ x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w };
+    constexpr Vector operator-(const Vector& rhs) const noexcept {
+        return Vector{ x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w };
     }
-    constexpr Tuple operator-() const noexcept { return Tuple{ -x, -y, -z, w }; }
-    constexpr bool operator==(const Tuple& rhs) const noexcept {
+    constexpr Vector operator-() const noexcept { return Vector{ -x, -y, -z, w }; }
+    constexpr bool operator==(const Vector& rhs) const noexcept {
         using math::float_cmp;
         return float_cmp(x, rhs.x) && float_cmp(y, rhs.y) &&
             float_cmp(z, rhs.z) && float_cmp(w, rhs.w);
     };
 };
 
+constexpr Point operator+(const Point& lhs, const Vector& rhs)  noexcept {
+     return Point{ lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, lhs.w + rhs.w };
+}
+constexpr void operator+=(Point& lhs, const Vector& rhs) noexcept {
+    lhs.x += rhs.x;
+    lhs.y += rhs.y;
+    lhs.z += rhs.z;
+    lhs.w += rhs.w;
+};
+constexpr Vector operator-(const Point& lhs, const Point& rhs)  noexcept {
+    return Vector{ lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, lhs.w - rhs.w };
+}
+constexpr Point operator-(const Point& lhs, const Vector& rhs) noexcept {
+    return Point{ lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, lhs.w - rhs.w };
+}
+
+
 template <>
-struct std::formatter<Tuple> : std::formatter<string_view> {
-    auto format(const Tuple& obj, std::format_context& ctx) const {
+struct std::formatter<Vector> : std::formatter<string_view> {
+    auto format(const Vector& obj, std::format_context& ctx) const {
         std::string temp;
         std::format_to(std::back_inserter(temp), "({}, {}, {}, {})"sv, 
                        obj.x, obj.y, obj.z, obj.w);
@@ -53,7 +113,7 @@ struct std::formatter<Tuple> : std::formatter<string_view> {
 
 #pragma warning(push)
 #pragma warning( disable : 26481 ) //spurious warning; "don't use pointer arithmetic" 
-std::ostream& operator<<(std::ostream& os, const Tuple& t) {
+std::ostream& operator<<(std::ostream& os, const Vector& t) {
     os << std::format("{}, {}, {}, {}"sv, t.x, t.y, t.z, t.w);
     return os;
 }
@@ -62,14 +122,20 @@ std::ostream& operator<<(std::ostream& os, const Tuple& t) {
 constexpr Vector vector(Real x, Real y, Real z) noexcept {
     return Vector{ x, y, z, 0.0f };
 }
+constexpr Vector vector(const Point& p) noexcept {
+    return Vector{ p.x, p.y, p.z, 0.0f };
+}
 constexpr Point point(Real x, Real y, Real z) noexcept {
     return Point{ x, y, z, 1.0f };
+}
+constexpr Point point(const Vector& v) noexcept {
+    return Point{ v.x, v.y, v.z, 1.0f };
 }
 
 static constexpr Point ORIGO = point(0,0,0);
 
-constexpr bool is_vector(Tuple t) noexcept { return t.w == 0; }
-constexpr bool is_point(Tuple t) noexcept { return t.w == 1; }
+constexpr bool is_vector(const Vector& t) noexcept { return t.w == 0; }
+constexpr bool is_point(const Point& p) noexcept { return p.w == 1; }
 
 constexpr Real magnitudeSq(const Vector& t) noexcept {
     return ((t.x * t.x) + (t.y * t.y) + (t.z * t.z));

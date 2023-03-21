@@ -55,7 +55,7 @@ TEST(Camera, renderWorldWithCamera) {
     auto c = Camera(11, 11, math::PI / 2.0f);
     const auto from = point(0, 0, -5);
     const auto to = ORIGO;
-    const auto up = point(0, 1, 0);
+    const auto up = vector(0, 1, 0);
     c.setTransform(view_transform(from, to, up));    
     const auto img = render(c, w);
     EXPECT_EQ(img.width(), c.height);

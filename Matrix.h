@@ -90,7 +90,7 @@ using Matrix1 = Matrix<1, 1>; //to stop template deductions from breaking
 static constexpr auto Matrix4Identity = Matrix4::identity();
 
 static_assert(is_matrix<Matrix4>, "Constraint test failed. Matrix4 should be identified as a Matrix");
-static_assert(!is_matrix<Tuple>, "Constraint test failed. Tuple shouldn't be identified as a Matrix.");
+static_assert(!is_matrix<Vector>, "Constraint test failed. Vector shouldn't be identified as a Matrix.");
 
 
 template <class Matrix>
@@ -198,12 +198,20 @@ constexpr auto operator*(const Matrix& lhs, const Matrix& rhs) noexcept {
     return result;
 }
 
-constexpr Tuple operator*(const Matrix4& lhs, const Tuple& rhs) noexcept {
+constexpr Vector operator*(const Matrix4& lhs, const Vector& rhs) noexcept {
     const auto x = rhs.x * lhs[0] + rhs.y   * lhs[1] + rhs.z * lhs[2]  + rhs.w * lhs[3];
     const auto y = rhs.x * lhs[4] + rhs.y   * lhs[5] + rhs.z * lhs[6]  + rhs.w * lhs[7];
     const auto z = rhs.x * lhs[8] + rhs.y   * lhs[9] + rhs.z * lhs[10] + rhs.w * lhs[11];
     const auto w = rhs.x * lhs[12] + rhs.y  * lhs[13]+ rhs.z * lhs[14] + rhs.w * lhs[15];
-    return Tuple{ x, y, z, w };
+    return Vector{ x, y, z, w };
+}
+
+constexpr Point operator*(const Matrix4& lhs, const Point& rhs) noexcept {
+    const auto x = rhs.x * lhs[0] + rhs.y   * lhs[1] + rhs.z * lhs[2]  + rhs.w * lhs[3];
+    const auto y = rhs.x * lhs[4] + rhs.y   * lhs[5] + rhs.z * lhs[6]  + rhs.w * lhs[7];
+    const auto z = rhs.x * lhs[8] + rhs.y   * lhs[9] + rhs.z * lhs[10] + rhs.w * lhs[11];
+    const auto w = rhs.x * lhs[12] + rhs.y  * lhs[13]+ rhs.z * lhs[14] + rhs.w * lhs[15];
+    return Point{ x, y, z, w };
 }
 
 template <class Matrix>
@@ -466,7 +474,7 @@ constexpr Matrix4 translation(Real x, Real y, Real z) noexcept {
         0.0f, 0.0f, 0.0f,   1.0f
     };
 }
-constexpr Matrix4 translation(Tuple p) noexcept {                
+constexpr Matrix4 translation(Point p) noexcept {                
     return translation(p.x, p.y, p.z);
 }
 
@@ -478,7 +486,7 @@ constexpr Matrix4 scaling(Real x, Real y, Real z) noexcept {
         0.0f, 0.0f, 0.0f,   1.0f
     };
 }
-constexpr Matrix4 scaling(Tuple p) noexcept {                
+constexpr Matrix4 scaling(Point p) noexcept {                
     return scaling(p.x, p.y, p.z);
 }
 constexpr Matrix4 scaling(Real xyz) noexcept {
@@ -532,7 +540,7 @@ constexpr Matrix4 scaling(Real xyz) noexcept {
     };
 }
 
-/*constexpr*/ Matrix4 rotation(Tuple p) noexcept {
+/*constexpr*/ Matrix4 rotation(Point p) noexcept {
     return rotation(p.x, p.y, p.z);
 }
 
@@ -550,10 +558,11 @@ constexpr Matrix4 view_transform(const Point& from, const Point& to, const Vecto
     const auto forward = normalize(to - from);
     const auto left = normalize(cross(forward, up));
     const auto true_up = normalize(cross(left, forward));
+    const auto from_v = vector(from);
     return Matrix4 /*orientation*/{ 
-        left.x,     left.y,     left.z,     -dot(left, from),
-        true_up.x,  true_up.y,  true_up.z,  -dot(true_up, from),
-        -forward.x, -forward.y, -forward.z,  dot(forward, from),
+        left.x,     left.y,     left.z,     -dot(left, from_v),
+        true_up.x,  true_up.y,  true_up.z,  -dot(true_up, from_v),
+        -forward.x, -forward.y, -forward.z,  dot(forward, from_v),
         0,          0,          0,          1
     };    
 }

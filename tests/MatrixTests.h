@@ -62,9 +62,9 @@ TEST(Matrix, canBeMultipliedWithTuple) {
         8, 6, 4, 1,
         0, 0, 0, 1 
     };
-    const auto b = Tuple{ 1, 2, 3, 1 };
+    const auto b = point( 1, 2, 3);
     const auto product = a * b; 
-    const auto expected = Tuple{ 18,24,33,1 };
+    const auto expected = point( 18,24,33);
     EXPECT_TRUE(product == expected);
 }
 

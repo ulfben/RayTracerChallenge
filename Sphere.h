@@ -60,14 +60,14 @@ std::ostream& operator<<(std::ostream& os, const Sphere& t) {
 #pragma warning(pop)
 
 constexpr Vector local_normal_at([[maybe_unused]]const Sphere& s, const Point& object_space_point) noexcept { 
-    return normalize(object_space_point/*-s.position*/); /*s position is always 0*/    
+    return normalize(vector(object_space_point)); /*imagine object_space_point - s.position, but s position is always 0*/    
 }
 
 //https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
 constexpr auto local_intersect([[maybe_unused]] const Sphere& s, const Ray& local_ray) {
     using math::square, math::sqrt;
     constexpr Real SPHERE_RADIUS = 1.0f; //assuming unit spheres for now    
-    const Vector sphere_to_ray = local_ray.origin;/* -s.position; sphere is always located at 0,0,0*/
+    const Vector sphere_to_ray = vector(local_ray.origin);/* -s.position; sphere is always located at 0,0,0*/
     const auto a = dot(local_ray.direction, local_ray.direction);
     const auto b = 2 * dot(local_ray.direction, sphere_to_ray);
     const auto col = dot(sphere_to_ray, sphere_to_ray) - SPHERE_RADIUS;
