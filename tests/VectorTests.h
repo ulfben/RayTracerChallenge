@@ -5,6 +5,44 @@
 
 DISABLE_WARNINGS_FROM_GTEST
 
+//vector + vector = vector
+//vector - vector = vector
+//vector - point is illegal
+//vector + point is illegal
+
+TEST(Vector, canBeDefaultConstructed) {
+  const Vector a;
+  EXPECT_FLOAT_EQ(a.x, .0f);
+  EXPECT_FLOAT_EQ(a.y, .0f);
+  EXPECT_FLOAT_EQ(a.z, .0f);
+}
+
+TEST(Vector, canBeAdded) {
+  const Vector t1{3, -2, 5};
+  const Vector t2{-2, 3, 1};
+  const Vector res = t1 + t2;
+  const Vector expected{1, 1, 6};
+  EXPECT_TRUE(res == expected);
+}
+
+TEST(Vector, canBeNegated) {  
+  const auto t2 = vector(5, 6, 7);  
+  EXPECT_EQ(-t2, vector(-5, -6, -7));
+}
+
+TEST(Vector, canBeMultipliedByScalar) {  
+  const auto t2 = vector(5, 6, 7);
+  const auto expected = point(9, 6, 3);  
+  EXPECT_EQ(t2 * 3, vector(15, 18, 21));
+}
+
+TEST(Vector, minusVectorIsaVector) {
+  const auto t1 = vector(3, 2, 1);
+  const auto t2 = vector(5, 6, 7);
+  const auto res = t1 - t2;
+  EXPECT_TRUE(res == vector(-2, -4, -6));  
+}
+
 TEST(Vector, hasMagnitude) {
   auto v = vector(1, 0, 0);
   EXPECT_FLOAT_EQ(magnitude(v), 1.0f);
