@@ -80,7 +80,16 @@ constexpr Real magnitude(const Vector& t) noexcept {
 constexpr Vector normalize(const Vector& t) noexcept {
     const auto length = magnitude(t);
     assert(length != 0.0f);
-    return t / length;
+    const auto inv_length = 1.0f / length;
+    return t * inv_length;
+}
+constexpr Vector normalize(const Vector& t, const Vector& fallback) noexcept {
+    const auto length = magnitude(t);
+    if (math::is_zero(length)) {
+        return fallback;
+    }
+    const auto inv_length = 1.0f / length;
+    return t * inv_length;
 }
 constexpr Real dot(const Vector& a, const Vector& b) noexcept {
     /* the smaller the dot product, the larger the angle between the vector. if the two

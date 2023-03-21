@@ -95,10 +95,10 @@ constexpr auto intersections(Intersection i1, Intersection i2) noexcept {
 constexpr auto intersections(std::initializer_list<Intersection> is) noexcept {
     return Intersections(is);
 };
-constexpr auto intersections(std::span<Real> ts, const Shapes& shape) noexcept {
+constexpr auto intersections(std::span<Real> ts, const Shapes& variant) noexcept {
     auto xs = intersections(ts.size());
     for (auto t : ts) {
-        xs.push_back(intersection(t, shape));
+        xs.push_back(intersection(t, variant));
     }
     return xs;
 };

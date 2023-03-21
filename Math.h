@@ -19,6 +19,12 @@ namespace math {
     constexpr auto TO_RAD = PI / 180.0f;
     constexpr auto MAX = std::numeric_limits<Real>::max();
     constexpr auto MIN = std::numeric_limits<Real>::lowest();  
+    static constexpr auto SHADOW_BIAS = 0.005f; //to avoid shadow acne due to spurious self-intersections
+    static constexpr auto BOOK_EPSILON = 0.0001f; //1.0e-4f, value suggested as "good enough" by the book.
+    static constexpr auto BRAZZY_EPSILON = 0.00001f; //1.0e-5f, https://github.com/brazzy/floating-point-gui.de    
+    static constexpr auto GTEST_EPSILON = 0.000001f;// 1.0e-6f; //from Google Test
+    static constexpr auto MACHINE_EPSILON = 0.000000119209f; //1.19209e-7f, == std::numeric_limits<Real>::epsilon();
+
 
     template<class T>        
     constexpr T max(T a, T b, T c) noexcept {
@@ -60,6 +66,12 @@ namespace math {
         }
         return std::abs(x);
     }
+
+    template<class T>        
+    constexpr T is_zero(T v, T epsilon = BRAZZY_EPSILON) noexcept {
+        return v == T(0) || math::abs(v) < epsilon;
+    }
+
 
     template<class T>
         requires std::is_arithmetic_v<T>
@@ -118,11 +130,7 @@ namespace math {
         return static_cast<T>(std::floor(f));
     }
 
-    static constexpr auto SHADOW_BIAS = 0.005f; //to avoid shadow acne due to spurious self-intersections
-    static constexpr auto BOOK_EPSILON = 0.0001f; //1.0e-4f, value suggested as "good enough" by the book.
-    static constexpr auto BRAZZY_EPSILON = 0.00001f; //1.0e-5f, https://github.com/brazzy/floating-point-gui.de    
-    static constexpr auto GTEST_EPSILON = 0.000001f;// 1.0e-6f; //from Google Test
-    static constexpr auto MACHINE_EPSILON = 0.000000119209f; //1.19209e-7f, == std::numeric_limits<Real>::epsilon();
+
 
     //from the book. fails on big, bigneg, infinities, opposite, small, smallneg, ulp and zero
     template<class T>

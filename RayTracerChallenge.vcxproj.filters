@@ -37,7 +37,6 @@
     <ClInclude Include="tests\RayTests.h">
       <Filter>tests</Filter>
     </ClInclude>
-    <ClInclude Include="Sphere.h" />
     <ClInclude Include="tests\SphereTests.h">
       <Filter>tests</Filter>
     </ClInclude>
@@ -59,7 +58,6 @@
     <ClInclude Include="tests\PlaneTests.h">
       <Filter>tests</Filter>
     </ClInclude>
-    <ClInclude Include="Plane.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="tests\ReflectionTests.h">
       <Filter>tests</Filter>
@@ -75,15 +73,26 @@
       <Filter>tests</Filter>
     </ClInclude>
     <ClInclude Include="Color.h" />
-    <ClInclude Include="Cube.h" />
     <ClInclude Include="tests\CubeTests.h">
       <Filter>tests</Filter>
     </ClInclude>
     <ClInclude Include="tests\CylinderTests.h">
       <Filter>tests</Filter>
     </ClInclude>
-    <ClInclude Include="Cylinder.h" />
     <ClInclude Include="HitState.h" />
+    <ClInclude Include="Lighting.h" />
+    <ClInclude Include="Cube.h">
+      <Filter>geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Cylinder.h">
+      <Filter>geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Plane.h">
+      <Filter>geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Sphere.h">
+      <Filter>geometry</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -91,6 +100,9 @@
   <ItemGroup>
     <Filter Include="tests">
       <UniqueIdentifier>{24b9989c-5b72-4715-a8bf-0a9746721665}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="geometry">
+      <UniqueIdentifier>{5651d234-36ad-49e5-9b87-ee26852cfe43}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

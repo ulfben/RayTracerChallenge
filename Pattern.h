@@ -5,7 +5,7 @@
 #include "Matrix.h"
 
 struct NullPattern final {
-    constexpr Color at([[maybe_unused]] const Point& p) const noexcept { return BLACK; }
+    constexpr Color at([[maybe_unused]] const Point& p) const noexcept { return MAGENTA; }
     explicit constexpr operator bool() const noexcept { return false; }    
     constexpr bool operator==(const NullPattern& that) const noexcept = default;
     constexpr const Matrix4& transform() const noexcept { return _transform; }    

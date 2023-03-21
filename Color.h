@@ -134,6 +134,7 @@ static constexpr Color WHITE = color(1, 1, 1);
 static constexpr Color RED = color(1, 0, 0);
 static constexpr Color GREEN = color(0, 1, 0);
 static constexpr Color BLUE = color(0, 0, 1);
+static constexpr Color MAGENTA = color(1, 0, 1);
 
 #pragma warning(push)
 #pragma warning( disable : 26481 ) //spurious warning; "don't use pointer arithmetic" 

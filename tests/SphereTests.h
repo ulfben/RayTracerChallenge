@@ -56,7 +56,7 @@ TEST(Sphere, normalOnTranslatedSphere) {
 }
 
 TEST(Sphere, normalOnTransformedSphere) {
-    constexpr auto v = math::sqrt(2) / 2.0f;
+    constexpr auto v = math::sqrt(2.0f) / 2.0f;
     auto s = sphere(scaling(1.0f, 0.5f, 1.0f) * rotation_z(math::PI/5.0f));
     const auto result = normal_at(s, point(0.0f, v, -v));
     const auto book_expected = vector(0.0f, 0.97014f, -0.24254f); //book oracle
