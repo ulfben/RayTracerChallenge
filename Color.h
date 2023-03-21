@@ -30,38 +30,51 @@ struct Color final {
     Real r{};
     Real g{};
     Real b{};
-    constexpr Color operator*(const Color& that) const noexcept {
-        return { r * that.r, g * that.g, b * that.b }; //hadamard product
-    }
-    constexpr Color operator*(Real scalar) const noexcept {
-        return Color{ r * scalar, g * scalar, b * scalar };
-    }
-    constexpr void operator*=(Real scalar) noexcept {
-        r *= scalar;
-        g *= scalar;
-        b *= scalar;
-    }
-    constexpr Color operator/(Real scalar) const noexcept {
-        return Color{ r / scalar, g / scalar, b / scalar };
-    }
-    constexpr Color operator+(Color rhs) const noexcept {
-        return Color{ r + rhs.r, g + rhs.g, b + rhs.b };
-    }
-    constexpr Color operator-(Color rhs) const noexcept {
-        return Color{ r - rhs.r, g - rhs.g, b - rhs.b };
-    }
-    constexpr bool operator==(const Color& rhs) const noexcept {
-        using math::float_cmp;
-        constexpr auto epsilon = 0.0005f;
-        return float_cmp(r, rhs.r, epsilon) && float_cmp(g, rhs.g, epsilon) &&
-            float_cmp(b, rhs.b, epsilon);
-    };
 };
-constexpr Color color(Real r, Real g, Real b) noexcept {
+static constexpr auto BLACK = Color{ 0, 0, 0 };
+static constexpr auto WHITE = Color{1, 1, 1};
+static constexpr auto RED = Color{1, 0, 0};
+static constexpr auto GREEN = Color{0, 1, 0};
+static constexpr auto BLUE = Color{0, 0, 1};
+static constexpr auto MAGENTA = Color{ 1, 0, 1 };
+
+constexpr Color color(Real r, Real g, Real b) noexcept {    
     return Color{ r, g, b };
 }
 constexpr Color color(Real rgb) noexcept {
     return color(rgb, rgb, rgb);
+}
+
+//Color interface
+constexpr Color operator*(const Color& lhs, const Color& rhs) noexcept {
+    return { lhs.r * rhs.r, lhs.g * rhs.g, lhs.b * rhs.b }; //hadamard product
+}
+constexpr Color operator*(const Color& lhs, Real scalar) noexcept {
+    return Color{ lhs.r * scalar, lhs.g * scalar, lhs.b * scalar };
+}
+constexpr void operator*=(Color& lhs,Real scalar) noexcept {
+    lhs.r *= scalar;
+    lhs.g *= scalar;
+    lhs.b *= scalar;
+}
+constexpr Color operator/(const Color& lhs, Real scalar) noexcept {
+    return Color{ lhs.r / scalar, lhs.g / scalar, lhs.b / scalar };
+}
+constexpr Color operator+(const Color& lhs, Color rhs) noexcept {
+    return Color{ lhs.r + rhs.r, lhs.g + rhs.g, lhs.b + rhs.b };
+}
+constexpr Color operator-(const Color& lhs, Color rhs) noexcept {
+    return Color{ lhs.r - rhs.r, lhs.g - rhs.g, lhs.b - rhs.b };
+}
+constexpr bool operator==(const Color& lhs, const Color& rhs) noexcept {
+    using math::float_cmp;
+    constexpr auto epsilon = 0.0005f;
+    return float_cmp(lhs.r, rhs.r, epsilon) && float_cmp(lhs.g, rhs.g, epsilon) &&
+        float_cmp(lhs.b, rhs.b, epsilon);
+};
+constexpr Color lerp(Color start, Color end, Real t) {    
+    //return (start*(1.0f - t)) + (end*t);
+    return start + (end - start) * t;
 }
 
 void to_sRGB(Color& c) noexcept {
@@ -120,22 +133,7 @@ constexpr ByteColor_sRGB to_ByteColor_sRGB(const Color& col) noexcept {
     return ByteColor_sRGB(col);
 }
 
-constexpr Color hadamard_product(const Color& a, const Color& b) noexcept {
-    return a * b;
-}
-
-constexpr Color lerp(Color start, Color end, Real t) {    
-    //return (start*(1.0f - t)) + (end*t);
-    return start + (end - start) * t;
-}
-
-static constexpr Color BLACK = color(0, 0, 0);
-static constexpr Color WHITE = color(1, 1, 1);
-static constexpr Color RED = color(1, 0, 0);
-static constexpr Color GREEN = color(0, 1, 0);
-static constexpr Color BLUE = color(0, 0, 1);
-static constexpr Color MAGENTA = color(1, 0, 1);
-
+//print and string features
 #pragma warning(push)
 #pragma warning( disable : 26481 ) //spurious warning; "don't use pointer arithmetic" 
 std::ostream& operator<<(std::ostream& os, const Color& t) {

@@ -8,7 +8,7 @@
 #include "tests/CanvasTests.h"
 #include "tests/FloatCompareTests.h"
 #include "tests/ColorTests.h"
-#include "tests/TupleTests.h"
+#include "tests/PointTests.h"
 #include "tests/VectorTests.h"
 #include "tests/MatrixTests.h"
 #include "tests/MatrixTransformationTests.h"
@@ -378,17 +378,16 @@ TEST(DISABLED_Chapter12, CanRenderCubes) {
     save_to_file(img, "output/chapter12_1.ppm"sv);
 }
 
-TEST(DISABLED_Chapter13, CanRenderCylinders) {    
-    const auto mighty_slate = color(85, 98, 112);
-    const auto pacifica = color(78, 206, 196);
+TEST(Chapter13, CanRenderCylinders) {    
+    const auto mighty_slate = color(0.33f, 0.38f, 0.44f);
+    const auto pacifica = color(0.31f, 0.81f, 0.77f);
     const auto c = Camera(600, 400, math::PI / 3.0f, 
         view_transform(point(0.0f, 5.0f, -10.0f), point(0, 1, 0), vector(0, 1, 0)));
         
-    auto surface = material(color(85, 98, 112)); // material(checkers_pattern(mighty_slate, WHITE, rotation_y(-45 * math::TO_RAD)));
-    surface.reflective = 0.0f;
+    auto surface = material(checkers_pattern(mighty_slate, pacifica, rotation_y(-45 * math::TO_RAD)));   
     const auto floor = plane(surface);    
     
-   /* surface = material(stripe_pattern(mighty_slate, pacifica, scaling(0.1f, 0.1f, 0.1f)*rotation_z(45*math::TO_RAD)));
+    surface = material(stripe_pattern(mighty_slate, pacifica, scaling(0.1f, 0.1f, 0.1f)*rotation_z(45*math::TO_RAD)));
     surface.reflective = 0.1f;
     const auto middle = cylinder(surface);  
     
@@ -397,10 +396,9 @@ TEST(DISABLED_Chapter13, CanRenderCylinders) {
     const auto left = cylinder(1.0f, 3.0f, surface, translation(-4, 0.01f, 0.01f)*rotation_z(22*math::TO_RAD));    
 
     surface.reflective = 0.2f;
-    const auto right = cylinder(1.0f, 3.0f, surface, translation(3, -0.01f, 0.01f));*/
+    const auto right = cylinder(1.0f, 3.0f, surface, translation(3, -0.01f, 0.01f));
 
-
-    const auto world = World({ floor/*, left, middle, right*/}, 
+    const auto world = World({ floor, left, middle, right}, 
                               point_light(point(-10, 10, -10), color(1, 1, 1)));    
     const auto img = render(c, world);
     save_to_file(img, "output/chapter13_3.ppm"sv);
