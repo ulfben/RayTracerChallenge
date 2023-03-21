@@ -9,42 +9,13 @@ TEST(Point, canBeDefaultConstructed) {
   EXPECT_FLOAT_EQ(a.x, .0f);
   EXPECT_FLOAT_EQ(a.y, .0f);
   EXPECT_FLOAT_EQ(a.z, .0f);
-  EXPECT_FLOAT_EQ(a.w, 1.0f);
-}
-
-TEST(Point, W1isPoint) {
-  const Point t{4.3f, -4.2f, 3.1f, 1.0f};
-  EXPECT_EQ(t.x, 4.3f);
-  EXPECT_EQ(t.y, -4.2f);
-  EXPECT_EQ(t.z, 3.1f);
-  EXPECT_TRUE(is_point(t));
-  //EXPECT_FALSE(is_vector(t));
-}
-
-TEST(Vector, W0isVector) {
-  const Vector t{4.3f, -4.2f, 3.1f, 0.0f};
-  EXPECT_EQ(t.x, 4.3f);
-  EXPECT_EQ(t.y, -4.2f);
-  EXPECT_EQ(t.z, 3.1f);
-  //EXPECT_FALSE(is_point(t));
-  EXPECT_TRUE(is_vector(t));
-}
-TEST(Vector, vectorFactoryMakesVectors) {
-  const Vector t = vector(4.3f, -4.2f, 3.1f);
-  
-  EXPECT_TRUE(is_vector(t));
-}
-TEST(Point, pointFactoryMakesPoints) {
-  const Point t = point(4.3f, -4.2f, 3.1f);
-  EXPECT_TRUE(is_point(t));
-  
 }
 
 TEST(Vector, canBeAdded) {
-  const Vector t1{3, -2, 5, 1};
-  const Vector t2{-2, 3, 1, 0};
+  const Vector t1{3, -2, 5};
+  const Vector t2{-2, 3, 1};
   const Vector res = t1 + t2;
-  const Vector expected{1, 1, 6, 1};
+  const Vector expected{1, 1, 6};
   EXPECT_TRUE(res == expected);
 }
 

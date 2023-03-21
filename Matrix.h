@@ -199,19 +199,19 @@ constexpr auto operator*(const Matrix& lhs, const Matrix& rhs) noexcept {
 }
 
 constexpr Vector operator*(const Matrix4& lhs, const Vector& rhs) noexcept {
-    const auto x = rhs.x * lhs[0] + rhs.y   * lhs[1] + rhs.z * lhs[2]  + rhs.w * lhs[3];
-    const auto y = rhs.x * lhs[4] + rhs.y   * lhs[5] + rhs.z * lhs[6]  + rhs.w * lhs[7];
-    const auto z = rhs.x * lhs[8] + rhs.y   * lhs[9] + rhs.z * lhs[10] + rhs.w * lhs[11];
-    const auto w = rhs.x * lhs[12] + rhs.y  * lhs[13]+ rhs.z * lhs[14] + rhs.w * lhs[15];
-    return Vector{ x, y, z, w };
+    const auto x = rhs.x * lhs[0] + rhs.y   * lhs[1] + rhs.z * lhs[2]  + 0 * lhs[3];
+    const auto y = rhs.x * lhs[4] + rhs.y   * lhs[5] + rhs.z * lhs[6]  + 0 * lhs[7];
+    const auto z = rhs.x * lhs[8] + rhs.y   * lhs[9] + rhs.z * lhs[10] + 0 * lhs[11];
+    //const auto w = rhs.x * lhs[12] + rhs.y  * lhs[13]+ rhs.z * lhs[14] + rhs.w * lhs[15];
+    return Vector{ x, y, z };
 }
 
 constexpr Point operator*(const Matrix4& lhs, const Point& rhs) noexcept {
-    const auto x = rhs.x * lhs[0] + rhs.y   * lhs[1] + rhs.z * lhs[2]  + rhs.w * lhs[3];
-    const auto y = rhs.x * lhs[4] + rhs.y   * lhs[5] + rhs.z * lhs[6]  + rhs.w * lhs[7];
-    const auto z = rhs.x * lhs[8] + rhs.y   * lhs[9] + rhs.z * lhs[10] + rhs.w * lhs[11];
-    const auto w = rhs.x * lhs[12] + rhs.y  * lhs[13]+ rhs.z * lhs[14] + rhs.w * lhs[15];
-    return Point{ x, y, z, w };
+    const auto x = rhs.x * lhs[0] + rhs.y   * lhs[1] + rhs.z * lhs[2]  + 1 * lhs[3];
+    const auto y = rhs.x * lhs[4] + rhs.y   * lhs[5] + rhs.z * lhs[6]  + 1 * lhs[7];
+    const auto z = rhs.x * lhs[8] + rhs.y   * lhs[9] + rhs.z * lhs[10] + 1 * lhs[11];
+  //const auto w = rhs.x * lhs[12] + rhs.y  * lhs[13]+ rhs.z * lhs[14] + 1 * lhs[15];
+    return Point{ x, y, z };
 }
 
 template <class Matrix>

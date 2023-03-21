@@ -18,8 +18,7 @@ constexpr Vector normal_at(const Shapes& variant, const Point& p) {
     return std::visit([&p](const auto& obj){         
         const auto object_space_point = obj.inv_transform() * p; 
         const auto object_space_normal = local_normal_at(obj, object_space_point);
-        auto world_space_normal = transpose(obj.inv_transform()) * object_space_normal;
-        world_space_normal.w = 0; //hack to avoid having to work with the transform submatrix
+        auto world_space_normal = transpose(obj.inv_transform()) * object_space_normal;        
         return normalize(world_space_normal);               
     }, variant);    
 }
