@@ -15,8 +15,7 @@ TEST(Vector, hasMagnitude) {
   v = vector(1, 2, 3);
   EXPECT_FLOAT_EQ(magnitude(v), math::sqrt(14.0f));
   v = vector(-1, -2, -3);
-  EXPECT_FLOAT_EQ(magnitude(v), math::sqrt(14.0f));
-  EXPECT_TRUE(is_vector(v));
+  EXPECT_FLOAT_EQ(magnitude(v), math::sqrt(14.0f));  
 }
 
 TEST(Vector, canBeNormalized) {
@@ -24,9 +23,9 @@ TEST(Vector, canBeNormalized) {
   EXPECT_EQ(normalize(v), vector(1, 0, 0));
   const auto norm = normalize(vector(1, 2, 3));
   EXPECT_FLOAT_EQ(magnitude(norm), 1.0f);
-  EXPECT_FLOAT_EQ(norm.x, 1.0f / std::sqrt(14.0f)); // roughly 0.26726
-  EXPECT_FLOAT_EQ(norm.y, 2.0f / std::sqrt(14.0f)); // roughly 0.53452
-  EXPECT_FLOAT_EQ(norm.z, 3.0f / std::sqrt(14.0f)); // roughly 0.80178
+  EXPECT_FLOAT_EQ(norm.x, 1.0f / math::sqrt(14.0f)); // roughly 0.26726
+  EXPECT_FLOAT_EQ(norm.y, 2.0f / math::sqrt(14.0f)); // roughly 0.53452
+  EXPECT_FLOAT_EQ(norm.z, 3.0f / math::sqrt(14.0f)); // roughly 0.80178
 }
 
 TEST(Vector, hasDotProduct) {

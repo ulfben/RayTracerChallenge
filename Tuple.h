@@ -2,133 +2,65 @@
 #include "pch.h"
 #include "Math.h"
 
-struct Point final {    
+struct Point final {
     Real x{};
-    Real y{};            
-    Real z{};   
-
-    //constexpr Point operator*(Real scalar) const noexcept {
-    //    return Point{ x * scalar, y * scalar, z * scalar, w * scalar };
-    //}
-    //constexpr void operator*=(Real scalar) noexcept {
-    //    x *= scalar;
-    //    y *= scalar;
-    //    z *= scalar;
-    //    w *= scalar;
-    //}
-    constexpr Point operator/(Real scalar) const noexcept {
-        return Point{ x / scalar, y / scalar, z / scalar };
-    }
-    constexpr Point operator-() const noexcept { return Point{ -x, -y, -z }; }
-    constexpr bool operator==(const Point& rhs) const noexcept {
-        using math::float_cmp;
-        return float_cmp(x, rhs.x) && float_cmp(y, rhs.y) && float_cmp(z, rhs.z);
-    };
-    
-    /*constexpr Point operator+(const Vector& rhs) const noexcept {
-        return Point{ x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w };
-    }
-    constexpr void operator+=(const Vector& rhs) noexcept {
-        x += rhs.x;
-        y += rhs.y;
-        z += rhs.z;
-        w += rhs.w;
-    };
-    constexpr Vector operator-(const Point& rhs) const noexcept {
-        return Vector{ x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w };
-    }
-    constexpr Point operator-(const Vector& rhs) const noexcept {
-        return Point{ x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w };
-    }*/
-    
+    Real y{};
+    Real z{};
 };
-
-struct Vector final {    
+struct Vector final {
     Real x{};
-    Real y{};            
-    Real z{};   
-
-    constexpr Vector operator*(Real scalar) const noexcept {
-        return Vector{ x * scalar, y * scalar, z * scalar  };
-    }
-    constexpr void operator*=(Real scalar) noexcept {
-        x *= scalar;
-        y *= scalar;
-        z *= scalar;        
-    }
-    constexpr Vector operator/(Real scalar) const noexcept {
-        return Vector{ x / scalar, y / scalar, z / scalar };
-    }
-    constexpr Vector operator+(const Vector& rhs) const noexcept {
-        return Vector{ x + rhs.x, y + rhs.y, z + rhs.z };
-    }
-    constexpr void operator+=(const Vector& rhs) noexcept {
-        x += rhs.x;
-        y += rhs.y;
-        z += rhs.z;        
-    };
-    constexpr Vector operator-(const Vector& rhs) const noexcept {
-        return Vector{ x - rhs.x, y - rhs.y, z - rhs.z };
-    }
-    constexpr Vector operator-() const noexcept { return Vector{ -x, -y, -z}; }
-    constexpr bool operator==(const Vector& rhs) const noexcept {
-        using math::float_cmp;
-        return float_cmp(x, rhs.x) && float_cmp(y, rhs.y) && float_cmp(z, rhs.z);
-    };
+    Real y{};
+    Real z{};
 };
-
-constexpr Point operator+(const Point& lhs, const Vector& rhs)  noexcept {
-     return Point{ lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z };
-}
-constexpr void operator+=(Point& lhs, const Vector& rhs) noexcept {
-    lhs.x += rhs.x;
-    lhs.y += rhs.y;
-    lhs.z += rhs.z;    
-};
-constexpr Vector operator-(const Point& lhs, const Point& rhs)  noexcept {
-    return Vector{ lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z };
-}
-constexpr Point operator-(const Point& lhs, const Vector& rhs) noexcept {
-    return Point{ lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z };
-}
-
-
-template <>
-struct std::formatter<Vector> : std::formatter<string_view> {
-    auto format(const Vector& obj, std::format_context& ctx) const {
-        std::string temp;
-        std::format_to(std::back_inserter(temp), "({}, {}, {})"sv, 
-                       obj.x, obj.y, obj.z );
-        return std::formatter<string_view>::format(temp, ctx);
-    }
-};
-
-
-#pragma warning(push)
-#pragma warning( disable : 26481 ) //spurious warning; "don't use pointer arithmetic" 
-std::ostream& operator<<(std::ostream& os, const Vector& t) {
-    os << std::format("{}, {}, {}"sv, t.x, t.y, t.z);
-    return os;
-}
-#pragma warning(pop)
+static constexpr Point ORIGO = Point{ 0, 0, 0 };
 
 constexpr Vector vector(Real x, Real y, Real z) noexcept {
     return Vector{ x, y, z };
 }
 constexpr Vector vector(const Point& p) noexcept {
-    return Vector{ p.x, p.y, p.z  };
+    return Vector{ p.x, p.y, p.z };
+}
+constexpr Vector vector(Real xyz) noexcept {
+    return Vector{ xyz, xyz, xyz };
 }
 constexpr Point point(Real x, Real y, Real z) noexcept {
-    return Point{ x, y, z  }; //, 1.0f
+    return Point{ x, y, z };
 }
 constexpr Point point(const Vector& v) noexcept {
     return Point{ v.x, v.y, v.z };
 }
+constexpr Point point(Real xyz) noexcept {
+    return Point{ xyz, xyz, xyz };
+}
 
-static constexpr Point ORIGO = point(0,0,0);
-
-constexpr bool is_vector(const Vector& t) noexcept { return true; }
-constexpr bool is_point(const Point& p) noexcept { return true; }
+//Vector interface
+constexpr Vector operator*(const Vector& lhs, Real scalar) noexcept {
+    return Vector{ lhs.x * scalar, lhs.y * scalar, lhs.z * scalar };
+}
+constexpr void operator*=(Vector& lhs, Real scalar) noexcept {
+    lhs.x *= scalar;
+    lhs.y *= scalar;
+    lhs.z *= scalar;
+}
+constexpr Vector operator/(const Vector& lhs, Real scalar) noexcept {
+    return Vector{ lhs.x / scalar, lhs.y / scalar, lhs.z / scalar };
+}
+constexpr Vector operator+(const Vector& lhs, const Vector& rhs) noexcept {
+    return Vector{ lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z };
+}
+constexpr void operator+=(Vector& lhs, const Vector& rhs) noexcept {
+    lhs.x += rhs.x;
+    lhs.y += rhs.y;
+    lhs.z += rhs.z;
+};
+constexpr Vector operator-(const Vector& lhs, const Vector& rhs)  noexcept {
+    return Vector{ lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z };
+}
+constexpr Vector operator-(const Vector& self)  noexcept { return Vector{ -self.x, -self.y, -self.z }; }
+constexpr bool operator==(const Vector& lhs, const Vector& rhs) noexcept {
+    using math::float_cmp;
+    return float_cmp(lhs.x, rhs.x) && float_cmp(lhs.y, rhs.y) && float_cmp(lhs.z, rhs.z);
+};
 
 constexpr Real magnitudeSq(const Vector& t) noexcept {
     return ((t.x * t.x) + (t.y * t.y) + (t.z * t.z));
@@ -162,3 +94,47 @@ constexpr Vector cross(const Vector& a, const Vector& b) noexcept {
 constexpr Vector reflect(const Vector& v, const Vector& normal) noexcept {
     return v - normal * 2 * dot(v, normal);
 }
+
+//Point interface
+constexpr Point operator/(const Point& lhs, Real scalar) noexcept {
+    return Point{ lhs.x / scalar, lhs.y / scalar, lhs.z / scalar };
+}
+constexpr Point operator-(const Point& self) noexcept { return Point{ -self.x, -self.y, -self.z }; }
+constexpr bool operator==(const Point& lhs, const Point& rhs) noexcept {
+    using math::float_cmp;
+    return float_cmp(lhs.x, rhs.x) && float_cmp(lhs.y, rhs.y) && float_cmp(lhs.z, rhs.z);
+};
+constexpr Point operator+(const Point& lhs, const Vector& rhs)  noexcept {
+    return Point{ lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z };
+}
+constexpr void operator+=(Point& lhs, const Vector& rhs) noexcept {
+    lhs.x += rhs.x;
+    lhs.y += rhs.y;
+    lhs.z += rhs.z;
+};
+constexpr Vector operator-(const Point& lhs, const Point& rhs)  noexcept {
+    return Vector{ lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z };
+}
+constexpr Point operator-(const Point& lhs, const Vector& rhs) noexcept {
+    return Point{ lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z };
+}
+
+//printing support:
+template <>
+struct std::formatter<Vector> : std::formatter<string_view> {
+    auto format(const Vector& obj, std::format_context& ctx) const {
+        std::string temp;
+        std::format_to(std::back_inserter(temp), "({}, {}, {})"sv,
+            obj.x, obj.y, obj.z);
+        return std::formatter<string_view>::format(temp, ctx);
+    }
+};
+
+#pragma warning(push)
+#pragma warning( disable : 26481 ) //spurious warning; "don't use pointer arithmetic" 
+std::ostream& operator<<(std::ostream& os, const Vector& t) {
+    os << std::format("{}, {}, {}"sv, t.x, t.y, t.z);
+    return os;
+}
+#pragma warning(pop)
+

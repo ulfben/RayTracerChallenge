@@ -7,9 +7,7 @@ struct Ray final {
     Vector direction;
     constexpr bool operator==(const Ray& that) const noexcept = default;
 };
-constexpr Ray ray(Point p, Vector dir) noexcept {
-    assert(is_point(p));
-    assert(is_vector(dir));
+constexpr Ray ray(Point p, Vector dir) noexcept {    
     return Ray{ p, dir };
 }
 
