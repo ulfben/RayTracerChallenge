@@ -4,7 +4,7 @@
 namespace Detail {
     template<class T>
         requires std::is_arithmetic_v<T>
-    T constexpr sqrtNewtonRaphson(T x, T curr, T prev) {        
+    [[nodiscard]] T constexpr sqrtNewtonRaphson(T x, T curr, T prev) {        
         return curr == prev ? curr
             : sqrtNewtonRaphson(x, T(0.5) * (curr + x / curr), curr);
     }
@@ -25,42 +25,53 @@ namespace math {
     static constexpr auto GTEST_EPSILON = 0.000001f;// 1.0e-6f; //from Google Test
     static constexpr auto MACHINE_EPSILON = 0.000000119209f; //1.19209e-7f, == std::numeric_limits<Real>::epsilon();
 
+    template<class T>
+        requires std::is_arithmetic_v<T>
+    [[nodiscard]] constexpr T to_radians(T degrees) noexcept {
+        return degrees * T(TO_RAD);
+    }
+    
+    template<class T>
+        requires std::is_arithmetic_v<T>
+    [[nodiscard]] constexpr T to_degrees(T radians) noexcept {
+        return radians * T(TO_DEG);
+    }
 
     template<class T>        
-    constexpr T max(T a, T b, T c) noexcept {
+    [[nodiscard]] constexpr T max(T a, T b, T c) noexcept {
         return (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);
     }
     
     template<class T>        
-    constexpr T min(T a, T b, T c) noexcept {
+    [[nodiscard]] constexpr T min(T a, T b, T c) noexcept {
        return (a < b) ? ((a < c) ? a : c) : ((b < c) ? b : c);
     }
 
     template<class T>    
-    constexpr bool is_between(T in, T min, T max) noexcept {
+    [[nodiscard]] constexpr bool is_between(T in, T min, T max) noexcept {
         return (in > min) && (in < max);
     }
 
     template<class T>        
-    constexpr T lerp(T start, T end, T t) {        
+    [[nodiscard]] constexpr T lerp(T start, T end, T t) {        
        return (T(1.0) - t) * start + t * end;
     }
 
     template<class T>
         requires std::integral<T>
-    constexpr bool is_odd(T v) noexcept {
+    [[nodiscard]] constexpr bool is_odd(T v) noexcept {
         return v & 1;
     }
 
     template<class T>
         requires std::integral<T>
-    constexpr bool is_even(T v) noexcept {
+    [[nodiscard]] constexpr bool is_even(T v) noexcept {
         return v & 0;
     }
 
     template<class T>
         requires std::is_arithmetic_v<T>
-    constexpr T abs(T x) noexcept {
+    [[nodiscard]] constexpr T abs(T x) noexcept {
         if (std::is_constant_evaluated()) {
             return x == 0 ? 0 : (x < 0 ? -x : x);
         }
@@ -68,14 +79,14 @@ namespace math {
     }
 
     template<class T>        
-    constexpr T is_zero(T v, T epsilon = BRAZZY_EPSILON) noexcept {
+    [[nodiscard]] constexpr T is_zero(T v, T epsilon = BRAZZY_EPSILON) noexcept {
         return v == T(0) || math::abs(v) < epsilon;
     }
 
 
     template<class T>
         requires std::is_arithmetic_v<T>
-    constexpr bool is_nan(T x) noexcept {
+    [[nodiscard]] constexpr bool is_nan(T x) noexcept {
         if (std::is_constant_evaluated()) {
             return x != x; //in use until std::is_nan becomes constexpr.
         }
@@ -84,7 +95,7 @@ namespace math {
 
     template<class T>
         requires std::is_arithmetic_v<T>
-    constexpr T sqrt(T x) noexcept {
+    [[nodiscard]] constexpr T sqrt(T x) noexcept {
         if (std::is_constant_evaluated()) {            
             return x >= T(0.0) && x < std::numeric_limits<T>::infinity()
                 ? Detail::sqrtNewtonRaphson(x, x, T(0.0))
@@ -95,13 +106,13 @@ namespace math {
 
     template<class T>
         requires std::is_arithmetic_v<T>
-    constexpr T square(T x) noexcept {
+   [[nodiscard]]  constexpr T square(T x) noexcept {
         return x * x;
     }
     
     template<class T>
         requires std::is_arithmetic_v<T>
-    constexpr int int_ceil(T f) noexcept {
+    [[nodiscard]] constexpr int int_ceil(T f) noexcept {
         if (std::is_constant_evaluated()) {
             const int i = static_cast<int>(f);
             return f > i ? i + 1 : i;
@@ -112,7 +123,7 @@ namespace math {
     
     template<class T>
         requires std::is_arithmetic_v<T>
-    constexpr int int_floor(T f) noexcept {
+    [[nodiscard]] constexpr int int_floor(T f) noexcept {
         if (std::is_constant_evaluated()) {
             const auto i = static_cast<int>(f);
             return f < i ? i - 1 : i;
@@ -122,7 +133,7 @@ namespace math {
 
     template<class T>
         requires std::is_arithmetic_v<T>
-    constexpr T floor(T f) noexcept {
+    [[nodiscard]] constexpr T floor(T f) noexcept {
         if (std::is_constant_evaluated()) {
             const auto i = static_cast<T>(f);
             return f < i ? i - 1 : i;
@@ -135,7 +146,7 @@ namespace math {
     //from the book. fails on big, bigneg, infinities, opposite, small, smallneg, ulp and zero
     template<class T>
         requires std::is_arithmetic_v<T>
-    constexpr bool almost_equal(T a, T b, T epsilon) noexcept {
+    [[nodiscard]] constexpr bool almost_equal(T a, T b, T epsilon) noexcept {
         return math::abs(a - b) <= epsilon;
     }
 
@@ -143,7 +154,7 @@ namespace math {
     //doesn't handle infinities, ulp or near-zero values
     template<class T>
         requires std::is_arithmetic_v<T>
-    constexpr bool qt_fuzzy_compare(T a, T b, [[maybe_unused]] T) noexcept {
+    [[nodiscard]] constexpr bool qt_fuzzy_compare(T a, T b, [[maybe_unused]] T) noexcept {
         return (math::abs(a - b) * 100000.f <= std::min(math::abs(a), math::abs(b)));
     }
 
@@ -152,7 +163,7 @@ namespace math {
     //  Currently failing all ulp tests. Does not work well with /fp:fast.
     template<class T>
         requires std::is_arithmetic_v<T>
-    constexpr bool brazzy_nearly_equal(T a, T b, T epsilon) noexcept {
+    [[nodiscard]] constexpr bool brazzy_nearly_equal(T a, T b, T epsilon) noexcept {
         if (a == b) { // shortcut, handles infinities
             return true;
         }
@@ -172,7 +183,7 @@ namespace math {
     //borrowed from google test. Doesn't handle infinities, opposite, Small, SmallNeg or ulp
     template<class T>
         requires std::is_arithmetic_v<T>
-    constexpr  bool gtest_almost_equals(T expected, T actual, T max_abs_error) noexcept {
+    [[nodiscard]] constexpr  bool gtest_almost_equals(T expected, T actual, T max_abs_error) noexcept {
         if (is_nan(expected) || is_nan(actual)) {
             return false;
         }
@@ -187,7 +198,7 @@ namespace math {
     //borrowed from Paul Floyd, https://accu.org/journals/overload/31/173/floyd/
     template<class T>
         requires std::is_arithmetic_v<T>
-    constexpr bool cmpEq(T a, T b, T epsilon = 1.0e-7f, T abstol = 1.0e-12f) noexcept {
+    [[nodiscard]] constexpr bool cmpEq(T a, T b, T epsilon = 1.0e-7f, T abstol = 1.0e-12f) noexcept {
         if (a == b) {
             return true;
         }
@@ -199,13 +210,13 @@ namespace math {
     //facade to let me swap the tested function and epsilon easily
     template<class T>
         requires std::is_arithmetic_v<T>
-    static constexpr bool float_cmp(T a, T b, T epsilon) noexcept {
+    [[nodiscard]] static constexpr bool float_cmp(T a, T b, T epsilon) noexcept {
         return math::brazzy_nearly_equal(a, b, epsilon);
     }
 
     template<class T>
        requires std::is_arithmetic_v<T>
-    static constexpr bool float_cmp(T a, T b) noexcept {
+    [[nodiscard]] static constexpr bool float_cmp(T a, T b) noexcept {
         return float_cmp(a, b, math::BRAZZY_EPSILON);
     }
 }

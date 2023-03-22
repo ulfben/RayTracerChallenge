@@ -35,7 +35,7 @@ struct StripePattern final {
     constexpr StripePattern(Matrix4 mat, Color a_, Color b_) noexcept : a{ a_ }, b{b_} {
         setTransform(std::move(mat));
     }
-    constexpr Color at(const Point& p) const noexcept {
+    constexpr Color at(const Point& p) const noexcept {        
         return (math::int_floor(p.x) % 2 == 0) ? a : b;
     }
     constexpr void setTransform(Matrix4 mat) noexcept {
@@ -205,6 +205,11 @@ inline bool operator==(const Patterns& v, const is_pattern auto& t) {
     return t == v;
 };
 
+constexpr void set_transform(Patterns& variant, const Matrix4& newTransform) noexcept { 
+    return std::visit([&newTransform](auto& pattern) noexcept -> void { 
+        return pattern.setTransform(newTransform);
+    }, variant);    
+};
 constexpr const Matrix4& transform(const Patterns& variant) noexcept { 
     return std::visit([](const auto& pattern) noexcept -> const Matrix4& { 
         return pattern.transform();

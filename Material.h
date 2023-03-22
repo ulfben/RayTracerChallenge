@@ -58,6 +58,13 @@ constexpr Material glass(Real refractive = IoR::glass) noexcept {
 constexpr Material material(Patterns pattern) noexcept {    
     return Material(std::move(pattern)); 
 }
+
+constexpr Material material(Material mat, const Matrix4& texture_transform) noexcept {    
+    auto current_transform = transform(mat.pattern);
+    set_transform(mat.pattern, current_transform * texture_transform);
+    return mat; 
+}
+
 constexpr bool has_pattern(const Material& mat) noexcept {
     return std::visit([](const auto& obj) noexcept -> bool { return static_cast<bool>(obj); }, mat.pattern);
 }

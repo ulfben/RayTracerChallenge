@@ -296,50 +296,6 @@ TEST(DISABLED_Chapter11, CanRenderReflectionsAndRefractions) {
     save_to_file(img, "output/chapter11_5_sRGB.ppm"sv);
 }
 
-TEST(DISABLED_Chapter11, CanRenderBookScene) {    
-    using math::TO_RAD;
-    const auto c = Camera(400, 400, 90*TO_RAD/*0.5f*/,
-        view_transform(point(-4.5f, 0.85f, -4.0f), point(0, 0.85f, 0), vector(0, 1, 0)));
-      
-    auto wallpaper = material(checkers_pattern(BLACK, color(0.75f), scaling(0.5f)));
-    wallpaper.specular = 0;
-    
-    auto floor_material = wallpaper;
-    floor_material.ambient = 0.5f;
-    floor_material.diffuse = 0.4f;
-    floor_material.specular = 0.8f;
-    floor_material.reflective = 0.1f;
-    const auto floor = plane(floor_material, rotation_y(0.31415f));    
-
-    auto ceiling_material = material(checkers_pattern(color(0.85f), WHITE, scaling(0.2f)));
-    ceiling_material.ambient = 0.5f;
-    ceiling_material.specular = 0;
-
-    auto transf = translation(0, 5, 0);
-    const auto ceiling = plane(ceiling_material, transf);
-
-    transf = translation(-5, 0, 0)*rotation(0.0f, 1.5708f, 1.5708f); 
-    const auto west_wall = plane(wallpaper,  transf);
-
-    transf = translation(5, 0, 0)*rotation(0.0f, 1.5708f, 1.5708f);
-    const auto east_wall = plane(wallpaper, transf);
-
-    transf = translation(0, 0, 5) * rotation_x(1.5708f);
-    const auto north_wall = plane(wallpaper, transf);
-
-    transf = translation(0, 0, -5) * rotation_x(1.5708f);
-    const auto south_wall = plane(wallpaper, transf);
-
-    transf = translation(4, 1, 4);
-    auto background_sphere = sphere(color(0.8f, 0.1f, 0.3f), transf);
-    background_sphere.surface.specular = 0;
-
-    const auto world = World({ floor, background_sphere, ceiling, west_wall, east_wall, north_wall, south_wall }, 
-                                point_light(point(-4.9f, 4.9f, 1), color(1, 1, 1)));    
-    const auto img = render(c, world);
-    save_to_file(img, "output/chapter11_bookscene.ppm"sv);
-}
-
 TEST(DISABLED_Chapter12, CanRenderCubes) {    
     const auto c = Camera(600, 400, math::PI / 3.0f, 
         view_transform(point(0.0f, 5.0f, -10.0f), point(0, 1, 0), vector(0, 1, 0)));
@@ -378,7 +334,7 @@ TEST(DISABLED_Chapter12, CanRenderCubes) {
     save_to_file(img, "output/chapter12_1.ppm"sv);
 }
 
-TEST(Chapter13, CanRenderCylinders) {    
+TEST(DISABLED_Chapter13, CanRenderCylinders) {    
     const auto mighty_slate = color(0.33f, 0.38f, 0.44f);
     const auto pacifica = color(0.31f, 0.81f, 0.77f);
     const auto c = Camera(600, 400, math::PI / 3.0f, 
@@ -402,4 +358,74 @@ TEST(Chapter13, CanRenderCylinders) {
                               point_light(point(-10, 10, -10), color(1, 1, 1)));    
     const auto img = render(c, world);
     save_to_file(img, "output/chapter13_3.ppm"sv);
+}
+
+TEST(Chapter11, CanRenderBookScene) {    
+    using math::TO_RAD;
+    
+    const auto ROT = math::HALF_PI; //book rotation 1.5708f
+    const auto DIST = 5.0f;
+    const auto FOV = 0.5f;
+
+    const auto c = Camera(1024, 768, FOV,
+        view_transform(point(-4.5f, 0.85f, -4.0f), point(0, 0.85f, 0), vector(0, 1, 0)));        
+
+    auto floor_material = material(checkers_pattern(BLACK, color(0.75f)));
+    floor_material.ambient = 0.5f;
+    floor_material.diffuse = 0.4f;
+    floor_material.specular = 0.8f;
+    floor_material.reflective = 0.1f;    
+    const auto floor = plane(floor_material, rotation_y(math::PI));    
+
+    auto ceiling_material = material(checkers_pattern(color(0.85f), WHITE, scaling(0.2f)));
+    ceiling_material.ambient = 0.5f;
+    ceiling_material.specular = 0;
+
+    auto transf = translation(0, DIST, 0);
+    const auto ceiling = plane(ceiling_material, transf);
+
+    auto wallpaper = material(checkers_pattern(BLACK, color(0.75f), scaling(0.5f)));
+    wallpaper.specular = 0;           
+
+    transf = translation(0, 0, DIST) * rotation_x(ROT);
+    const auto north_wall = plane(wallpaper, transf);
+
+    transf = translation(0, 0, -DIST) * rotation_x(ROT);
+    const auto south_wall = plane(wallpaper, transf);
+        
+    transf = translation(-DIST,0,0)*rotation_z(ROT);    
+    auto west_wall = plane(material(wallpaper, rotation_y(ROT)), transf);   
+    
+    transf = translation(DIST, 0, 0)*rotation_z(ROT);
+    const auto east_wall = plane(material(wallpaper, rotation_y(ROT)), transf);
+
+    transf = translation(4.0f, 1.0f, 4.0f);
+    auto red_sphere = sphere(color(0.8f, 0.1f, 0.3f), transf);
+    red_sphere.surface.specular = 0;
+
+    transf = translation(4.6f, 0.4f, 2.9f) * scaling(0.4f);
+    auto green_sphere = sphere(color(0.1f, 0.8f, 0.2f), transf);
+    green_sphere.surface.shininess = 200;
+
+    transf = translation(2.6f, 0.6f, 4.4f) * scaling(0.6f);
+    auto blue_sphere = sphere(color(0.2f, 0.1f, 0.8f), transf);
+    green_sphere.surface.shininess = 10;
+    green_sphere.surface.specular = 0.4f;
+
+    auto glass_material = material(color(0.8f, 0.8f, 0.9f));
+    glass_material.ambient = 0; 
+    glass_material.diffuse = 0.2f;
+    glass_material.specular = 0.9f; 
+    glass_material.shininess = 300.0f;
+    glass_material.transparency = 0.8f;
+    glass_material.refractive_index = IoR::glass;
+
+    transf = scaling(1.0f, 1.0f, 1.0f) * translation(0.25f, 1.0f, .0f);
+    auto glass_sphere = sphere(glass_material, transf);
+
+
+    const auto world = World({ floor, glass_sphere, red_sphere, green_sphere, blue_sphere, ceiling, north_wall, south_wall, east_wall, west_wall }, 
+                                point_light(point(-4.9f, 4.9f, 1), color(1, 1, 1)));    
+    const auto img = render(c, world);
+    save_to_file(img, "output/chapter11_bookscene.ppm"sv);
 }
