@@ -409,8 +409,8 @@ TEST(Chapter11, CanRenderBookScene) {
 
     transf = translation(2.6f, 0.6f, 4.4f) * scaling(0.6f);
     auto blue_sphere = sphere(color(0.2f, 0.1f, 0.8f), transf);
-    green_sphere.surface.shininess = 10;
-    green_sphere.surface.specular = 0.4f;
+    blue_sphere.surface.shininess = 10;
+    blue_sphere.surface.specular = 0.4f;
 
     auto glass_material = material(color(0.8f, 0.8f, 0.9f));
     glass_material.ambient = 0; 

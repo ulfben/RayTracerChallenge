@@ -30,7 +30,12 @@ constexpr Color lighting(const Color& color, const Material& surface, const Ligh
     const auto diffuse = effective_color * surface.diffuse * light_dot_normal;
     const auto reflection_v = reflect(-direction_to_light, normal);
     //reflection vector dot eye vector, if negative, means the light reflects away from the eye, so the specular component will be 0.
-    const auto specular = light.intensity * surface.specular * std::pow(std::max(dot(reflection_v, eye), 0.0f), surface.shininess);
+    const auto reflect_dot_eye = dot(reflection_v, eye);    
+    if (reflect_dot_eye <= 0) {
+        return ambient + diffuse;       
+    }
+    const auto factor = std::pow(reflect_dot_eye, surface.shininess);
+    const auto specular = light.intensity * surface.specular * factor;
     return ambient + diffuse + specular;
 }
 
