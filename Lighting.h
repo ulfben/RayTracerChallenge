@@ -64,8 +64,8 @@ constexpr Real schlick(const HitState& state) noexcept {
         //when n1 > n2, use cos(theta_t) instead
         cos = cos_t;
     }
-    const auto r0 = std::powf((state.n1 - state.n2) / (state.n1 + state.n2), 2);
-    return r0 + (1.0f - r0) * std::powf(1.0f - cos, 5);
+    const auto r0 = math::pow((state.n1 - state.n2) / (state.n1 + state.n2), 2);
+    return r0 + (1.0f - r0) * math::pow(1.0f - cos, 5);
 }
 
 constexpr bool is_shadowed(const World& w, const Point& p) noexcept {

@@ -46,19 +46,6 @@ template <class T, class U>
     return static_cast<T>(std::forward<U>(u));
 }
 
-template<class T>
-[[nodiscard]] constexpr T map_to(Real v) noexcept {   
-    return v >= 1.0f ? std::numeric_limits<T>::max() : 
-            (v <= 0.0f ? std::numeric_limits<T>::min() : 
-                narrow_cast<T>(v * std::numeric_limits<T>::max()));
-}
-static_assert(map_to<int8_t>(-0.5f) == -128);
-static_assert(map_to<int8_t>(1.0f) == 127);
-static_assert(map_to<uint8_t>(0.0f) == 0);
-static_assert(map_to<uint8_t>(0.5f) == 127);
-static_assert(map_to<uint8_t>(1.0f) == 255);
-static_assert(map_to<uint8_t>(1.5f) == 255);
-
 constexpr size_t index_to_column(size_t index, size_t width) noexcept {        
     return index % width;
 }

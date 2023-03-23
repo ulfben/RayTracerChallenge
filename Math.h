@@ -4,9 +4,15 @@
 namespace Detail {
     template<class T>
         requires std::is_arithmetic_v<T>
-    [[nodiscard]] T constexpr sqrtNewtonRaphson(T x, T curr, T prev) {        
+    [[nodiscard]] T constexpr sqrtNewtonRaphson(T x, T curr, T prev) {
         return curr == prev ? curr
             : sqrtNewtonRaphson(x, T(0.5) * (curr + x / curr), curr);
+    }
+
+    template <typename T, typename U>
+        requires std::is_arithmetic_v<T> && std::integral<U>
+    constexpr T pow_helper(T base, U exponent, T result) {
+        return (exponent == 0) ? result : pow_helper(base, exponent - 1, result * base);
     }
 }
 
@@ -18,43 +24,52 @@ namespace math {
     constexpr auto TO_DEG = 180.0f / PI;
     constexpr auto TO_RAD = PI / 180.0f;
     constexpr auto MAX = std::numeric_limits<Real>::max();
-    constexpr auto MIN = std::numeric_limits<Real>::lowest();  
+    constexpr auto MIN = std::numeric_limits<Real>::lowest();
     static constexpr auto SHADOW_BIAS = 0.005f; //to avoid shadow acne due to spurious self-intersections
     static constexpr auto BOOK_EPSILON = 0.0001f; //1.0e-4f, value suggested as "good enough" by the book.
     static constexpr auto BRAZZY_EPSILON = 0.00001f; //1.0e-5f, https://github.com/brazzy/floating-point-gui.de    
     static constexpr auto GTEST_EPSILON = 0.000001f;// 1.0e-6f; //from Google Test
     static constexpr auto MACHINE_EPSILON = 0.000000119209f; //1.19209e-7f, == std::numeric_limits<Real>::epsilon();
+        
+    template <typename T, typename U>
+        requires std::is_arithmetic_v<T> && std::integral<U>
+    constexpr T pow(T base, U exponent) {        
+        if (std::is_constant_evaluated()) {
+            return Detail::pow_helper(base, exponent, T(1));
+        }
+        return static_cast<T>(std::pow(base, exponent));
+    }    
 
     template<class T>
         requires std::is_arithmetic_v<T>
     [[nodiscard]] constexpr T to_radians(T degrees) noexcept {
         return degrees * T(TO_RAD);
     }
-    
+
     template<class T>
         requires std::is_arithmetic_v<T>
     [[nodiscard]] constexpr T to_degrees(T radians) noexcept {
         return radians * T(TO_DEG);
     }
 
-    template<class T>        
+    template<class T>
     [[nodiscard]] constexpr T max(T a, T b, T c) noexcept {
         return (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);
     }
-    
-    template<class T>        
+
+    template<class T>
     [[nodiscard]] constexpr T min(T a, T b, T c) noexcept {
-       return (a < b) ? ((a < c) ? a : c) : ((b < c) ? b : c);
+        return (a < b) ? ((a < c) ? a : c) : ((b < c) ? b : c);
     }
 
-    template<class T>    
+    template<class T>
     [[nodiscard]] constexpr bool is_between(T in, T min, T max) noexcept {
         return (in > min) && (in < max);
     }
 
-    template<class T>        
-    [[nodiscard]] constexpr T lerp(T start, T end, T t) {        
-       return (T(1.0) - t) * start + t * end;
+    template<class T>
+    [[nodiscard]] constexpr T lerp(T start, T end, T t) {
+        return (T(1.0) - t) * start + t * end;
     }
 
     template<class T>
@@ -78,7 +93,7 @@ namespace math {
         return std::abs(x);
     }
 
-    template<class T>        
+    template<class T>
     [[nodiscard]] constexpr T is_zero(T v, T epsilon = BRAZZY_EPSILON) noexcept {
         return v == T(0) || math::abs(v) < epsilon;
     }
@@ -96,7 +111,7 @@ namespace math {
     template<class T>
         requires std::is_arithmetic_v<T>
     [[nodiscard]] constexpr T sqrt(T x) noexcept {
-        if (std::is_constant_evaluated()) {            
+        if (std::is_constant_evaluated()) {
             return x >= T(0.0) && x < std::numeric_limits<T>::infinity()
                 ? Detail::sqrtNewtonRaphson(x, x, T(0.0))
                 : std::numeric_limits<T>::quiet_NaN();
@@ -106,10 +121,10 @@ namespace math {
 
     template<class T>
         requires std::is_arithmetic_v<T>
-   [[nodiscard]]  constexpr T square(T x) noexcept {
+    [[nodiscard]] constexpr T square(T x) noexcept {
         return x * x;
     }
-    
+
     template<class T>
         requires std::is_arithmetic_v<T>
     [[nodiscard]] constexpr int int_ceil(T f) noexcept {
@@ -120,7 +135,7 @@ namespace math {
         return static_cast<int>(std::ceil(f));
 
     }
-    
+
     template<class T>
         requires std::is_arithmetic_v<T>
     [[nodiscard]] constexpr int int_floor(T f) noexcept {
@@ -141,6 +156,19 @@ namespace math {
         return static_cast<T>(std::floor(f));
     }
 
+    template<class T>
+        requires std::is_arithmetic_v<T>
+    [[nodiscard]] constexpr T map_to(Real v) noexcept {
+        return v >= 1.0f ? std::numeric_limits<T>::max() :
+            (v <= 0.0f ? std::numeric_limits<T>::min() :
+                narrow_cast<T>(v * std::numeric_limits<T>::max()));
+    }
+    static_assert(map_to<int8_t>(-0.5f) == -128);
+    static_assert(map_to<int8_t>(1.0f) == 127);
+    static_assert(map_to<uint8_t>(0.0f) == 0);
+    static_assert(map_to<uint8_t>(0.5f) == 127);
+    static_assert(map_to<uint8_t>(1.0f) == 255);
+    static_assert(map_to<uint8_t>(1.5f) == 255);
 
 
     //from the book. fails on big, bigneg, infinities, opposite, small, smallneg, ulp and zero
@@ -215,7 +243,7 @@ namespace math {
     }
 
     template<class T>
-       requires std::is_arithmetic_v<T>
+        requires std::is_arithmetic_v<T>
     [[nodiscard]] static constexpr bool float_cmp(T a, T b) noexcept {
         return float_cmp(a, b, math::BRAZZY_EPSILON);
     }
