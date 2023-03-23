@@ -400,19 +400,19 @@ TEST(Chapter11, CanRenderBookScene) {
     const auto east_wall = plane(material(wallpaper, rotation_y(ROT)), transf);
 
     transf = translation(4.0f, 1.0f, 4.0f);
-    auto red_sphere = sphere(color(0.8f, 0.1f, 0.3f), transf);
+    auto red_sphere = sphere(sRGB_to_linear(color(0.8f, 0.1f, 0.3f)), transf);
     red_sphere.surface.specular = 0;
 
     transf = translation(4.6f, 0.4f, 2.9f) * scaling(0.4f);
-    auto green_sphere = sphere(color(0.1f, 0.8f, 0.2f), transf);
+    auto green_sphere = sphere(sRGB_to_linear(color(0.1f, 0.8f, 0.2f)), transf);
     green_sphere.surface.shininess = 200;
 
     transf = translation(2.6f, 0.6f, 4.4f) * scaling(0.6f);
-    auto blue_sphere = sphere(color(0.2f, 0.1f, 0.8f), transf);
+    auto blue_sphere = sphere(sRGB_to_linear(color(0.2f, 0.1f, 0.8f)), transf);
     blue_sphere.surface.shininess = 10;
     blue_sphere.surface.specular = 0.4f;
 
-    auto glass_material = material(color(0.8f, 0.8f, 0.9f));
+    auto glass_material = material(sRGB_to_linear(color(0.8f, 0.8f, 0.9f)));
     glass_material.ambient = 0; 
     glass_material.diffuse = 0.2f;
     glass_material.specular = 0.9f; 

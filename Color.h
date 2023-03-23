@@ -61,6 +61,10 @@ constexpr ByteColor to_byte_color(const Color& col) noexcept {
 /*constexpr*/ Color sRGB_to_linear(const Color& c) noexcept {
     return {sRGB_to_linear(c.r), sRGB_to_linear(c.g), sRGB_to_linear(c.b),};
 }
+Color sRGB_to_linear(Real r, Real g, Real b) noexcept {    
+    return sRGB_to_linear(color(r, g, b));
+}
+
 
 /*constexpr*/ Real linear_to_sRGB(Real s) noexcept {
     constexpr Real a = 0.055f;
