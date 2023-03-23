@@ -53,5 +53,14 @@ Adding cubes to the world.
 
 ![chapter12_1](https://user-images.githubusercontent.com/5237741/225836412-1199027f-5797-4562-9d98-f64234889f18.png)
 
+# Revisiting chapter 11:
+Re-creating a scene from the book, but in sRGB color space.
+
+Original render from the book: 
+![chapter11_bookscene_oracle](https://user-images.githubusercontent.com/5237741/227318472-a70cb96f-dc12-41fa-8eaf-8dd888a696df.png)
+
+My render:
+![chapter11_bookscene_convert_colorspace_on_import](https://user-images.githubusercontent.com/5237741/227318481-008bd634-e4c0-44ef-93bc-038a9aee7f8e.png)
+
 
 
