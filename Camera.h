@@ -35,7 +35,7 @@ struct Camera final{
         : Camera(hsize_, vsize_, field_of_view_){
         setTransform(viewTransform);
     }
-    constexpr const Matrix4& transform() const noexcept {
+    constexpr const Matrix4& get_transform() const noexcept {
         return _transform;
     }
     constexpr const Matrix4& inv_transform() const noexcept {

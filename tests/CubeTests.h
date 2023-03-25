@@ -9,8 +9,8 @@ DISABLE_WARNINGS_FROM_GTEST
 
 TEST(Cube, hasTransformAndInverseTransform) {
     const auto c = cube();
-    EXPECT_EQ(c.transform(), Matrix4Identity);
-    EXPECT_EQ(c.inv_transform(), inverse(c.transform()));
+    EXPECT_EQ(c.get_transform(), Matrix4Identity);
+    EXPECT_EQ(c.inv_transform(), inverse(c.get_transform()));
 }
 
 TEST(Cube, rayIntersectsACube) {

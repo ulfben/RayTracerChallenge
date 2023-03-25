@@ -59,8 +59,9 @@ constexpr Material material(Patterns pattern) noexcept {
     return Material(std::move(pattern)); 
 }
 
+//clone a material and append new transform
 constexpr Material material(Material mat, const Matrix4& texture_transform) noexcept {    
-    auto& current_transform = transform(mat.pattern);
+    auto& current_transform = get_transform(mat.pattern);
     set_transform(mat.pattern, current_transform * texture_transform);
     return mat; 
 }

@@ -33,9 +33,9 @@ constexpr bool operator==(const Patterns& v, const is_shape auto& t) {
     return t == v;
 };
 
-constexpr const Matrix4& transform(const Shapes& variant) noexcept { 
+constexpr const Matrix4& get_transform(const Shapes& variant) noexcept { 
     return std::visit([](const auto& obj) -> const Matrix4& { 
-        return obj.transform();
+        return obj.get_transform();
     }, variant);    
 }
 constexpr const Matrix4& invTransform(const Shapes& variant) noexcept { 
@@ -58,8 +58,8 @@ constexpr const Material& color(const is_shape auto& obj) noexcept {
     return obj.surface;
 }
 
-constexpr const Matrix4& transform(const is_shape auto& obj) noexcept {
-    return  obj.transform();
+constexpr const Matrix4& get_transform(const is_shape auto& obj) noexcept {
+    return  obj.get_transform();
 }
 
 constexpr const Matrix4& invTransform(const is_shape auto& obj) noexcept {

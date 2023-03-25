@@ -8,7 +8,7 @@ struct NullPattern final {
     constexpr Color at([[maybe_unused]] const Point& p) const noexcept { return MAGENTA; }
     explicit constexpr operator bool() const noexcept { return false; }    
     constexpr bool operator==(const NullPattern& that) const noexcept = default;
-    constexpr const Matrix4& transform() const noexcept { return _transform; }    
+    constexpr const Matrix4& get_transform() const noexcept { return _transform; }    
     constexpr const Matrix4& inv_transform() const noexcept { return _invTransform; }
     constexpr void setTransform([[maybe_unused]]Matrix4 mat) noexcept {}
 private: 
@@ -20,7 +20,7 @@ struct TestPattern final {
     constexpr Color at([[maybe_unused]] const Point& p) const noexcept { return color(p.x, p.y, p.z); }
     explicit constexpr operator bool() const noexcept { return true; }    
     constexpr bool operator==(const TestPattern& that) const noexcept = default;
-    constexpr const Matrix4& transform() const noexcept { return _transform; }    
+    constexpr const Matrix4& get_transform() const noexcept { return _transform; }    
     constexpr const Matrix4& inv_transform() const noexcept { return _invTransform; }
     constexpr void setTransform(Matrix4 mat) noexcept {
         _transform = std::move(mat);
@@ -42,7 +42,7 @@ struct StripePattern final {
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }
-    constexpr const Matrix4& transform() const noexcept {
+    constexpr const Matrix4& get_transform() const noexcept {
         return _transform;
     }    
     constexpr const Matrix4& inv_transform() const noexcept {
@@ -69,7 +69,7 @@ struct GradientPattern final {
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }
-    constexpr const Matrix4& transform() const noexcept {
+    constexpr const Matrix4& get_transform() const noexcept {
         return _transform;
     }    
     constexpr const Matrix4& inv_transform() const noexcept {
@@ -96,7 +96,7 @@ struct RadialGradientPattern final {
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }
-    constexpr const Matrix4& transform() const noexcept {
+    constexpr const Matrix4& get_transform() const noexcept {
         return _transform;
     }    
     constexpr const Matrix4& inv_transform() const noexcept {
@@ -123,7 +123,7 @@ struct RingPattern final {
         const auto mod = math::int_floor(distance_from_center) % 2;        
         return mod == 0 ? a : b; 
     }   
-    constexpr const Matrix4& transform() const noexcept {
+    constexpr const Matrix4& get_transform() const noexcept {
         return _transform;
     }    
     constexpr const Matrix4& inv_transform() const noexcept {
@@ -149,7 +149,7 @@ struct CheckersPattern final {
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }
-    constexpr const Matrix4& transform() const noexcept {
+    constexpr const Matrix4& get_transform() const noexcept {
         return _transform;
     }    
     constexpr const Matrix4& inv_transform() const noexcept {
@@ -210,9 +210,9 @@ constexpr void set_transform(Patterns& variant, const Matrix4& newTransform) noe
         return pattern.setTransform(newTransform);
     }, variant);    
 };
-constexpr const Matrix4& transform(const Patterns& variant) noexcept { 
+constexpr const Matrix4& get_transform(const Patterns& variant) noexcept { 
     return std::visit([](const auto& pattern) noexcept -> const Matrix4& { 
-        return pattern.transform();
+        return pattern.get_transform();
     }, variant);    
 };
 constexpr const Matrix4& invTransform(const Patterns& variant) noexcept { 

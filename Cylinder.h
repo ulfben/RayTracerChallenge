@@ -25,7 +25,7 @@ struct Cylinder {
     constexpr auto operator==(const Cylinder& that) const noexcept {
         return surface == that.surface && _transform == that._transform;
     }
-    constexpr const Matrix4& transform() const noexcept {
+    constexpr const Matrix4& get_transform() const noexcept {
         return _transform;
     }
     constexpr const Matrix4& inv_transform() const noexcept {

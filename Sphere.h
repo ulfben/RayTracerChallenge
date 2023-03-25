@@ -20,7 +20,7 @@ struct Sphere final {
     constexpr auto operator==(const Sphere& that) const noexcept {
         return surface == that.surface && _transform == that._transform;
     }
-    constexpr const Matrix4& transform() const noexcept {
+    constexpr const Matrix4& get_transform() const noexcept {
         return _transform;
     }
     constexpr const Matrix4& inv_transform() const noexcept {
@@ -54,7 +54,7 @@ constexpr Sphere sphere(Material m, Matrix4 transform) noexcept {
 #pragma warning(push)
 #pragma warning( disable : 26481 ) //spurious warning; "don't use pointer arithmetic" 
 std::ostream& operator<<(std::ostream& os, const Sphere& t) {
-    os << std::format("Sphere({})"sv, t.transform()); 
+    os << std::format("Sphere({})"sv, t.get_transform()); 
     return os;
 }
 #pragma warning(pop)
