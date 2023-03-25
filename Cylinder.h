@@ -122,34 +122,33 @@ constexpr void intersect_caps(const Cylinder& cylinder, const Ray& ray, std::vec
 constexpr auto local_intersect([[maybe_unused]] const Cylinder& cylinder, const Ray& local_ray) noexcept {
     using math::square, math::sqrt, math::is_between;
     std::vector<Real> result;
-    const auto a = square(local_ray.dx()) + square(local_ray.dz());
-    if (math::is_zero(a)) { //close to 0
-        intersect_caps(cylinder, local_ray, result);
-        return result; //ray is ~parallel to the Y axis so we can't collide.
+    const auto a = 2*(square(local_ray.dx()) + square(local_ray.dz()));
+    if (!math::is_zero(a, math::BOOK_EPSILON*2)) {  //ray is not ~parallel to the Y axis so we can collide.    
+        const auto b = 2.0f * (local_ray.x() * local_ray.dx() + local_ray.z() * local_ray.dz());
+        const auto c = square(local_ray.x()) + square(local_ray.z()) - 1.0f;
+        const auto discriminant = square(b) - 2.0f * a * c;
+        if (discriminant < 0.0f) {
+            return MISS; //ray does not intersect with the cylinder
+        }
+        const auto x = -b / a;
+        const auto sq = sqrt(discriminant)/a;
+        const auto t1 = x - sq;
+        const auto t2 = x + sq;         
+        if (!is_bounded(cylinder)) {
+            result.push_back(t1);
+            result.push_back(t2);        
+        }
+        else { //let's compute the height of each intersection
+            const auto y1 = local_ray.y() + t1 * local_ray.dy();
+            if (is_between(y1, cylinder.minimum, cylinder.maximum)) {
+                result.push_back(t1);
+            }
+            const auto y2 = local_ray.y() + t2 * local_ray.dy();
+            if (is_between(y2, cylinder.minimum, cylinder.maximum)) {
+                result.push_back(t2);
+            }
+        }
     }
-    const auto b = 2.0f * local_ray.x() * local_ray.dx() +
-                   2.0f * local_ray.z() * local_ray.dz();
-    const auto c = square(local_ray.x()) + square(local_ray.z()) - 1.0f;
-    const auto discriminant = square(b) - 4.0f * a * c;
-    if (discriminant < 0.0f) {
-        return MISS; //ray does not intersect with the cylinder
-    }
-    const auto t1 = (-b - sqrt(discriminant)) / (2.0f * a);
-    const auto t2 = (-b + sqrt(discriminant)) / (2.0f * a);   
     intersect_caps(cylinder, local_ray, result);
-    if (!is_bounded(cylinder)) {
-        result.push_back(t1);
-        result.push_back(t2);
-        return result;
-    }    
-     //let's compute the height of each intersection
-    const auto y1 = local_ray.y() + t1 * local_ray.dy();
-    if (is_between(y1, cylinder.minimum, cylinder.maximum)) {
-        result.push_back(t1); 
-    }
-    const auto y2 = local_ray.y() + t2 * local_ray.dy();
-    if (is_between(y2, cylinder.minimum, cylinder.maximum)) {
-        result.push_back(t2); 
-    }    
     return result;
 };
