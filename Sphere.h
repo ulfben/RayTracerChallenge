@@ -12,10 +12,10 @@ struct Sphere final {
     explicit constexpr Sphere(Material m) noexcept : surface(std::move(m))
     {}
     explicit constexpr Sphere(Matrix4 transf) noexcept {
-        setTransform(std::move(transf));
+        set_transform(std::move(transf));
     }
     constexpr Sphere(Material m, Matrix4 transf) noexcept : surface(std::move(m)) {
-        setTransform(std::move(transf));
+        set_transform(std::move(transf));
     }
     constexpr auto operator==(const Sphere& that) const noexcept {
         return surface == that.surface && _transform == that._transform;
@@ -26,7 +26,7 @@ struct Sphere final {
     constexpr const Matrix4& inv_transform() const noexcept {
         return _invTransform;
     }
-    constexpr void setTransform(Matrix4 mat) noexcept {
+    constexpr void set_transform(Matrix4 mat) noexcept {
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }

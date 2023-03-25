@@ -14,13 +14,13 @@ struct Cylinder {
     constexpr Cylinder(Real min, Real max) noexcept : minimum(min), maximum(max) {}
     explicit constexpr Cylinder(Material m) noexcept : surface(std::move(m)) {}
     explicit constexpr Cylinder(Matrix4 transf) noexcept {
-        setTransform(std::move(transf));
+        set_transform(std::move(transf));
     }
     constexpr Cylinder(Material m, Matrix4 transf) noexcept : surface(std::move(m)) {
-        setTransform(std::move(transf));
+        set_transform(std::move(transf));
     }   
     constexpr Cylinder(Real min, Real max, Material m, Matrix4 transform) noexcept : minimum(min), maximum(max), surface(std::move(m)) {
-        setTransform(std::move(transform));
+        set_transform(std::move(transform));
     }
     constexpr auto operator==(const Cylinder& that) const noexcept {
         return surface == that.surface && _transform == that._transform;
@@ -31,7 +31,7 @@ struct Cylinder {
     constexpr const Matrix4& inv_transform() const noexcept {
         return _invTransform;
     }
-    constexpr void setTransform(Matrix4 mat) noexcept {
+    constexpr void set_transform(Matrix4 mat) noexcept {
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }

@@ -10,10 +10,10 @@ struct Cube {
     constexpr Cube() noexcept = default;    
     explicit constexpr Cube(Material m) noexcept : surface(std::move(m)) {}
     explicit constexpr Cube(Matrix4 transf) noexcept {
-        setTransform(std::move(transf));
+        set_transform(std::move(transf));
     }
     constexpr Cube(Material m, Matrix4 transf) noexcept : surface(std::move(m)) {
-        setTransform(std::move(transf));
+        set_transform(std::move(transf));
     }   
     constexpr auto operator==(const Cube& that) const noexcept {
         return surface == that.surface && _transform == that._transform;
@@ -24,7 +24,7 @@ struct Cube {
     constexpr const Matrix4& inv_transform() const noexcept {
         return _invTransform;
     }
-    constexpr void setTransform(Matrix4 mat) noexcept {
+    constexpr void set_transform(Matrix4 mat) noexcept {
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }

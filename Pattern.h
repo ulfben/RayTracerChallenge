@@ -10,7 +10,7 @@ struct NullPattern final {
     constexpr bool operator==(const NullPattern& that) const noexcept = default;
     constexpr const Matrix4& get_transform() const noexcept { return _transform; }    
     constexpr const Matrix4& inv_transform() const noexcept { return _invTransform; }
-    constexpr void setTransform([[maybe_unused]]Matrix4 mat) noexcept {}
+    constexpr void set_transform([[maybe_unused]]Matrix4 mat) noexcept {}
 private: 
     Matrix4 _transform{ Matrix4Identity };
     Matrix4 _invTransform{ Matrix4Identity };
@@ -22,7 +22,7 @@ struct TestPattern final {
     constexpr bool operator==(const TestPattern& that) const noexcept = default;
     constexpr const Matrix4& get_transform() const noexcept { return _transform; }    
     constexpr const Matrix4& inv_transform() const noexcept { return _invTransform; }
-    constexpr void setTransform(Matrix4 mat) noexcept {
+    constexpr void set_transform(Matrix4 mat) noexcept {
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }
@@ -33,12 +33,12 @@ private:
 
 struct StripePattern final {
     constexpr StripePattern(Matrix4 mat, Color a_, Color b_) noexcept : a{ a_ }, b{b_} {
-        setTransform(std::move(mat));
+        set_transform(std::move(mat));
     }
     constexpr Color at(const Point& p) const noexcept {        
         return (math::int_floor(p.x) % 2 == 0) ? a : b;
     }
-    constexpr void setTransform(Matrix4 mat) noexcept {
+    constexpr void set_transform(Matrix4 mat) noexcept {
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }
@@ -59,13 +59,13 @@ private:
 
 struct GradientPattern final {
     constexpr GradientPattern(Matrix4 mat, Color a_, Color b_) noexcept : a{ a_ }, b{b_} {
-        setTransform(std::move(mat));
+        set_transform(std::move(mat));
     }
     constexpr Color at(const Point& p) const noexcept {              
        const auto dx = p.x - math::floor(p.x);
        return lerp(a, b,  dx);       
     }
-    constexpr void setTransform(Matrix4 mat) noexcept {
+    constexpr void set_transform(Matrix4 mat) noexcept {
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }
@@ -85,14 +85,14 @@ private:
 };
 struct RadialGradientPattern final {
     constexpr RadialGradientPattern(Matrix4 mat, Color a_, Color b_) noexcept : a{ a_ }, b{b_} {
-        setTransform(std::move(mat));
+        set_transform(std::move(mat));
     }
     constexpr Color at(const Point& p) const noexcept {              
         const auto dist_from_center = magnitude(vector(p.x, p.y, p.z));
         const auto fraction = dist_from_center - math::floor(dist_from_center);
        return lerp(a, b, fraction);       
     }
-    constexpr void setTransform(Matrix4 mat) noexcept {
+    constexpr void set_transform(Matrix4 mat) noexcept {
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }
@@ -112,9 +112,9 @@ private:
 };
 struct RingPattern final {
     constexpr RingPattern(Matrix4 mat, Color a_, Color b_) noexcept : a{ a_ }, b{b_} {
-        setTransform(std::move(mat));
+        set_transform(std::move(mat));
     }
-    constexpr void setTransform(Matrix4 mat) noexcept {
+    constexpr void set_transform(Matrix4 mat) noexcept {
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }
@@ -139,13 +139,13 @@ private:
 };
 struct CheckersPattern final {    
     constexpr CheckersPattern(Matrix4 mat, Color a_, Color b_) noexcept : a{ a_ }, b{b_} {
-        setTransform(std::move(mat));
+        set_transform(std::move(mat));
     }
     constexpr Color at(const Point& p) const noexcept {        
         const auto val = static_cast<int>(math::floor(p.x) + math::floor(p.y) + math::floor(p.z));
         return (val % 2 == 0) ? a : b; 
     }
-    constexpr void setTransform(Matrix4 mat) noexcept {
+    constexpr void set_transform(Matrix4 mat) noexcept {
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }
@@ -207,7 +207,7 @@ inline bool operator==(const Patterns& v, const is_pattern auto& t) {
 
 constexpr void set_transform(Patterns& variant, const Matrix4& newTransform) noexcept { 
     return std::visit([&newTransform](auto& pattern) noexcept -> void { 
-        return pattern.setTransform(newTransform);
+        return pattern.set_transform(newTransform);
     }, variant);    
 };
 constexpr const Matrix4& get_transform(const Patterns& variant) noexcept { 

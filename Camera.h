@@ -33,7 +33,7 @@ struct Camera final{
     }
     /*constexpr*/ Camera(size_type hsize_, size_type vsize_, Real field_of_view_, Matrix4 viewTransform) noexcept 
         : Camera(hsize_, vsize_, field_of_view_){
-        setTransform(viewTransform);
+        set_transform(viewTransform);
     }
     constexpr const Matrix4& get_transform() const noexcept {
         return _transform;
@@ -41,7 +41,7 @@ struct Camera final{
     constexpr const Matrix4& inv_transform() const noexcept {
         return _invTransform;
     }
-    constexpr void setTransform(Matrix4 mat) noexcept {
+    constexpr void set_transform(Matrix4 mat) noexcept {
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }

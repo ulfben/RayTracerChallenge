@@ -44,7 +44,7 @@ TEST(Camera, constructRayThroughCornerOfCanvas) {
 TEST(Camera, constructRayWithCameraTransformed) {
     const auto sqr = std::sqrtf(2.0f) / 2.0f;
     auto c = Camera(201, 101, math::PI / 2.0f);
-    c.setTransform(rotation_y(math::PI / 4.0f) * translation(0,-2,5));
+    c.set_transform(rotation_y(math::PI / 4.0f) * translation(0,-2,5));
     const auto r = ray_for_pixel(c, 100, 50);
     EXPECT_EQ(r.origin, point(0, 2, -5));
     EXPECT_EQ(r.direction, vector(sqr, 0, -sqr));
@@ -56,7 +56,7 @@ TEST(Camera, renderWorldWithCamera) {
     const auto from = point(0, 0, -5);
     const auto to = ORIGO;
     const auto up = vector(0, 1, 0);
-    c.setTransform(view_transform(from, to, up));    
+    c.set_transform(view_transform(from, to, up));    
     const auto img = render(c, w);
     EXPECT_EQ(img.width(), c.height);
     EXPECT_EQ(img.height(), c.width);
