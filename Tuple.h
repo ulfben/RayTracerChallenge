@@ -14,6 +14,8 @@ struct Vector final {
 };
 static constexpr Point ORIGO = Point{ 0, 0, 0 };
 
+constexpr Vector normalize(const Vector& t) noexcept; //pre-declare
+
 constexpr Vector vector(Real x, Real y, Real z) noexcept {
     return Vector{ x, y, z };
 }
@@ -23,6 +25,10 @@ constexpr Vector vector(const Point& p) noexcept {
 constexpr Vector vector(Real xyz) noexcept {
     return Vector{ xyz, xyz, xyz };
 }
+constexpr Vector normal_vector(Real x, Real y, Real z) noexcept {
+    return normalize(Vector{ x, y, z });
+}
+
 constexpr Point point(Real x, Real y, Real z) noexcept {
     return Point{ x, y, z };
 }

@@ -10,8 +10,9 @@ struct Cylinder {
     Material surface{ material() };    
     Real minimum = math::MIN; //cylinder extents on the Y-axis. Up-to but not including this value.
     Real maximum = math::MAX; //avoiding INFINITY to avoid fp:fast bugs.
+    bool closed = false; 
     constexpr Cylinder() noexcept = default;    
-    constexpr Cylinder(Real min, Real max) noexcept : minimum(min), maximum(max) {}
+    constexpr Cylinder(Real min, Real max, bool closed_ = false) noexcept : minimum(min), maximum(max), closed(closed_) {}
     explicit constexpr Cylinder(Material m) noexcept : surface(std::move(m)) {}
     explicit constexpr Cylinder(Matrix4 transf) noexcept {
         set_transform(std::move(transf));
@@ -61,6 +62,9 @@ constexpr Cylinder cylinder(Material m, Matrix4 transform) noexcept {
 constexpr Cylinder cylinder(Real min, Real max, Material m, Matrix4 transform) noexcept {
     return Cylinder(min, max, std::move(m), std::move(transform));    
 }
+constexpr Cylinder closed_cylinder(Real min, Real max) noexcept {
+    return {min, max, true};
+}
 
 constexpr Vector local_normal_at([[maybe_unused]]const Cylinder& c, const Point& p) noexcept {
     using std::max, math::abs, math::square;
@@ -80,6 +84,13 @@ constexpr bool is_bounded(const Cylinder& c) noexcept {
     return !(c.maximum == math::MAX && c.minimum == math::MIN);    
 }
 
+constexpr bool is_closed(const Cylinder& c) noexcept {
+    return c.closed;    
+}
+constexpr bool is_open(const Cylinder& c) noexcept {
+    return !is_closed(c);    
+}
+
 constexpr auto local_intersect([[maybe_unused]] const Cylinder& cylinder, Ray local_ray) noexcept {
     using math::square, math::sqrt, math::is_between;
     const auto a = square(local_ray.direction.x) + square(local_ray.direction.z);
@@ -95,9 +106,9 @@ constexpr auto local_intersect([[maybe_unused]] const Cylinder& cylinder, Ray lo
     }
     auto t1 = (-b - sqrt(discriminant)) / (2.0f * a);
     auto t2 = (-b + sqrt(discriminant)) / (2.0f * a);
-    //if (t1 > t2) {
-    //    std::swap(t1, t2);
-    //}
+    if (t1 > t2) {
+        std::swap(t1, t2);
+    }
     if (!is_bounded(cylinder)) {
         return std::vector{ t1, t2 };
     }
