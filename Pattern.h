@@ -215,7 +215,7 @@ constexpr const Matrix4& get_transform(const Patterns& variant) noexcept {
         return pattern.get_transform();
     }, variant);    
 };
-constexpr const Matrix4& invTransform(const Patterns& variant) noexcept { 
+constexpr const Matrix4& get_inverse_transform(const Patterns& variant) noexcept { 
     return std::visit([](const auto& pattern) noexcept -> const Matrix4& { 
         return pattern.inv_transform();
     }, variant);    
@@ -231,7 +231,7 @@ Color pattern_at(const Patterns& variant, const Point& p) noexcept {
 //requires is_shape<T>
 Color pattern_at(const Patterns& pattern, const /*must be is_shapes but I can't name that here. got some circular dependency going on.*/ auto& obj, const Point& world_point) noexcept {
     assert(!std::holds_alternative<NullPattern>(pattern) && "pattern_at: called on NullPattern.");
-    const auto object_point = invTransform(obj) * world_point;
-    const auto pattern_point = invTransform(pattern) * object_point;        
+    const auto object_point = get_inverse_transform(obj) * world_point;
+    const auto pattern_point = get_inverse_transform(pattern) * object_point;        
     return pattern_at(pattern, pattern_point);
 };

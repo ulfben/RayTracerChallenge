@@ -38,7 +38,7 @@ constexpr const Matrix4& get_transform(const Shapes& variant) noexcept {
         return obj.get_transform();
     }, variant);    
 }
-constexpr const Matrix4& invTransform(const Shapes& variant) noexcept { 
+constexpr const Matrix4& get_inverse_transform(const Shapes& variant) noexcept { 
     return std::visit([](const auto& obj) -> const Matrix4& { 
         return obj.inv_transform();
     }, variant);    
@@ -62,7 +62,7 @@ constexpr const Matrix4& get_transform(const is_shape auto& obj) noexcept {
     return  obj.get_transform();
 }
 
-constexpr const Matrix4& invTransform(const is_shape auto& obj) noexcept {
+constexpr const Matrix4& get_inverse_transform(const is_shape auto& obj) noexcept {
     return obj.inv_transform();
 }
 
