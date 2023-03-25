@@ -58,9 +58,9 @@ constexpr Vector local_normal_at([[maybe_unused]]const Plane& s, [[maybe_unused]
 }
 
 constexpr auto local_intersect([[maybe_unused]] const Plane& p, const Ray& local_ray) {
-    if (math::abs(local_ray.direction.y) < math::BOOK_EPSILON) {
+    if (math::abs(local_ray.dy()) < math::BOOK_EPSILON) {
         return MISS;
     }
-    const auto t1 = -local_ray.origin.y / local_ray.direction.y;
+    const auto t1 = -local_ray.y() / local_ray.dy();
     return std::vector{ t1 };
 };

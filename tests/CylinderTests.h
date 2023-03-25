@@ -52,7 +52,6 @@ TEST(Cylinder, rayMissesACylinder) {
     }
 }
 
-
 TEST(Cylinder, normalOnTheSurfaceOfACylinder) {   
     const std::vector<Point> points{
         point(1, 0, 0),
@@ -68,7 +67,7 @@ TEST(Cylinder, normalOnTheSurfaceOfACylinder) {
     };
     const auto c = cylinder();
     for (size_t i = 0; i < points.size(); i++) {
-        const auto p = points[i];
+        const auto& p = points[i];
         const auto normal = local_normal_at(c, p);
         EXPECT_EQ(normal, normals[i]);        
     }
@@ -118,17 +117,42 @@ TEST(Cylinder, intersectingTheCapsOfAClosedCylinder) {
     auto c = closed_cylinder(1.0f, 2.f);
     EXPECT_TRUE(is_closed(c));  
     const std::vector<Ray> rays{
-        {point(0, 3, 0), normal_vector(0, -1.0f, 0)},
-        {point(0, 3, -2), normal_vector(0, -1, 2)}, 
-        {point(0, 4, -2), normal_vector(0, -1, 1)}, // corner case
-        {point(0, 0, -2), normal_vector(0, 1, 2)},        
-        {point(0, -1, -2), normal_vector(0, 1, 1)} //corner case
+        {point(0, 3, 0), vector(0, -1, 0)}, //start above the cylinder pointing straight down through it. hits both caps
+        {point(0, 3, -2), vector(0, -1, 2)}, //diagonal through top cap and cylinder wall 
+        {point(0, 4, -2), vector(0, -1, 1)}, // corner case, diagonal through top cap + where second cap meets cylinder wall
+        {point(0, 0, -2), vector(0, 1, 2)},  //diagonal through bottom cap and cylinder wall       
+        {point(0, -1, -2), vector(0, 1, 1)} //corner case, diagonal through bottom cap + where second cap meets cylinder wall
     };     
     
     for (size_t i = 0; i < rays.size(); i++) {        
         const auto xs = local_intersect(c, rays[i]);        
         EXPECT_EQ(xs.size(), 2);        
     }         
+}
+
+TEST(Cylinder, normalOnCylinderEndCap) {   
+    const std::vector<Point> points{
+        point(0.0f, 1.0f, 0.0f),
+        point(0.5f, 1.0f, 0.0f),
+        point(0.0f, 1.0f, 0.5f),
+        point(0.0f, 2.0f, 0.0f),        
+        point(0.5f, 2.0f, 0.0f),
+        point(0.0f, 2.0f, 0.5f)
+    };
+    const std::vector<Vector> normals{
+        vector(0, -1, 0),
+        vector(0, -1, 0),
+        vector(0, -1, 0),
+        vector(0, 1, 0),        
+        vector(0, 1, 0),        
+        vector(0, 1, 0)        
+    };
+    const auto c = closed_cylinder(1, 2);
+    for (size_t i = 0; i < points.size(); i++) {        
+        const auto& point = points[i];
+        const auto normal = local_normal_at(c, point);
+        EXPECT_EQ(normal, normals[i]);        
+    }
 }
 
 RESTORE_WARNINGS

@@ -5,7 +5,7 @@
 #include "Matrix.h"
 #include "Material.h"
 #include "Ray.h"
-/*A unit AABB, always positioned at 0, 0, 0 and extending from -1 to +1f*/
+/* unit cylinder, always radius 1, positioned at 0, 0, 0 and extending to infinity on the y axis*/
 struct Cylinder {
     Material surface{ material() };    
     Real minimum = math::MIN; //cylinder extents on the Y-axis. Up-to but not including this value.
@@ -21,6 +21,9 @@ struct Cylinder {
         set_transform(std::move(transf));
     }   
     constexpr Cylinder(Real min, Real max, Material m, Matrix4 transform) noexcept : minimum(min), maximum(max), surface(std::move(m)) {
+        set_transform(std::move(transform));
+    }
+    constexpr Cylinder(Real min, Real max, bool closed_, Material m, Matrix4 transform) noexcept : minimum(min), maximum(max), closed(closed_), surface(std::move(m)) {
         set_transform(std::move(transform));
     }
     constexpr auto operator==(const Cylinder& that) const noexcept {
@@ -63,21 +66,24 @@ constexpr Cylinder cylinder(Real min, Real max, Material m, Matrix4 transform) n
     return Cylinder(min, max, std::move(m), std::move(transform));    
 }
 constexpr Cylinder closed_cylinder(Real min, Real max) noexcept {
-    return {min, max, true};
+    return Cylinder(min, max, true);
+}
+constexpr Cylinder closed_cylinder(Real min, Real max, Material m, Matrix4 transform) noexcept {
+    return Cylinder(min, max, true, std::move(m), std::move(transform));    
 }
 
 constexpr Vector local_normal_at([[maybe_unused]]const Cylinder& c, const Point& p) noexcept {
-    using std::max, math::abs, math::square;
+    using math::square;
     const auto dist = square(p.x) + square(p.z); //the square of the distance from the y-axis
     if (dist < 1.0f) {
-        if (p.y >= c.maximum - math::BOOK_EPSILON) {
+        if (p.y >= (c.maximum - math::BOOK_EPSILON)) {
             return vector(0, 1, 0);
         }
-        if (p.y >= c.minimum + math::BOOK_EPSILON) {
+        if (p.y <= (c.minimum + math::BOOK_EPSILON)) {
             return vector(0, -1, 0);
         }
     }
-    return normalize(vector(p.x, 0, p.z));
+    return normal_vector(p.x, 0, p.z);
 }
 
 constexpr bool is_bounded(const Cylinder& c) noexcept {
@@ -91,34 +97,57 @@ constexpr bool is_open(const Cylinder& c) noexcept {
     return !is_closed(c);    
 }
 
-constexpr auto local_intersect([[maybe_unused]] const Cylinder& cylinder, Ray local_ray) noexcept {
-    using math::square, math::sqrt, math::is_between;
-    const auto a = square(local_ray.direction.x) + square(local_ray.direction.z);
-    if (a < math::BOOK_EPSILON) { //close to 0
-        return MISS; //ray is ~parallel to the Y axis so we can't collide.
+constexpr bool check_cap(const Ray& ray, Real t) noexcept {
+    using math::square;
+    const auto x = ray.x() + t * ray.dx();
+    const auto z = ray.z() + t * ray.dz();
+    return (square(x) + square(z)) <= 1.0f;
+}
+
+constexpr void intersect_caps(const Cylinder& cylinder, const Ray& ray, std::vector<Real>& xs) noexcept {
+    if (is_open(cylinder) || math::is_zero(ray.dy())) {
+        return; //caps only matter if the cylinder is closed and might possibly be intersected by the ray
     }
-    const auto b = 2.0f * local_ray.origin.x * local_ray.direction.x +
-        2.0f * local_ray.origin.z * local_ray.direction.z;
-    const auto c = square(local_ray.origin.x) + square(local_ray.origin.z) - 1.0f;
+    const auto t_for_lower_end_cap = (cylinder.minimum - ray.y()) / ray.dy();
+    if (check_cap(ray, t_for_lower_end_cap)) { //check ray against the plane at y = cylinder.minimum
+       xs.push_back(t_for_lower_end_cap);
+    }
+    const auto t_for_upper_end_cap = (cylinder.maximum - ray.y()) / ray.dy();
+    if (check_cap(ray, t_for_upper_end_cap)) {
+       xs.push_back(t_for_upper_end_cap);
+    }
+}
+
+//TODO: refactor this overly long function.
+constexpr auto local_intersect([[maybe_unused]] const Cylinder& cylinder, const Ray& local_ray) noexcept {
+    using math::square, math::sqrt, math::is_between;
+    std::vector<Real> result;
+    const auto a = square(local_ray.dx()) + square(local_ray.dz());
+    if (math::is_zero(a)) { //close to 0
+        intersect_caps(cylinder, local_ray, result);
+        return result; //ray is ~parallel to the Y axis so we can't collide.
+    }
+    const auto b = 2.0f * local_ray.x() * local_ray.dx() +
+                   2.0f * local_ray.z() * local_ray.dz();
+    const auto c = square(local_ray.x()) + square(local_ray.z()) - 1.0f;
     const auto discriminant = square(b) - 4.0f * a * c;
     if (discriminant < 0.0f) {
         return MISS; //ray does not intersect with the cylinder
     }
-    auto t1 = (-b - sqrt(discriminant)) / (2.0f * a);
-    auto t2 = (-b + sqrt(discriminant)) / (2.0f * a);
-    if (t1 > t2) {
-        std::swap(t1, t2);
-    }
+    const auto t1 = (-b - sqrt(discriminant)) / (2.0f * a);
+    const auto t2 = (-b + sqrt(discriminant)) / (2.0f * a);   
+    intersect_caps(cylinder, local_ray, result);
     if (!is_bounded(cylinder)) {
-        return std::vector{ t1, t2 };
-    }
-    std::vector<Real> result;
+        result.push_back(t1);
+        result.push_back(t2);
+        return result;
+    }    
      //let's compute the height of each intersection
-    const auto y1 = local_ray.origin.y + t1 * local_ray.direction.y;
+    const auto y1 = local_ray.y() + t1 * local_ray.dy();
     if (is_between(y1, cylinder.minimum, cylinder.maximum)) {
         result.push_back(t1); 
     }
-    const auto y2 = local_ray.origin.y + t2 * local_ray.direction.y;
+    const auto y2 = local_ray.y() + t2 * local_ray.dy();
     if (is_between(y2, cylinder.minimum, cylinder.maximum)) {
         result.push_back(t2); 
     }    

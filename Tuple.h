@@ -75,8 +75,10 @@ constexpr Real magnitude(const Vector& t) noexcept {
     return math::sqrt((t.x * t.x) + (t.y * t.y) + (t.z * t.z));
 }
 constexpr Vector normalize(const Vector& t) noexcept {
-    const auto length = magnitude(t);
-    assert(length != 0.0f);
+    const auto length = magnitude(t);    
+    if (math::is_zero(length)) {
+        return t;
+    }
     const auto inv_length = 1.0f / length;
     return t * inv_length;
 }

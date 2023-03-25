@@ -94,7 +94,7 @@ namespace math {
     }
 
     template<class T>
-    [[nodiscard]] constexpr T is_zero(T v, T epsilon = BRAZZY_EPSILON) noexcept {
+    [[nodiscard]] constexpr T is_zero(T v, T epsilon = BOOK_EPSILON) noexcept {
         return v == T(0) || math::abs(v) < epsilon;
     }
 
