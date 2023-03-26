@@ -585,18 +585,32 @@ constexpr Matrix4 view_transform(const Point& from, const Point& to, const Vecto
     };
 }
 
+//rodrigues rotation matrix
 //https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
-constexpr Matrix4 rotation(Vector u, Vector v) noexcept {
-    u = normalize(u);
-    v = normalize(v);
+/*constexpr*/ Matrix4 rotation(Vector axisOfRotation, Real angle) noexcept {
+    const auto kx = axisOfRotation.x;
+    const auto ky = axisOfRotation.y;
+    const auto kz = axisOfRotation.z;
+    const auto cos_t = std::cos(angle);
+    const auto sin_t = std::sin(angle);
+    return Matrix4{
+        cos_t + (1.0f - cos_t) * kx * kx, -sin_t * kz + (1.0f - cos_t) * kx * ky, sin_t * ky + (1.0f - cos_t) * kx * kz, 0,
+        sin_t * kz + (1.0f - cos_t) * ky * kx, cos_t + (1.0f - cos_t) * ky * ky, -sin_t * kx + (1.0f - cos_t) * ky * kz, 0,
+        -sin_t * ky + (1.0f - cos_t) * kz * kx, sin_t * kx + (1.0f - cos_t) * kz * ky, cos_t + (1.0f - cos_t) * kz * kz, 0,
+        0, 0, 0, 1
+    };
+}
+
+//https://github.com/fremag/ray-tracer/blob/e24f767944c950203ed880b2b6311dd5efe3319e/ray-tracer/Helper.cs#L312
+constexpr Matrix4 rotation(Vector u, Vector v) noexcept {    
     const auto cosPhi = dot(u, v);
     if (math::abs(cosPhi - 1.0f) < math::BOOK_EPSILON) {
         return Matrix4Identity; // No rotation needed
     }
-
     const auto uv = cross(u, v);
     const auto uvMagnitude = magnitude(u) * magnitude(v);
     const auto sinPhi = magnitude(uv) / uvMagnitude;
+    //rodrigues rotation
     const auto m1 = Matrix4{
         cosPhi, 0, 0, 0,
         0, cosPhi, 0, 0,

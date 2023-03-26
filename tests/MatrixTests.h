@@ -315,4 +315,58 @@ TEST(Matrix, canRoundtripInvert) {
     EXPECT_EQ(prod*inv_b, a);    
 }
 
+TEST(Matrix, RodriguesRotationAroundZAxis) {
+    //90 degrees counter-clockwise around z-axis
+     const auto axis = vector(0, 0, 1);
+    const auto t = 90 * math::TO_RAD;
+    const auto m = rotation(axis, t); 
+    
+    const auto result1 = m * vector(1, 0, 0);
+    EXPECT_EQ(result1, vector(0,1,0));  
+
+    const auto result2 = m * vector(0, 1, 0);
+    EXPECT_EQ(result2, vector(-1,0,0));        
+}
+
+TEST(Matrix, RodriguesRotationAroundXAxis) {
+    //checks that a rotation of 90 degrees around the x-axis correctly transforms the y-axis to the z-axis. 
+    const auto axis = vector(1, 0, 0);
+    const auto t = 90 * math::TO_RAD;
+    const auto R = rotation(axis, t);    
+    const auto in = vector(0, 1, 0);
+    const auto out = R * in;
+    const auto expected =  vector(0, 0, 1);
+    EXPECT_EQ(out, expected);
+}
+
+TEST(Matrix, RodriguesRotationAroundZAxisTwoComponents) {
+    //checks that a rotation of 45 degrees around the z-axis correctly transforms a vector lying in the xy-plane.
+    using std::sin, std::cos;
+    const auto axis = vector(0, 0, 1);
+    const auto t = 45 * math::TO_RAD;
+    const auto R = rotation(axis, t);
+    const auto in = vector(1, 1, 0);
+    const auto out = R * in;
+    const auto expected = vector(cos(t)-sin(t), sin(t)+cos(t), 0);
+    EXPECT_EQ(out, expected);
+}
+
+TEST(Matrix, RodriguesIdentityRotation) {
+    // checks that the rotation function returns the identity matrix when given the same input vector twice, indicating that no rotation is needed.
+    const auto u = vector(1, 0, 0);
+    const auto v = vector(1, 0, 0);
+    const auto R = rotation(u, v);
+    EXPECT_EQ(R, Matrix4Identity);
+}
+
+TEST(Matrix, RodriguesYAxisRotation) {
+    // rotates a vector lying in the xy-plane (in) by 90 degrees around the z-axis, when given the x-axis and y-axis as input vectors (cross u v)
+    const auto u = vector(1, 0, 0);
+    const auto v = vector(0, 1, 0);
+    const auto R = rotation(u, v);
+    const auto in = vector(1, 1, 0);
+    const auto out = R * in;
+    EXPECT_EQ(out, vector(-1, 1, 0));
+}
+
 RESTORE_WARNINGS
