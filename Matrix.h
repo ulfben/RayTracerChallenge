@@ -587,7 +587,8 @@ constexpr Matrix4 view_transform(const Point& from, const Point& to, const Vecto
 
 //rodrigues rotation matrix
 //https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
-/*constexpr*/ Matrix4 rotation(Vector axisOfRotation, Real angle) noexcept {
+/*constexpr*/ Matrix4 rotation(Vector axisOfRotation, Real angle) noexcept {    
+    assert(is_normalized(axisOfRotation) && "the axis of rotation vector should be normalized.");     
     const auto kx = axisOfRotation.x;
     const auto ky = axisOfRotation.y;
     const auto kz = axisOfRotation.z;
@@ -602,39 +603,11 @@ constexpr Matrix4 view_transform(const Point& from, const Point& to, const Vecto
 }
 
 //https://github.com/fremag/ray-tracer/blob/e24f767944c950203ed880b2b6311dd5efe3319e/ray-tracer/Helper.cs#L312
-constexpr Matrix4 rotation(Vector u, Vector v) noexcept {    
-    const auto cosPhi = dot(u, v);
-    if (math::abs(cosPhi - 1.0f) < math::BOOK_EPSILON) {
-        return Matrix4Identity; // No rotation needed
+/*constexpr*/ Matrix4 rotation(Vector u, Vector v) noexcept {    
+    const auto axisOfRotation = normalize(cross(u, v));
+    const auto angleOfRotation = std::acos(dot(u, v) / (magnitude(u) * magnitude(v)));    
+    if (math::is_zero(angleOfRotation) || is_zero(axisOfRotation)) {
+        return Matrix4Identity;
     }
-    const auto uv = cross(u, v);
-    const auto uvMagnitude = magnitude(u) * magnitude(v);
-    const auto sinPhi = magnitude(uv) / uvMagnitude;
-    //rodrigues rotation
-    const auto m1 = Matrix4{
-        cosPhi, 0, 0, 0,
-        0, cosPhi, 0, 0,
-        0, 0, cosPhi, 0,
-        0, 0, 0, 1.0f
-    };
-
-    if (math::abs(sinPhi) < math::BOOK_EPSILON) {
-        return m1;
-    }
-
-    const auto n = uv / sinPhi;
-    const auto m2 = Matrix4{
-       n.x * n.x, n.x * n.y, n.x * n.z, 0,
-       n.x * n.y, n.y * n.y, n.y * n.z, 0,
-       n.x * n.z, n.z * n.y, n.z * n.z, 0,
-       0, 0, 0, 0
-    };
-    const auto m3 = Matrix4{
-        0, -n.z, n.y, 0,
-        n.z, 0, -n.x, 0,
-        -n.y, n.x, 0, 0,
-        0, 0, 0, 0
-    };
-    //return m1 + (1.0f - cosPhi) * m2 + sinPhi * m3;
-    return m1 + (m2 * (1.0f - cosPhi)) + (m3 * sinPhi);
+    return rotation(axisOfRotation, angleOfRotation);
 }

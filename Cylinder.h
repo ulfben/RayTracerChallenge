@@ -73,7 +73,7 @@ constexpr Cylinder closed_cylinder(Real min, Real max, Material m, Matrix4 trans
 }
 
 //helper to build Icosahedrons
-constexpr Cylinder closed_cylinder(const Point& p1, const Point& p2, Real radius) noexcept{
+/*constexpr*/ Cylinder closed_cylinder(const Point& p1, const Point& p2, Real radius) noexcept{
     const auto v = p2 - p1;    
     auto cyl = closed_cylinder(0, 1);
     auto rot = rotation(vector(0, 1, 0), normalize(v));    

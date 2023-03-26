@@ -90,6 +90,15 @@ constexpr Vector normalize(const Vector& t, const Vector& fallback) noexcept {
     const auto inv_length = 1.0f / length;
     return t * inv_length;
 }
+constexpr bool is_normalized(const Vector& v, Real tolerance = math::BRAZZY_EPSILON) noexcept {
+    const auto mag = magnitude(v);
+    return math::abs(mag - 1.0f) <= tolerance;
+}
+
+constexpr bool is_zero(const Vector& v, Real tolerance = math::BRAZZY_EPSILON) noexcept {
+    return magnitude(v) <= tolerance;
+}
+
 constexpr Real dot(const Vector& a, const Vector& b) noexcept {
     /* the smaller the dot product, the larger the angle between the vector. if the two
     vectors are unit vectors, the dot product is the cosine of the angle between them */
