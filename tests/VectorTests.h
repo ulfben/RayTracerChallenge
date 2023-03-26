@@ -21,7 +21,7 @@ TEST(Vector, canBeAdded) {
   const Vector t1{3, -2, 5};
   const Vector t2{-2, 3, 1};
   const Vector res = t1 + t2;
-  const Vector expected{1, 1, 6};
+  const auto expected = vector(1, 1, 6);
   EXPECT_TRUE(res == expected);
 }
 
@@ -90,5 +90,38 @@ TEST(Vector, canBeReflectedAtSlantedAngle) {
   const auto result = reflect(v, n);
   EXPECT_EQ(result,vector(1, 0, 0));
 }
+
+TEST(Vector, RodriguesRotationAroundXAxis) {
+    const auto v = vector(0, 1, 0);
+    const auto axis = vector(1, 0, 0);
+    const auto angle = math::HALF_PI; //90 degrees
+
+    const auto expected = vector(0, 0, 1);
+    const auto result = rodriguesRotation(v, axis, angle);
+
+    EXPECT_EQ(expected, result);
+}
+
+TEST(Vector, RodriguesRotationAroundYAxis) {
+    const auto v = vector(1, 0, 0);
+    const auto axis = vector(0, 1, 0);
+    const auto angle = math::HALF_PI; //90 degrees
+
+    const auto expected = vector(0, 0, -1);
+    const auto result = rodriguesRotation(v, axis, angle);
+    EXPECT_EQ(expected, result);
+}
+
+TEST(Vector, RodriguesRotationZAxis) {
+    const auto v = vector(1, 0, 0);
+    const auto axis = vector(0, 0, 1);
+    const auto angle = math::HALF_PI; //90 degrees
+
+    const auto expected = vector(0, 1, 0);
+    const auto result = rodriguesRotation(v, axis, angle);
+
+    EXPECT_EQ(expected, result);
+}
+
 
 RESTORE_WARNINGS

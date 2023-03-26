@@ -111,6 +111,13 @@ constexpr Vector hadamard_product(const Vector& lhs, const Vector& rhs) noexcept
     };
 }
 
+/*constexpr*/ Vector rodriguesRotation(const Vector& vector, const Vector& axis, Real angle) {
+    const Vector unitAxis = normalize(axis);
+    Real cosAngle = std::cos(angle);
+    Real sinAngle = std::sin(angle);    
+    return vector * cosAngle + unitAxis * ((1.0f - cosAngle) * dot(vector, unitAxis)) + cross(unitAxis, vector) * sinAngle;
+}
+
 
 //Point interface
 constexpr Point operator/(const Point& lhs, Real scalar) noexcept {
