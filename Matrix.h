@@ -594,10 +594,11 @@ constexpr Matrix4 view_transform(const Point& from, const Point& to, const Vecto
     const auto kz = axisOfRotation.z;
     const auto cos_t = std::cos(angle);
     const auto sin_t = std::sin(angle);
+    const auto s = (1.0f - cos_t); // the sine component of the rotation formula.
     return Matrix4{
-        cos_t + (1.0f - cos_t) * kx * kx, -sin_t * kz + (1.0f - cos_t) * kx * ky, sin_t * ky + (1.0f - cos_t) * kx * kz, 0,
-        sin_t * kz + (1.0f - cos_t) * ky * kx, cos_t + (1.0f - cos_t) * ky * ky, -sin_t * kx + (1.0f - cos_t) * ky * kz, 0,
-        -sin_t * ky + (1.0f - cos_t) * kz * kx, sin_t * kx + (1.0f - cos_t) * kz * ky, cos_t + (1.0f - cos_t) * kz * kz, 0,
+        cos_t + s * kx * kx, -sin_t * kz + s * kx * ky, sin_t * ky + s * kx * kz, 0,
+        sin_t * kz + s * ky * kx, cos_t + s * ky * ky, -sin_t * kx + s * ky * kz, 0,
+        -sin_t * ky + s * kz * kx, sin_t * kx + s * kz * ky, cos_t + s * kz * kz, 0,
         0, 0, 0, 1
     };
 }

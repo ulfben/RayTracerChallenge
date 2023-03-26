@@ -93,6 +93,12 @@
     <ClInclude Include="Sphere.h">
       <Filter>geometry</Filter>
     </ClInclude>
+    <ClInclude Include="Cone.h">
+      <Filter>geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\ConeTests.h">
+      <Filter>tests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

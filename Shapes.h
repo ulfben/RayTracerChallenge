@@ -5,14 +5,15 @@
 #include "Plane.h"
 #include "Cube.h"
 #include "Cylinder.h"
+#include "Cone.h"
 
 #include "Matrix.h"
 #include "Color.h"
 #include "Material.h"
 
-using Shapes = std::variant<Sphere, Plane, Cube, Cylinder>;
+using Shapes = std::variant<Sphere, Plane, Cube, Cylinder, Cone>;
 template<typename T> 
-concept is_shape = std::is_same_v<Sphere, T> || std::is_same_v<Plane, T> || std::is_same_v<Cube, T> || std::is_same_v<Cylinder, T>;
+concept is_shape = std::is_same_v<Sphere, T> || std::is_same_v<Plane, T> || std::is_same_v<Cube, T> || std::is_same_v<Cylinder, T> || std::is_same_v<Cone, T>;
 
 constexpr Vector normal_at(const Shapes& variant, const Point& p) { 
     return std::visit([&p](const auto& obj){         
