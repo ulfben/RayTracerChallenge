@@ -79,7 +79,7 @@ TEST_F(Phong, noShadowWhenObjectIsBehindTheLight) {
 
 TEST_F(Phong, noShadowWhenObjectIsBehindThePoint) {
     const auto w = World(); 
-    const auto p = point(-2, 2, -2);  //our point far behind the light
+    const auto p = point(-2, 2, -2);  //point between the light and object. ergo: no shadow. 
     EXPECT_FALSE(is_shadowed(w, p));
 }
 RESTORE_WARNINGS

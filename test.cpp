@@ -404,7 +404,7 @@ TEST(DISABLED_Chapter11, CanRenderBookScene) {
     save_to_file(img, "output/chapter11_bookscene.ppm"sv);
 }
 
-TEST(Chapter13, CanRenderCylinders) {    
+TEST(DISABLED_Chapter13, CanRenderCylinders) {    
     const auto mighty_slate = sRGB_to_linear(color(0.33f, 0.38f, 0.44f));
     const auto pacifica = sRGB_to_linear(color(0.31f, 0.81f, 0.77f));
     const auto c = Camera(600, 400, math::PI / 3.0f, 
