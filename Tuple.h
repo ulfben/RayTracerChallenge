@@ -103,6 +103,15 @@ constexpr Vector reflect(const Vector& v, const Vector& normal) noexcept {
     return v - normal * 2 * dot(v, normal);
 }
 
+constexpr Vector hadamard_product(const Vector& lhs, const Vector& rhs) noexcept {
+    return {
+        lhs.x * rhs.x,
+        lhs.y * rhs.y,
+        lhs.z * rhs.z,
+    };
+}
+
+
 //Point interface
 constexpr Point operator/(const Point& lhs, Real scalar) noexcept {
     return Point{ lhs.x / scalar, lhs.y / scalar, lhs.z / scalar };

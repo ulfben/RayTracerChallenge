@@ -72,6 +72,15 @@ constexpr Cylinder closed_cylinder(Real min, Real max, Material m, Matrix4 trans
     return Cylinder(min, max, true, std::move(m), std::move(transform));    
 }
 
+//helper to build Icosahedrons
+constexpr Cylinder closed_cylinder(const Point& p1, const Point& p2, Real radius) noexcept{
+    const auto v = p2 - p1;    
+    auto cyl = closed_cylinder(0, 1);
+    auto rot = rotation(vector(0, 1, 0), normalize(v));    
+    cyl.set_transform(translation(p1) * rot * scaling(radius, magnitude(v), radius));    
+    return cyl;
+}
+
 constexpr Vector local_normal_at([[maybe_unused]]const Cylinder& c, const Point& p) noexcept {
     using math::square;
     const auto dist = square(p.x) + square(p.z); //the square of the distance from the y-axis
