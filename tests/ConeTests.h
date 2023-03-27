@@ -10,65 +10,67 @@ DISABLE_WARNINGS_FROM_GTEST
 
 TEST(Cone, intersectingAConeWithARay) {           
     const auto c = cone();
-    EXPECT_TRUE(is_bounded(c));
-    const std::vector<Ray> rays{
-        {point(0, 1.5f, 0), normal_vector(0.1f, 1, 0)}, //from inside, heading up and escaping the cylinder
-        {point(0, 3, -5), normal_vector(0, 0, 1)}, // perpendicular to the y-axis, but above the cylinder
-        {point(0, 0, -5), normal_vector(0, 0, 1)}, // perpendicular to the y-axis, but below the cylinder
-        {point(0, 2, -5), normal_vector(0, 0, 1)}, //edge case: the maximum extent is *excluded*
-        {point(0, 1, -5), normal_vector(0, 0, 1)}, //edge case: the minimum extent is *excluded*
-        {point(0, 1.5f, -2), normal_vector(0, 0, 1)} //perpendicular to the cylinder, at the middle of it. 
-    }; 
-    const std::vector<std::vector<Real>> points{
-        MISS,
-        MISS,
-        MISS,
-        MISS,
-        MISS,
-        {1.0f,3.0f} 
-    };
-    
-    for (size_t i = 0; i < rays.size(); i++) {        
-        const auto xs = local_intersect(c, rays[i]);        
-        EXPECT_EQ(xs, points[i]);        
-    }         
+    EXPECT_FALSE(is_bounded(c));    
+
+    auto r = ray(point(0, 0, -5), vector(0, 0, 1));
+    auto xs = local_intersect(c, r);   
+    ASSERT_EQ(xs.size(), 2);    
+    EXPECT_FLOAT_EQ(xs[0], 5.0f);        
+    EXPECT_FLOAT_EQ(xs[1], 5.0f);        
+
+    r = ray(point(0, 0, -5), normal_vector(1, 1, 1));
+    xs = local_intersect(c, r);   
+    ASSERT_EQ(xs.size(), 2);
+    EXPECT_FLOAT_EQ(xs[0], 8.66025f);        
+    EXPECT_FLOAT_EQ(xs[1], 8.66025f);        
+
+    r = ray(point(1, 1, -5), normal_vector(-0.5f, -1, 1));
+    xs = local_intersect(c, r);   
+    ASSERT_EQ(xs.size(), 2);
+    EXPECT_FLOAT_EQ(xs[0], 4.5500546f); //book oracle 4.55006f, which is actually 4.5500598      
+    EXPECT_FLOAT_EQ(xs[1], 49.44994f);       
 }
 
-TEST(Cone, intersectingTheCapsOfAClosedCylinder) {           
-    auto c = closed_cylinder(1.0f, 2.f);
+TEST(Cone, intersectingAConeWithRayParallelToOneOfItsHalves) {           
+    const auto c = cone();
+    EXPECT_FALSE(is_bounded(c));
+    const auto r = ray(point(0,0,-1), normal_vector(0,1,1));    
+    const auto xs = local_intersect(c, r);        
+    ASSERT_EQ(xs.size(), 1);
+    EXPECT_FLOAT_EQ(xs[0], 0.35355338f);  //book oracle 0.35355f, which is actually 0.35354999f
+}
+
+TEST(Cone, intersectingAConesEndCap) {           
+    auto c = closed_cone(-0.5f, 0.5f);
     EXPECT_TRUE(is_closed(c));  
     const std::vector<Ray> rays{
-        {point(0, 3, 0), vector(0, -1, 0)}, //start above the cylinder pointing straight down through it. hits both caps
-        {point(0, 3, -2), vector(0, -1, 2)}, //diagonal through top cap and cylinder wall 
-        {point(0, 4, -2), vector(0, -1, 1)}, // corner case, diagonal through top cap + where second cap meets cylinder wall
-        {point(0, 0, -2), vector(0, 1, 2)},  //diagonal through bottom cap and cylinder wall       
-        {point(0, -1, -2), vector(0, 1, 1)} //corner case, diagonal through bottom cap + where second cap meets cylinder wall
-    };     
+        {point(0, 0, -5), normal_vector(0, 1, 0)},
+        {point(0, 0, -0.25f), normal_vector(0, 1, 1)},
+        {point(0, 0, -0.25f), normal_vector(0, 1, 0)}        
+    };    
     
-    for (size_t i = 0; i < rays.size(); i++) {        
-        const auto xs = local_intersect(c, rays[i]);        
-        EXPECT_EQ(xs.size(), 2);        
-    }         
+    auto xs = local_intersect(c, rays[0]);        
+    EXPECT_EQ(xs.size(), 0); 
+
+    xs = local_intersect(c, rays[1]);        
+    EXPECT_EQ(xs.size(), 2); 
+
+    xs = local_intersect(c, rays[2]);        
+    EXPECT_EQ(xs.size(), 4); 
 }
 
-TEST(Cone, normalOnCylinderEndCap) {   
+TEST(Cone, normalOnSurfaceOfCone) {   
     const std::vector<Point> points{
-        point(0.0f, 1.0f, 0.0f),
-        point(0.5f, 1.0f, 0.0f),
-        point(0.0f, 1.0f, 0.5f),
-        point(0.0f, 2.0f, 0.0f),        
-        point(0.5f, 2.0f, 0.0f),
-        point(0.0f, 2.0f, 0.5f)
+        point(0.0f, 0.0f, 0.0f),
+        point(1.0f, 1.0f, 1.0f),
+        point(-1.0f, -1.0f, 0)
     };
     const std::vector<Vector> normals{
-        vector(0, -1, 0),
-        vector(0, -1, 0),
-        vector(0, -1, 0),
-        vector(0, 1, 0),        
-        vector(0, 1, 0),        
-        vector(0, 1, 0)        
+        vector(0, 0, 0),
+        normal_vector(1, -math::sqrt(2.0f), 1),
+        normal_vector(-1, 1, 0),        
     };
-    const auto c = closed_cylinder(1, 2);
+    const auto c = cone();
     for (size_t i = 0; i < points.size(); i++) {        
         const auto& point = points[i];
         const auto normal = local_normal_at(c, point);

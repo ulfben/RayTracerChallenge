@@ -101,12 +101,13 @@ constexpr bool is_open(const Cone& c) noexcept {
     return !is_closed(c);    
 }
 
-constexpr bool check_cap(const Ray& ray, Real t) noexcept {
-    using math::square;
-    const auto x = ray.x() + t * ray.dx();
-    const auto z = ray.z() + t * ray.dz();
-    return (square(x) + square(z)) <= 1.0f;
-}
+// same as the cylinder check_cap
+//constexpr bool check_cap(const Ray& ray, Real t) noexcept {
+//    using math::square;
+//    const auto x = ray.x() + t * ray.dx();
+//    const auto z = ray.z() + t * ray.dz();
+//    return (square(x) + square(z)) <= 1.0f;
+//}
 
 constexpr void intersect_caps(const Cone& cone, const Ray& ray, std::vector<Real>& xs) noexcept {
     if (is_open(cone) || math::is_zero(ray.dy())) {
@@ -126,21 +127,23 @@ constexpr void intersect_caps(const Cone& cone, const Ray& ray, std::vector<Real
 constexpr auto local_intersect([[maybe_unused]] const Cone& cone, const Ray& local_ray) noexcept {
     using math::square, math::sqrt, math::is_between;
     std::vector<Real> result;
-    const auto a = square(local_ray.dx()) + square(local_ray.dy()) + square(local_ray.dz());   
-    const auto b = 2.0f * (local_ray.x() * local_ray.dx()) - 2*(local_ray.y() * local_ray.dy()) + 2*(local_ray.z() * local_ray.dz());
+    const auto a = square(local_ray.dx()) - square(local_ray.dy()) + square(local_ray.dz());   
+    const auto b = 2.0f * local_ray.x() * local_ray.dx() - 2*local_ray.y() * local_ray.dy() + 2*local_ray.z() * local_ray.dz();
     const auto c = square(local_ray.x()) - square(local_ray.y()) + square(local_ray.z());
     
-    if (math::abs(a) <= math::BRAZZY_EPSILON && math::abs(b) > math::BRAZZY_EPSILON){
-        const auto t = -c / (2 * b);
+    if (math::abs(a) <= math::BOOK_EPSILON && math::abs(b) > math::BOOK_EPSILON){
+        const auto t = -c / (2.0f * b);
         result.push_back(t);        
-    }
-    
-    if (math::abs(a) > math::BRAZZY_EPSILON) {
+    }    
+    if (math::abs(a) > math::BOOK_EPSILON) {
         const auto discriminant = square(b) - 4.0f * a * c;
+
         if (discriminant >= 0.0f) {            
-            const auto t1 = (-b - math::sqrt(discriminant)) / (2 * a);
-            const auto t2 = (-b + math::sqrt(discriminant)) / (2 * a);            
-            //maybe swap t1 t2
+            auto t1 = (-b - math::sqrt(discriminant)) / (2 * a);
+            auto t2 = (-b + math::sqrt(discriminant)) / (2 * a);            
+            if (t1 > t2) {
+                std::swap(t1, t2);
+            }         
             const auto y1 = local_ray.y() + t1 * local_ray.dy();
             if (is_between(y1, cone.minimum, cone.maximum)) {
                 result.push_back(t1);
