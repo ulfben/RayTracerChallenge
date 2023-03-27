@@ -102,42 +102,41 @@ constexpr bool is_open(const Cone& c) noexcept {
 }
 
 // same as the cylinder check_cap
-//constexpr bool check_cap(const Ray& ray, Real t) noexcept {
-//    using math::square;
-//    const auto x = ray.x() + t * ray.dx();
-//    const auto z = ray.z() + t * ray.dz();
-//    return (square(x) + square(z)) <= 1.0f;
-//}
+constexpr bool check_cap(const Ray& ray, Real t, Real y) noexcept {
+    using math::square;
+    const auto x = ray.x() + t * ray.dx();
+    const auto z = ray.z() + t * ray.dz();
+    return (square(x) + square(z)) <= square(y);
+}
 
 constexpr void intersect_caps(const Cone& cone, const Ray& ray, std::vector<Real>& xs) noexcept {
     if (is_open(cone) || math::is_zero(ray.dy())) {
         return; //caps only matter if the cone is closed and might possibly be intersected by the ray
     }
     const auto t_for_lower_end_cap = (cone.minimum - ray.y()) / ray.dy();
-    if (check_cap(ray, t_for_lower_end_cap)) { //check ray against the plane at y = cone.minimum
+    if (check_cap(ray, t_for_lower_end_cap, cone.minimum)) { //check ray against the plane at y = cone.minimum
        xs.push_back(t_for_lower_end_cap);
     }
     const auto t_for_upper_end_cap = (cone.maximum - ray.y()) / ray.dy();
-    if (check_cap(ray, t_for_upper_end_cap)) {
+    if (check_cap(ray, t_for_upper_end_cap, cone.maximum)) {
        xs.push_back(t_for_upper_end_cap);
     }
 }
 
 //TODO: refactor this overly long function.
 constexpr auto local_intersect([[maybe_unused]] const Cone& cone, const Ray& local_ray) noexcept {
-    using math::square, math::sqrt, math::is_between;
+    using math::square, math::is_zero, math::sqrt, math::is_between;
     std::vector<Real> result;
     const auto a = square(local_ray.dx()) - square(local_ray.dy()) + square(local_ray.dz());   
     const auto b = 2.0f * local_ray.x() * local_ray.dx() - 2*local_ray.y() * local_ray.dy() + 2*local_ray.z() * local_ray.dz();
     const auto c = square(local_ray.x()) - square(local_ray.y()) + square(local_ray.z());
     
-    if (math::abs(a) <= math::BOOK_EPSILON && math::abs(b) > math::BOOK_EPSILON){
+    if (is_zero(a) && !is_zero(b)){
         const auto t = -c / (2.0f * b);
         result.push_back(t);        
     }    
-    if (math::abs(a) > math::BOOK_EPSILON) {
+    if (!is_zero(a)) {
         const auto discriminant = square(b) - 4.0f * a * c;
-
         if (discriminant >= 0.0f) {            
             auto t1 = (-b - math::sqrt(discriminant)) / (2 * a);
             auto t2 = (-b + math::sqrt(discriminant)) / (2 * a);            

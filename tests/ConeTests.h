@@ -18,7 +18,7 @@ TEST(Cone, intersectingAConeWithARay) {
     EXPECT_FLOAT_EQ(xs[0], 5.0f);        
     EXPECT_FLOAT_EQ(xs[1], 5.0f);        
 
-    r = ray(point(0, 0, -5), normal_vector(1, 1, 1));
+    r = ray(point(0, 0, -5), vector(1, 1, 1));
     xs = local_intersect(c, r);   
     ASSERT_EQ(xs.size(), 2);
     EXPECT_FLOAT_EQ(xs[0], 8.66025f);        
