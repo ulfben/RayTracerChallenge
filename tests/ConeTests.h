@@ -12,17 +12,19 @@ TEST(Cone, intersectingAConeWithARay) {
     const auto c = cone();
     EXPECT_FALSE(is_bounded(c));    
 
-    auto r = ray(point(0, 0, -5), vector(0, 0, 1));
+    auto r = ray(point(0, 0, -5), normal_vector(0, 0, 1));
     auto xs = local_intersect(c, r);   
     ASSERT_EQ(xs.size(), 2);    
     EXPECT_FLOAT_EQ(xs[0], 5.0f);        
     EXPECT_FLOAT_EQ(xs[1], 5.0f);        
 
-    r = ray(point(0, 0, -5), vector(1, 1, 1));
+    r = ray(point(0, 0, -5.0f), normal_vector(1.0f, 1.0f, 1.0f));
     xs = local_intersect(c, r);   
-    ASSERT_EQ(xs.size(), 2);
-    EXPECT_FLOAT_EQ(xs[0], 8.66025f);        
-    EXPECT_FLOAT_EQ(xs[1], 8.66025f);        
+    EXPECT_EQ(xs.size(), 2);
+    if (xs.size() >= 2) {        
+        EXPECT_FLOAT_EQ(xs[0], 8.66025f);
+        EXPECT_FLOAT_EQ(xs[1], 8.66025f);
+    }
 
     r = ray(point(1, 1, -5), normal_vector(-0.5f, -1, 1));
     xs = local_intersect(c, r);   

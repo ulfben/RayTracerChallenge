@@ -136,7 +136,7 @@ constexpr auto local_intersect([[maybe_unused]] const Cone& cone, const Ray& loc
         result.push_back(t);        
     }    
     if (!is_zero(a)) {
-        const auto discriminant = square(b) - 4.0f * a * c;
+        const auto discriminant = (square(b) - 4.0f * a * c);
         if (discriminant >= 0.0f) {            
             auto t1 = (-b - math::sqrt(discriminant)) / (2 * a);
             auto t2 = (-b + math::sqrt(discriminant)) / (2 * a);            
