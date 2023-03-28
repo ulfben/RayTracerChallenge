@@ -125,10 +125,10 @@ constexpr void intersect_caps(const Cone& cone, const Ray& ray, std::vector<Real
 
 //TODO: refactor this overly long function.
 constexpr auto local_intersect([[maybe_unused]] const Cone& cone, const Ray& local_ray) noexcept {
-    using math::square, math::is_zero, math::sqrt, math::is_between;
+    using math::square, math::is_zero, math::sqrt, math::is_between, math::max, math::abs;
     std::vector<Real> result;
     const auto a = square(local_ray.dx()) - square(local_ray.dy()) + square(local_ray.dz());   
-    const auto b = 2 * local_ray.x() * local_ray.dx() - 2 * local_ray.y() * local_ray.dy() + 2 * local_ray.z() * local_ray.dz();
+    const auto b = 2 * ((local_ray.x() * local_ray.dx()) - (local_ray.y() * local_ray.dy()) + (local_ray.z() * local_ray.dz()));
     const auto c = square(local_ray.x()) - square(local_ray.y()) + square(local_ray.z());
     
     //When a is zero, it means the ray is parallel to one of the cone’s halves
@@ -143,13 +143,13 @@ constexpr auto local_intersect([[maybe_unused]] const Cone& cone, const Ray& loc
         //In general, the discriminant of the quadratic equation should be non-negative if there are real solutions, 
         // and negative if there are complex solutions. However, due to floating-point roundoff errors, the discriminant 
         // may sometimes become slightly negative even when there are real solutions, leading to incorrect results.
-        const auto discriminant = (square(b) - 4.0f * a * c)+math::BRAZZY_EPSILON;
-        if (discriminant >= 0) {            
-            auto t1 = (-b - sqrt(discriminant)) / (2 * a);
-            auto t2 = (-b + sqrt(discriminant)) / (2 * a);            
-            if (t1 > t2) {
-                std::swap(t1, t2);
-            }         
+        //Here, rel_eps is a small relative epsilon based on the magnitudes of the coefficients, making it more robust to different combinations of coefficients 
+        const auto rel_eps = math::GTEST_EPSILON * max(abs(a), abs(b), abs(c));
+        const auto discriminant = square(b) - 4.0f * a * c;
+        if (discriminant >= -rel_eps) { //The discriminant is considered to be non-negative if it is greater than or equal to -rel_eps            
+            const auto sqrt_discriminant = sqrt(max(discriminant, 0.0f)); //rount to 0 if need be.
+            auto t1 = (-b - sqrt_discriminant) / (2 * a);
+            auto t2 = (-b + sqrt_discriminant) / (2 * a);                  
             const auto y1 = local_ray.y() + t1 * local_ray.dy();
             if (is_between(y1, cone.minimum, cone.maximum)) {
                 result.push_back(t1);

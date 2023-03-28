@@ -52,6 +52,11 @@ namespace math {
         return radians * T(TO_DEG);
     }
 
+     template<class T>
+    [[nodiscard]] constexpr T max(T a, T b) noexcept {
+        return (a > b) ? a : b;
+    }
+
     template<class T>
     [[nodiscard]] constexpr T max(T a, T b, T c) noexcept {
         return (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);
