@@ -123,4 +123,13 @@ TEST(Pattern, checkersShouldRepeatInZ) {    ;
     EXPECT_EQ(pattern_at(pattern, point(0, 0, 0.99f)), WHITE);    
     EXPECT_EQ(pattern_at(pattern, point(0, 0, 1.01f)), BLACK);    
 }
+
+TEST(Pattern, checkersPatternIn2D) {    ;    
+    const auto pattern = uv_checkers_pattern(2, 2, BLACK, WHITE);    
+    EXPECT_EQ(pattern_at(pattern, point(0, 0, 0)), BLACK);
+    EXPECT_EQ(pattern_at(pattern, point(0.5f, 0, 0)), WHITE);
+    EXPECT_EQ(pattern_at(pattern, point(0, 0.5f, 0)), WHITE);
+    EXPECT_EQ(pattern_at(pattern, point(0.5f, 0.5f, 0)), BLACK);
+    EXPECT_EQ(pattern_at(pattern, point(1, 1, 0)), BLACK);
+}
 RESTORE_WARNINGS

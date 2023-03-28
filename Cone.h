@@ -139,7 +139,7 @@ constexpr auto local_intersect([[maybe_unused]] const Cone& cone, const Ray& loc
             result.push_back(t);
         }
     }    
-    else {
+    else {// a is non-zero
         //In general, the discriminant of the quadratic equation should be non-negative if there are real solutions, 
         // and negative if there are complex solutions. However, due to floating-point roundoff errors, the discriminant 
         // may sometimes become slightly negative even when there are real solutions, leading to incorrect results.
@@ -147,9 +147,9 @@ constexpr auto local_intersect([[maybe_unused]] const Cone& cone, const Ray& loc
         const auto rel_eps = math::GTEST_EPSILON * max(abs(a), abs(b), abs(c));
         const auto discriminant = square(b) - 4.0f * a * c;
         if (discriminant >= -rel_eps) { //The discriminant is considered to be non-negative if it is greater than or equal to -rel_eps            
-            const auto sqrt_discriminant = sqrt(max(discriminant, 0.0f)); //rount to 0 if need be.
-            auto t1 = (-b - sqrt_discriminant) / (2 * a);
-            auto t2 = (-b + sqrt_discriminant) / (2 * a);                  
+            const auto sqrt_discriminant = sqrt(max(discriminant, 0.0f)); //round to 0 if need be.
+            const auto t1 = (-b - sqrt_discriminant) / (2 * a);
+            const auto t2 = (-b + sqrt_discriminant) / (2 * a);                  
             const auto y1 = local_ray.y() + t1 * local_ray.dy();
             if (is_between(y1, cone.minimum, cone.maximum)) {
                 result.push_back(t1);
