@@ -128,18 +128,25 @@ constexpr auto local_intersect([[maybe_unused]] const Cone& cone, const Ray& loc
     using math::square, math::is_zero, math::sqrt, math::is_between;
     std::vector<Real> result;
     const auto a = square(local_ray.dx()) - square(local_ray.dy()) + square(local_ray.dz());   
-    const auto b = 2.0f * local_ray.x() * local_ray.dx() - 2*local_ray.y() * local_ray.dy() + 2*local_ray.z() * local_ray.dz();
+    const auto b = 2 * local_ray.x() * local_ray.dx() - 2 * local_ray.y() * local_ray.dy() + 2 * local_ray.z() * local_ray.dz();
     const auto c = square(local_ray.x()) - square(local_ray.y()) + square(local_ray.z());
     
-    if (is_zero(a) && !is_zero(b)){
-        const auto t = -c / (2.0f * b);
-        result.push_back(t);        
+    //When a is zero, it means the ray is parallel to one of the cone’s halves
+    //this still means the ray might intersect the other half of the cone.
+    if (is_zero(a)){  //In this case the ray will miss when both a and b are zero.
+        if (!is_zero(b)) { //If a is zero but b isn’t, calc the single point of intersection:
+            const auto t = -c / (2.0f * b);
+            result.push_back(t);
+        }
     }    
-    if (!is_zero(a)) {
-        const auto discriminant = (square(b) - 4.0f * a * c);
-        if (discriminant >= 0.0f) {            
-            auto t1 = (-b - math::sqrt(discriminant)) / (2 * a);
-            auto t2 = (-b + math::sqrt(discriminant)) / (2 * a);            
+    else {
+        //In general, the discriminant of the quadratic equation should be non-negative if there are real solutions, 
+        // and negative if there are complex solutions. However, due to floating-point roundoff errors, the discriminant 
+        // may sometimes become slightly negative even when there are real solutions, leading to incorrect results.
+        const auto discriminant = (square(b) - 4.0f * a * c)+math::BRAZZY_EPSILON;
+        if (discriminant >= 0) {            
+            auto t1 = (-b - sqrt(discriminant)) / (2 * a);
+            auto t2 = (-b + sqrt(discriminant)) / (2 * a);            
             if (t1 > t2) {
                 std::swap(t1, t2);
             }         

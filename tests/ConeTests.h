@@ -16,24 +16,10 @@ testing::AssertionResult IsAlmostEqual(std::string_view expr1,
         return testing::AssertionSuccess();
     } 
     return testing::AssertionFailure()
-        << "Expected: (" << expr1 << " ~= " << expr2
+        << "Expected: " << expr1 << " ~= " << expr2
         /*<< ") up to a tolerance of " << tolerance*/
-        << ")\nActual: ( " << val1 << " vs " << val2 << ")";
+        << "\n\tActual: " << val1 << " vs " << val2;
 }
-
-template <typename T>
-testing::AssertionResult SafeRangeTest(std::string_view expr1,
-                                       std::string_view expr2,
-                                       std::span<T> actualVales,
-                                       std::span<T> expectedValues
-                                       ) {
-    size_t count = (actualValues.size() > expectedValues.size()) ? expectedValues.size() : actualVales.size();
-    for (auto i = 0; i < count; ++i) {
-        EXPECT_PRED_FORMAT2(actualValues[i], expectedValues[i]);
-    }
-    return EXPECT_PRED_FORMAT2(actualValues.size(), expectedValues.size());
-}
-
 
 TEST(Cone, intersectingAConeWithARay) {           
     const auto c = cone();
@@ -45,17 +31,17 @@ TEST(Cone, intersectingAConeWithARay) {
     EXPECT_PRED_FORMAT2(IsAlmostEqual, xs[0], 5.0f);
     EXPECT_PRED_FORMAT2(IsAlmostEqual, xs[1], 5.0f);
     
-    r = ray(point(0, 0, -5.0f), normal_vector(1.0f, 1.0f, 1.0f));
-    xs = local_intersect(c, r);   
-    ASSERT_EQ(xs.size(), 2);    
-    EXPECT_PRED_FORMAT2(IsAlmostEqual, xs[0], 8.66025f);
-    EXPECT_PRED_FORMAT2(IsAlmostEqual, xs[1], 8.66025f);
-    
     r = ray(point(1, 1, -5), normal_vector(-0.5f, -1, 1));
     xs = local_intersect(c, r);   
     ASSERT_EQ(xs.size(), 2);
     EXPECT_PRED_FORMAT2(IsAlmostEqual, xs[0], 4.5500546f); //book oracle 4.55006f, which is actually 4.5500598      
     EXPECT_PRED_FORMAT2(IsAlmostEqual, xs[1], 49.44994f);    
+
+    r = ray(point(0, 0, -5.0f), normal_vector(1.0f, 1.0f, 1.0f));
+    xs = local_intersect(c, r);   
+    ASSERT_EQ(xs.size(), 2);    
+    EXPECT_PRED_FORMAT2(IsAlmostEqual, xs[0], 8.66025f);
+    EXPECT_PRED_FORMAT2(IsAlmostEqual, xs[1], 8.66025f);
 }
 
 TEST(Cone, intersectingAConeWithRayParallelToOneOfItsHalves) {           
