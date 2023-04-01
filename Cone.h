@@ -149,7 +149,8 @@ constexpr auto local_intersect([[maybe_unused]] const Cone& cone, const Ray& loc
         if (discriminant >= -rel_eps) { //The discriminant is considered to be non-negative if it is greater than or equal to -rel_eps            
             const auto sqrt_discriminant = sqrt(max(discriminant, 0.0f)); //round to 0 if need be.
             const auto t1 = (-b - sqrt_discriminant) / (2 * a);
-            const auto t2 = (-b + sqrt_discriminant) / (2 * a);                  
+            const auto t2 = (-b + sqrt_discriminant) / (2 * a); 
+            //maybe swap t1 / t2 if reversed. can they ever be reversed? 
             const auto y1 = local_ray.y() + t1 * local_ray.dy();
             if (is_between(y1, cone.minimum, cone.maximum)) {
                 result.push_back(t1);

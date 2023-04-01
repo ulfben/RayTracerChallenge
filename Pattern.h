@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "pch.h"
 #include "Tuple.h"
 #include "Color.h"
@@ -164,8 +164,8 @@ private:
     Color b{};
 };
 struct UVCheckersPattern final {
-    constexpr UVCheckersPattern(Matrix4 mat, unsigned width_, unsigned height_, Color a_, Color b_) noexcept 
-        : width{ width_ }, height{height_}, a{ a_ }, b{ b_ } {
+    constexpr UVCheckersPattern(Matrix4 mat, unsigned width_, unsigned height_, Color a_, Color b_) noexcept
+        : width{ width_ }, height{ height_ }, a{ a_ }, b{ b_ } {
         set_transform(std::move(mat));
     }
     constexpr Color at(const Point& uv) const noexcept {
@@ -269,3 +269,32 @@ Color pattern_at(const Patterns& pattern, const /*must be is_shapes but I can't 
     const auto pattern_point = get_inverse_transform(pattern) * object_point;
     return pattern_at(pattern, pattern_point);
 };
+
+/*constexpr*/ std::pair<Real, Real> spherical_map(const Point& p) noexcept {
+    // Compute the azimuthal angle
+    // -π < theta <= π
+    // Angle increases clockwise as viewed from above,
+    // which is opposite of what we want, but we'll fix it later.
+    const auto theta = std::atan2(p.x, p.z);
+
+    // Compute the polar angle
+    // 0 <= phi <= π
+    //we are treating the point as a vector pointing from the sphere's origin (the world origin)
+    //to the point, and calculating the magnitude of that get the sphere's radius.
+    const auto phi = acos(p.y / sqrt(math::square(p.x) + math::square(p.y) + math::square(p.z)));
+
+    // -0.5 < raw_u <= 0.5
+    const auto raw_u = theta / math::TWO_PI;
+
+    // 0 <= u < 1
+    // Here's also where we fix the direction of u. Subtract it from 1,
+    // so that it increases counterclockwise as viewed from above.
+    const auto u = 1.0f - (raw_u + 0.5f);
+
+    // We want v to be 0 at the south pole of the sphere,
+    // and 1 at the north pole, so we have to "flip it over"
+    // by subtracting it from 1.
+    const auto v = 1 - phi / math::PI;
+
+    return { u, v };
+}

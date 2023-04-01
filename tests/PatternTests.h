@@ -132,4 +132,37 @@ TEST(Pattern, checkersPatternIn2D) {    ;
     EXPECT_EQ(pattern_at(pattern, point(0.5f, 0.5f, 0)), BLACK);
     EXPECT_EQ(pattern_at(pattern, point(1, 1, 0)), BLACK);
 }
+
+TEST(Pattern, TestSphericalMapping) {
+    constexpr auto tolerance = math::BRAZZY_EPSILON;
+
+    const auto [u1, v1] = spherical_map(point(0, 0, -1));
+    EXPECT_NEAR(u1, 0.0f, tolerance);
+    EXPECT_NEAR(v1, 0.5f, tolerance);
+
+    const auto [u2, v2] = spherical_map(point(1, 0, 0));
+    EXPECT_NEAR(u2, 0.25f, tolerance);
+    EXPECT_NEAR(v2, 0.5f, tolerance);
+
+    const auto [u3, v3] = spherical_map(point(0, 0, 1));
+    EXPECT_NEAR(u3, 0.5f, tolerance);
+    EXPECT_NEAR(v3, 0.5f, tolerance);
+
+    const auto [u4, v4] = spherical_map(point(-1, 0, 0));
+    EXPECT_NEAR(u4, 0.75f, tolerance);
+    EXPECT_NEAR(v4, 0.5f, tolerance);
+
+    const auto [u5, v5] = spherical_map(point(0, 1, 0));
+    EXPECT_NEAR(u5, 0.5f, tolerance);
+    EXPECT_NEAR(v5, 1.0f, tolerance);
+
+    const auto [u6, v6] = spherical_map(point(0, -1, 0));
+    EXPECT_NEAR(u6, 0.5f, tolerance);
+    EXPECT_NEAR(v6, 0.0f, tolerance);
+
+    const auto [u7, v7] = spherical_map(point(math::sqrt(2.0f) / 2.0f, math::sqrt(2.0f) / 2.0f, 0));
+    EXPECT_NEAR(u7, 0.25f, tolerance);
+    EXPECT_NEAR(v7, 0.75f, tolerance);
+}
+
 RESTORE_WARNINGS
