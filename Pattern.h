@@ -163,40 +163,17 @@ private:
     Color a{};
     Color b{};
 };
-struct UVCheckersPattern final {
-    constexpr UVCheckersPattern(Matrix4 mat, unsigned width_, unsigned height_, Color a_, Color b_) noexcept
-        : width{ width_ }, height{ height_ }, a{ a_ }, b{ b_ } {
-        set_transform(std::move(mat));
-    }
-    constexpr Color at(const Point& uv) const noexcept {
-        const auto u = uv.x;
-        const auto v = uv.y;
-        const auto u2 = math::int_floor(u * width);
-        const auto v2 = math::int_floor(v * height);
-        const auto sum = u2 + v2;
-        return (sum % 2 == 0) ? a : b;
-    }
+struct UVCheckers final {
+    constexpr UVCheckers(unsigned width_, unsigned height_, Color a_, Color b_) noexcept
+        : width{ width_ }, height{ height_ }, a{ a_ }, b{ b_ } {        
+    }    
     constexpr Color at(const UVCoords& uv) const noexcept {        
         const auto u2 = math::int_floor(uv.u * width);
         const auto v2 = math::int_floor(uv.v * height);
         const auto sum = u2 + v2;
         return (sum % 2 == 0) ? a : b;
-    }
-    constexpr void set_transform(Matrix4 mat) noexcept {
-        _transform = std::move(mat);
-        _invTransform = inverse(_transform);
-    }
-    constexpr const Matrix4& get_transform() const noexcept {
-        return _transform;
-    }
-    constexpr const Matrix4& inv_transform() const noexcept {
-        return _invTransform;
-    }
-    explicit constexpr operator bool() const noexcept { return true; }
-    constexpr bool operator==(const UVCheckersPattern& that) const noexcept = default;
-private:
-    Matrix4 _transform{ Matrix4Identity };
-    Matrix4 _invTransform{ Matrix4Identity };
+    }    
+private:    
     Color a{};
     Color b{};
     unsigned width = 0;
@@ -204,7 +181,7 @@ private:
 };
 
 struct TextureMap final {
-    using Texture = UVCheckersPattern;
+    using Texture = UVCheckers;
     using Callable = std::function<UVCoords(const Point&)>;
     /*constexpr*/ TextureMap(Texture uv_pattern, Callable uv_map) noexcept
         : uv_pattern{ std::move(uv_pattern) }, uv_map{std::move(uv_map)}
@@ -266,17 +243,16 @@ constexpr auto ring_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexc
 constexpr auto checkers_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexcept {
     return CheckersPattern(std::move(m), a, b);
 };
-constexpr auto uv_checkers_pattern(unsigned width, unsigned height, Color a, Color b, Matrix4 m = Matrix4Identity) noexcept {
-    return UVCheckersPattern(std::move(m), width, height, a, b);
+constexpr auto uv_checkers(unsigned width, unsigned height, Color a, Color b) noexcept {
+    return UVCheckers(width, height, a, b);
 };
-using Patterns = std::variant<NullPattern, TestPattern, StripePattern, GradientPattern, RingPattern, CheckersPattern, RadialGradientPattern, UVCheckersPattern, TextureMap>;
+using Patterns = std::variant<NullPattern, TestPattern, StripePattern, GradientPattern, RingPattern, CheckersPattern, RadialGradientPattern, TextureMap>;
 
 template<typename T>
 concept is_pattern = std::is_same_v<NullPattern, T> || std::is_same_v<TestPattern, T> ||
 std::is_same_v<StripePattern, T> || std::is_same_v<GradientPattern, T> ||
 std::is_same_v<RingPattern, T> || std::is_same_v<CheckersPattern, T> ||
-std::is_same_v<RadialGradientPattern, T> || std::is_same_v<UVCheckersPattern, T>
-|| std::is_same_v<TextureMap, T>;
+std::is_same_v<RadialGradientPattern, T> || std::is_same_v<TextureMap, T>;
 
 template<typename T>
     requires is_pattern<T>
@@ -347,4 +323,11 @@ Color pattern_at(const Patterns& pattern, const /*must be is_shapes but I can't 
     const auto v = 1 - phi / math::PI;
 
     return { u, v };
+}
+
+/*planar mapping tiles every unit square on the plane, and ignores the y coordinate.*/
+/*constexpr*/ UVCoords planar_map(const Point& p) noexcept {
+    const auto u = p.x - std::floor(p.x); // treat the fractional portion of the x coordinate as u
+    const auto v = p.z - std::floor(p.z); //and the fractional portion of z as v.
+    return uv(u, v);
 }

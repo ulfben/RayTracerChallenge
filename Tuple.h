@@ -16,9 +16,21 @@ struct UVCoords final {
     Real u{};
     Real v{};
 };
+constexpr bool operator==(const UVCoords& lhs, const UVCoords& rhs) noexcept {
+    using math::float_cmp;
+    return float_cmp(lhs.u, rhs.u) && float_cmp(lhs.v, rhs.v);
+};
+
+
 static constexpr Point ORIGO = Point{ 0, 0, 0 };
 
 constexpr Vector normalize(const Vector& t) noexcept; //pre-declare
+
+constexpr UVCoords uv(Real u, Real v) noexcept {
+   /* assert(math::is_between(u, 0.0f, 1.0f));
+    assert(math::is_between(v, 0.0f, 1.0f));*/
+    return { u, v };
+}
 
 constexpr Vector vector(Real x, Real y, Real z) noexcept {
     return Vector{ x, y, z };

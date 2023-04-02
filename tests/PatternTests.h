@@ -129,14 +129,13 @@ TEST(Pattern, checkersShouldRepeatInZ) {
     EXPECT_EQ(pattern_at(pattern, point(0, 0, 1.01f)), BLACK);
 }
 
-TEST(Pattern, checkersPatternIn2D) {
-    ;
-    const auto pattern = uv_checkers_pattern(2, 2, BLACK, WHITE);
-    EXPECT_EQ(pattern_at(pattern, point(0, 0, 0)), BLACK);
-    EXPECT_EQ(pattern_at(pattern, point(0.5f, 0, 0)), WHITE);
-    EXPECT_EQ(pattern_at(pattern, point(0, 0.5f, 0)), WHITE);
-    EXPECT_EQ(pattern_at(pattern, point(0.5f, 0.5f, 0)), BLACK);
-    EXPECT_EQ(pattern_at(pattern, point(1, 1, 0)), BLACK);
+TEST(Pattern, checkersPatternIn2D) {    
+    const auto uv_pattern = uv_checkers(2, 2, BLACK, WHITE);
+    EXPECT_EQ(uv_pattern.at(uv(0, 0)), BLACK);
+    EXPECT_EQ(uv_pattern.at(uv(0.5f, 0)), WHITE);
+    EXPECT_EQ(uv_pattern.at(uv(0, 0.5f)), WHITE);
+    EXPECT_EQ(uv_pattern.at(uv(0.5f, 0.5f)), BLACK);
+    EXPECT_EQ(uv_pattern.at(uv(1, 1)), BLACK);
 }
 
 TEST(Pattern, TestSphericalMapping) {
@@ -172,7 +171,7 @@ TEST(Pattern, TestSphericalMapping) {
 }
 
 TEST(Pattern, UsingTextureMapPatternWithASphericalMap) {
-    const auto pattern = texture_map(uv_checkers_pattern(16, 8, BLACK, WHITE), spherical_map);
+    const auto pattern = texture_map(uv_checkers(16, 8, BLACK, WHITE), spherical_map);
 
     auto p1 = point(0.4315f, 0.4670f, 0.7719f);
     EXPECT_EQ(pattern.at(p1), WHITE);
@@ -203,6 +202,29 @@ TEST(Pattern, UsingTextureMapPatternWithASphericalMap) {
 
     auto p10 = point(-0.7652f, 0.2175f, 0.6060f);
     EXPECT_EQ(pattern.at(p10), BLACK);
+}
+
+TEST(Pattern, UsingAPlanarMappingOnA3DPoint) {           
+    auto uvCoords = planar_map(point(0.25f, 0, 0.5f));
+    EXPECT_EQ(uvCoords, uv(0.25f, 0.5f));
+
+    uvCoords = planar_map(point(0.25f, 0, -0.25f));
+    EXPECT_EQ(uvCoords, uv(0.25f, 0.75f));
+        
+    uvCoords = planar_map(point(0.25f, 0.5f, -0.25f));
+    EXPECT_EQ(uvCoords, uv(0.25f, 0.75f));
+
+    uvCoords = planar_map(point(1.25f, 0, 0.5f));
+    EXPECT_EQ(uvCoords, uv(0.25f, 0.5f));
+
+    uvCoords = planar_map(point(0.25f, 0, -1.75f));
+    EXPECT_EQ(uvCoords, uv(0.25f, 0.25f));
+        
+    uvCoords = planar_map(point(1, 0, -1));
+    EXPECT_EQ(uvCoords, uv(0, 0));
+
+    uvCoords = planar_map(point(0, 0, 0));
+    EXPECT_EQ(uvCoords, uv(0, 0));
 }
 
 RESTORE_WARNINGS

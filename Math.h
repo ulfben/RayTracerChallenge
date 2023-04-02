@@ -73,6 +73,11 @@ namespace math {
     }
 
     template<class T>
+    [[nodiscard]] constexpr bool is_between_inclusive(T in, T min, T max) noexcept {
+        return (in >= min) && (in <= max);
+    }
+
+    template<class T>
     [[nodiscard]] constexpr T lerp(T start, T end, T t) {
         return (T(1.0) - t) * start + t * end;
     }
