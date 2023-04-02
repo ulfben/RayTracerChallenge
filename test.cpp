@@ -456,3 +456,22 @@ TEST(DISABLED_Chapter13, CanRenderCones) {
     const auto img = render(c, world);
     save_to_file(img, "output/chapter13_5.ppm"sv);
 }
+
+TEST(Bonus01, CanTextureMap) {        
+    const auto c = Camera(400, 400, 0.5f, 
+        view_transform(point(0.0f, 0.0f, -5.0f), point(0, 0, 0), vector(0, 1, 0)));
+    const auto light = point_light(point(-10, 10, -10), color(1, 1, 1));
+    
+    const auto green = color_from_srgb(0, 0.5f, 0);
+    const auto texture = texture_map(uv_checkers_pattern(20, 10, green, WHITE), spherical_map);    
+    Material mat = material(texture);
+    mat.ambient = 0.1f;
+    mat.specular = 0.4f;
+    mat.shininess = 10.0f;
+    mat.diffuse = 0.6f;
+    const auto s = sphere(mat);
+    const auto world = World({s}, 
+                              light);    
+    const auto img = render(c, world);
+    save_to_file(img, "output/bonus_chapter_texture_01.ppm"sv);
+}

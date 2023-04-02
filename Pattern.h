@@ -176,6 +176,12 @@ struct UVCheckersPattern final {
         const auto sum = u2 + v2;
         return (sum % 2 == 0) ? a : b;
     }
+    constexpr Color at(const UVCoords& uv) const noexcept {        
+        const auto u2 = math::int_floor(uv.u * width);
+        const auto v2 = math::int_floor(uv.v * height);
+        const auto sum = u2 + v2;
+        return (sum % 2 == 0) ? a : b;
+    }
     constexpr void set_transform(Matrix4 mat) noexcept {
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
@@ -196,6 +202,48 @@ private:
     unsigned width = 0;
     unsigned height = 0;
 };
+
+struct TextureMap final {
+    using Texture = UVCheckersPattern;
+    using Callable = std::function<UVCoords(const Point&)>;
+    /*constexpr*/ TextureMap(Texture uv_pattern, Callable uv_map) noexcept
+        : uv_pattern{ std::move(uv_pattern) }, uv_map{std::move(uv_map)}
+    {           
+    }    
+    /*constexpr*/ Color at(const Point& p) const noexcept {
+        const auto texCoords = uv_map(p);
+        return uv_pattern.at(texCoords);
+    }        
+    constexpr void set_transform(Matrix4 mat) noexcept {
+        _transform = std::move(mat);
+        _invTransform = inverse(_transform);
+    }
+    constexpr const Matrix4& get_transform() const noexcept {
+        return _transform;
+    }
+    constexpr const Matrix4& inv_transform() const noexcept {
+        return _invTransform;
+    }
+    explicit constexpr operator bool() const noexcept { return true; }
+    constexpr bool operator==([[maybe_unused]]const TextureMap& that) const noexcept { 
+        return true; /* TODO: the implementation is necessary for the build to succeed,
+            as = default won't do. std::function isn't (easily) comparable anyway so some 
+            thought is needed to decide on how this comparison should operate. 
+            Right now all TextureMaps are functionally identical so returning true is mostly correct?
+            The proper solution might be to move texture and uv mapping functionality away from the 
+            "Pattern"-structure */
+    }
+private:
+    Matrix4 _transform{ Matrix4Identity };
+    Matrix4 _invTransform{ Matrix4Identity };
+    Texture uv_pattern;
+    Callable uv_map;    
+};
+
+/*constexpr*/ auto texture_map(TextureMap::Texture uv_pattern, TextureMap::Callable uv_map) noexcept {
+    return TextureMap(std::move(uv_pattern), std::move(uv_map));
+}
+
 constexpr auto null_pattern() noexcept {
     return NullPattern{};
 };
@@ -221,12 +269,13 @@ constexpr auto checkers_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) n
 constexpr auto uv_checkers_pattern(unsigned width, unsigned height, Color a, Color b, Matrix4 m = Matrix4Identity) noexcept {
     return UVCheckersPattern(std::move(m), width, height, a, b);
 };
-using Patterns = std::variant<NullPattern, TestPattern, StripePattern, GradientPattern, RingPattern, CheckersPattern, RadialGradientPattern, UVCheckersPattern>;
+using Patterns = std::variant<NullPattern, TestPattern, StripePattern, GradientPattern, RingPattern, CheckersPattern, RadialGradientPattern, UVCheckersPattern, TextureMap>;
 template<typename T>
 concept is_pattern = std::is_same_v<NullPattern, T> || std::is_same_v<TestPattern, T> ||
 std::is_same_v<StripePattern, T> || std::is_same_v<GradientPattern, T> ||
 std::is_same_v<RingPattern, T> || std::is_same_v<CheckersPattern, T> ||
-std::is_same_v<RadialGradientPattern, T> || std::is_same_v<UVCheckersPattern, T>;
+std::is_same_v<RadialGradientPattern, T> || std::is_same_v<UVCheckersPattern, T>
+|| std::is_same_v<TextureMap, T>;
 
 template<typename T>
     requires is_pattern<T>
@@ -270,7 +319,7 @@ Color pattern_at(const Patterns& pattern, const /*must be is_shapes but I can't 
     return pattern_at(pattern, pattern_point);
 };
 
-/*constexpr*/ std::pair<Real, Real> spherical_map(const Point& p) noexcept {
+/*constexpr*/ UVCoords spherical_map(const Point& p) noexcept {
     // Compute the azimuthal angle
     // -π < theta <= π
     // Angle increases clockwise as viewed from above,
@@ -281,7 +330,7 @@ Color pattern_at(const Patterns& pattern, const /*must be is_shapes but I can't 
     // 0 <= phi <= π
     //we are treating the point as a vector pointing from the sphere's origin (the world origin)
     //to the point, and calculating the magnitude of that get the sphere's radius.
-    const auto phi = acos(p.y / sqrt(math::square(p.x) + math::square(p.y) + math::square(p.z)));
+    const auto phi = std::acos(p.y / math::sqrt(math::square(p.x) + math::square(p.y) + math::square(p.z)));
 
     // -0.5 < raw_u <= 0.5
     const auto raw_u = theta / math::TWO_PI;

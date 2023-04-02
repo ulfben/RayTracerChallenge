@@ -12,6 +12,10 @@ struct Vector final {
     Real y{};
     Real z{};
 };
+struct UVCoords final {
+    Real u{};
+    Real v{};
+};
 static constexpr Point ORIGO = Point{ 0, 0, 0 };
 
 constexpr Vector normalize(const Vector& t) noexcept; //pre-declare

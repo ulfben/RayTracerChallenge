@@ -58,11 +58,20 @@ constexpr ByteColor to_byte_color(const Color& col) noexcept {
     return std::pow((s + a) / (1.0f + a), 2.4f);
 }
 
-/*constexpr*/ Color sRGB_to_linear(const Color& c) noexcept {
-    return {sRGB_to_linear(c.r), sRGB_to_linear(c.g), sRGB_to_linear(c.b),};
-}
 Color sRGB_to_linear(Real r, Real g, Real b) noexcept {    
-    return sRGB_to_linear(color(r, g, b));
+    return color(sRGB_to_linear(r), sRGB_to_linear(g), sRGB_to_linear(b));
+}
+
+/*constexpr*/ Color sRGB_to_linear(const Color& c) noexcept {
+    return sRGB_to_linear(c.r, c.g, c.b);
+}
+
+Color color_from_srgb(Real r, Real g, Real b) noexcept {
+    return color(sRGB_to_linear(r), sRGB_to_linear(g), sRGB_to_linear(b));
+}
+
+Color color_from_srgb(const Color& c) noexcept {
+    return color_from_srgb(c.r, c.g, c.b);
 }
 
 
