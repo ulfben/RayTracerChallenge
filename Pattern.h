@@ -270,6 +270,7 @@ constexpr auto uv_checkers_pattern(unsigned width, unsigned height, Color a, Col
     return UVCheckersPattern(std::move(m), width, height, a, b);
 };
 using Patterns = std::variant<NullPattern, TestPattern, StripePattern, GradientPattern, RingPattern, CheckersPattern, RadialGradientPattern, UVCheckersPattern, TextureMap>;
+
 template<typename T>
 concept is_pattern = std::is_same_v<NullPattern, T> || std::is_same_v<TestPattern, T> ||
 std::is_same_v<StripePattern, T> || std::is_same_v<GradientPattern, T> ||

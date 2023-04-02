@@ -124,7 +124,7 @@ constexpr Color refracted_color(const World& w, const HitState& state, int remai
     }
     const auto n_ratio = state.n1 / state.n2;
     const auto cos_i = dot(state.eye_v, state.normal);
-    const auto sin2_t = math::square(n_ratio) * (1 - math::square(cos_i));
+    const auto sin2_t = math::square(n_ratio) * (1.0f - math::square(cos_i));
     if (sin2_t > 1.0f) {
         return BLACK; //total internal reflection
     }
