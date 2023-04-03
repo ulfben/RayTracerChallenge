@@ -99,6 +99,9 @@
     <ClInclude Include="tests\ConeTests.h">
       <Filter>tests</Filter>
     </ClInclude>
+    <ClInclude Include="external\rapidyaml.h">
+      <Filter>external</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -109,6 +112,9 @@
     </Filter>
     <Filter Include="geometry">
       <UniqueIdentifier>{5651d234-36ad-49e5-9b87-ee26852cfe43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external">
+      <UniqueIdentifier>{f34350b6-2fc3-45c3-b715-edb5f6738b54}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
