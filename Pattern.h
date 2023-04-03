@@ -4,6 +4,30 @@
 #include "Color.h"
 #include "Matrix.h"
 
+struct AlignCheck final {
+    Color main;
+    Color upper_left;
+    Color upper_right;
+    Color bottom_left;
+    Color bottom_right;
+};
+constexpr AlignCheck uv_align_check(Color main, Color upper_left, Color upper_right,
+                                                Color bottom_left, Color bottom_right) noexcept {
+    return AlignCheck{ main, upper_left, upper_right, bottom_left, bottom_right };
+}
+
+constexpr Color uv_pattern_at(const AlignCheck& pattern, const UVCoords& uv) noexcept {
+    if (uv.v > 0.8f) {
+        if (uv.u < 0.2f) { return pattern.upper_left; }
+        if (uv.u > 0.8f) { return pattern.upper_right; }
+    }
+    else if (uv.v < 0.2f) {
+        if (uv.u < 0.2f) { return pattern.bottom_left; }
+        if (uv.u > 0.8f) { return pattern.bottom_right;}
+    }
+    return pattern.main;
+}
+
 struct NullPattern final {
     constexpr Color at([[maybe_unused]] const Point& p) const noexcept { return MAGENTA; }
     explicit constexpr operator bool() const noexcept { return false; }
@@ -217,6 +241,61 @@ private:
     Callable uv_map;
 };
 
+struct CubeMap final {    
+    /*constexpr*/ CubeMap(std::vector<AlignCheck*> patterns) noexcept
+        : faces{ std::move(patterns) } 
+    {
+        assert(faces.size() == static_cast<int>(CubeFace::count) && "A CubeMap must have 6 patterns, one for each face.");
+    }
+    /*constexpr*/ Color at(const Point& p) const noexcept {
+        const auto face = face_from_point(p);
+        auto uvCoords = uv(0, 0);
+        if (face == CubeFace::left) {
+            uvCoords = cube_uv_left(p);
+        }
+        else if (face == CubeFace::right) {
+            uvCoords = cube_uv_right(p);
+        }
+        else if (face == CubeFace::front) {
+            uvCoords = cube_uv_front(p);
+        }
+        else if (face == CubeFace::back) {
+            uvCoords = cube_uv_back(p);
+        }
+        else if (face == CubeFace::up) {
+            uvCoords = cube_uv_up(p);
+        }
+        else { //CubeFace::down
+            uvCoords = cube_uv_down(p);
+        }
+        const auto i = std::to_underlying(face);
+        assert(i > 0 && i < static_cast<int>(CubeFace::count));
+        return uv_pattern_at(*faces[i], uvCoords);        
+    }
+    constexpr void set_transform(Matrix4 mat) noexcept {
+        _transform = std::move(mat);
+        _invTransform = inverse(_transform);
+    }
+    constexpr const Matrix4& get_transform() const noexcept {
+        return _transform;
+    }
+    constexpr const Matrix4& inv_transform() const noexcept {
+        return _invTransform;
+    }
+    explicit constexpr operator bool() const noexcept { return true; }
+    constexpr bool operator==([[maybe_unused]] const CubeMap& that) const noexcept {
+        return true; 
+    }
+private:
+    Matrix4 _transform{ Matrix4Identity };
+    Matrix4 _invTransform{ Matrix4Identity };
+    std::vector<AlignCheck*> faces;    
+};
+
+/*constexpr*/ auto texture_map(TextureMap::Texture uv_pattern, TextureMap::Callable uv_map) noexcept {
+    return TextureMap(std::move(uv_pattern), std::move(uv_map));
+}
+
 /*constexpr*/ auto texture_map(TextureMap::Texture uv_pattern, TextureMap::Callable uv_map) noexcept {
     return TextureMap(std::move(uv_pattern), std::move(uv_map));
 }
@@ -341,36 +420,4 @@ Color pattern_at(const Patterns& pattern, const /*must be is_shapes but I can't 
     // let v go from 0 to 1 between whole units of y
     const auto v = p.y - std::floor(p.y);
     return uv(u, v);
-}
-
-struct AlignCheck final {
-    Color main;
-    Color upper_left;
-    Color upper_right;
-    Color bottom_left;
-    Color bottom_right;
-};
-constexpr AlignCheck uv_align_check(Color main, Color upper_left, Color upper_right,
-                                                Color bottom_left, Color bottom_right) noexcept {
-    return AlignCheck{ main, upper_left, upper_right, bottom_left, bottom_right };
-}
-
-constexpr Color uv_pattern_at(const AlignCheck& pattern, const UVCoords& uv) noexcept {
-    if (uv.v > 0.8f) {
-        if (uv.u < 0.2f) {
-            return pattern.upper_left; 
-        }
-        if (uv.u > 0.8f) {
-            return pattern.upper_right;
-        }
-    }
-    else if (uv.v < 0.2f) {
-        if (uv.u < 0.2f) {
-            return pattern.bottom_left;
-        }
-        if (uv.u > 0.8f) {
-            return pattern.bottom_right;
-        }
-    }
-    return pattern.main;
 }

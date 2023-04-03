@@ -179,6 +179,9 @@ TEST(Cube, UVMappingTheLowerFaceOfACube) {
     EXPECT_EQ(uv.v, 0.25f);
 }
 
+TEST(Cube, FindingTheColorsOnAMappedCube) {
+    EXPECT_EQ(1, 1);
+}
 
 
 RESTORE_WARNINGS

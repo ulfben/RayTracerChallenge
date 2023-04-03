@@ -87,12 +87,13 @@ constexpr auto local_intersect([[maybe_unused]] const Cube& cube, const Ray& loc
 };
 
 enum class CubeFace {
-    right,
-    left,
-    up,
-    down,
-    front,
-    back
+    left = 0,
+    front = 1,
+    right = 2,    
+    back = 3,
+    up = 4,
+    down = 5,
+    count = 6
 };
 
 constexpr CubeFace face_from_point(const Point& point) noexcept {
