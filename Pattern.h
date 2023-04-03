@@ -3,7 +3,7 @@
 #include "Tuple.h"
 #include "Color.h"
 #include "Matrix.h"
-
+//// uv stuff
 struct AlignCheck final {
     Color main;
     Color upper_left;
@@ -27,6 +27,61 @@ constexpr Color uv_pattern_at(const AlignCheck& pattern, const UVCoords& uv) noe
     }
     return pattern.main;
 }
+
+enum class CubeFace {
+    left = 0,
+    front = 1,
+    right = 2,    
+    back = 3,
+    up = 4,
+    down = 5,
+    count = 6
+};
+
+constexpr CubeFace face_from_point(const Point& point) noexcept {
+    float abs_x = math::abs(point.x);
+    float abs_y = math::abs(point.y);
+    float abs_z = math::abs(point.z);
+    float coord = math::max(abs_x, abs_y, abs_z);
+    if (coord == point.x) { return CubeFace::right; }
+    if (coord == -point.x) { return CubeFace::left; }
+    if (coord == point.y) { return CubeFace::up; }
+    if (coord == -point.y) { return CubeFace::down; }
+    if (coord == point.z) { return CubeFace::front; }
+    return CubeFace::back;
+}
+
+constexpr UVCoords cube_uv_front(const Point& p) noexcept {
+    return uv((p.x + 1.0f) * 0.5f, (p.y + 1.0f) * 0.5f);
+
+    /*const auto u = ((p.x + 1) % 2) / 2.0f;
+    const auto v = ((p.y + 1) % 2) / 2.0f;
+    return uv(u, v);*/
+}
+constexpr UVCoords cube_uv_back(const Point& p) noexcept {
+    return uv((1.0f - p.x) * 0.5f, (p.y + 1.0f) * 0.5f);
+    /*const auto u = ((1.0f - p.x) % 2) / 2.0f;
+    const auto v = ((p.y + 1) % 2) / 2.0f;
+    return uv(u, v);*/
+}
+
+constexpr UVCoords cube_uv_left(const Point& p) noexcept {
+    return uv((p.z + 1.0f) * 0.5f, (p.y + 1.0f) * 0.5f);    
+}
+
+constexpr UVCoords cube_uv_right(const Point& p) noexcept {
+    return uv((1.0f - p.z) * 0.5f, (p.y + 1.0f) * 0.5f);
+}
+
+constexpr UVCoords cube_uv_up(const Point& p) noexcept {
+    return uv((p.x + 1.0f) * 0.5f, (1.0f - p.z) * 0.5f);
+}
+
+constexpr UVCoords cube_uv_down(const Point& p) noexcept {
+    return uv((p.x + 1.0f) * 0.5f, (p.z + 1.0f) * 0.5f);
+}
+//// uv stuff
+
 
 struct NullPattern final {
     constexpr Color at([[maybe_unused]] const Point& p) const noexcept { return MAGENTA; }
@@ -241,8 +296,9 @@ private:
     Callable uv_map;
 };
 
+using Faces = std::vector<const AlignCheck*>; //std::span<const AlignCheck*>
 struct CubeMap final {    
-    /*constexpr*/ CubeMap(std::vector<AlignCheck*> patterns) noexcept
+    /*constexpr*/ CubeMap(Faces patterns) noexcept
         : faces{ std::move(patterns) } 
     {
         assert(faces.size() == static_cast<int>(CubeFace::count) && "A CubeMap must have 6 patterns, one for each face.");
@@ -269,7 +325,7 @@ struct CubeMap final {
             uvCoords = cube_uv_down(p);
         }
         const auto i = std::to_underlying(face);
-        assert(i > 0 && i < static_cast<int>(CubeFace::count));
+        assert(i >= 0 && i < static_cast<int>(CubeFace::count));
         return uv_pattern_at(*faces[i], uvCoords);        
     }
     constexpr void set_transform(Matrix4 mat) noexcept {
@@ -289,10 +345,10 @@ struct CubeMap final {
 private:
     Matrix4 _transform{ Matrix4Identity };
     Matrix4 _invTransform{ Matrix4Identity };
-    std::vector<AlignCheck*> faces;    
+    Faces faces;    
 };
 
-/*constexpr*/ auto cube_map(std::vector<AlignCheck*> patterns) noexcept {
+/*constexpr*/ auto cube_map(Faces patterns) noexcept {
     assert(patterns.size() == static_cast<int>(CubeFace::count) && "A CubeMap must have 6 patterns, one for each face.");
     return CubeMap(std::move(patterns));
 }
@@ -326,13 +382,14 @@ constexpr auto checkers_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) n
 constexpr auto uv_checkers(unsigned width, unsigned height, Color a, Color b) noexcept {
     return UVCheckers(width, height, a, b);
 };
-using Patterns = std::variant<NullPattern, TestPattern, StripePattern, GradientPattern, RingPattern, CheckersPattern, RadialGradientPattern, TextureMap>;
+using Patterns = std::variant<NullPattern, TestPattern, StripePattern, GradientPattern, RingPattern, CheckersPattern, RadialGradientPattern, TextureMap, CubeMap>;
 
 template<typename T>
 concept is_pattern = std::is_same_v<NullPattern, T> || std::is_same_v<TestPattern, T> ||
 std::is_same_v<StripePattern, T> || std::is_same_v<GradientPattern, T> ||
 std::is_same_v<RingPattern, T> || std::is_same_v<CheckersPattern, T> ||
-std::is_same_v<RadialGradientPattern, T> || std::is_same_v<TextureMap, T>;
+std::is_same_v<RadialGradientPattern, T> || std::is_same_v<TextureMap, T> || 
+std::is_same_v<CubeMap, T>;
 
 template<typename T>
     requires is_pattern<T>
