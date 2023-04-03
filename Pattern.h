@@ -292,8 +292,9 @@ private:
     std::vector<AlignCheck*> faces;    
 };
 
-/*constexpr*/ auto texture_map(TextureMap::Texture uv_pattern, TextureMap::Callable uv_map) noexcept {
-    return TextureMap(std::move(uv_pattern), std::move(uv_map));
+/*constexpr*/ auto cube_map(std::vector<AlignCheck*> patterns) noexcept {
+    assert(patterns.size() == static_cast<int>(CubeFace::count) && "A CubeMap must have 6 patterns, one for each face.");
+    return CubeMap(std::move(patterns));
 }
 
 /*constexpr*/ auto texture_map(TextureMap::Texture uv_pattern, TextureMap::Callable uv_map) noexcept {

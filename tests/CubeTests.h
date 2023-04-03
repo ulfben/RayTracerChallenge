@@ -180,6 +180,14 @@ TEST(Cube, UVMappingTheLowerFaceOfACube) {
 }
 
 TEST(Cube, FindingTheColorsOnAMappedCube) {
+    const auto left = uv_align_check(YELLOW, CYAN, RED, BLUE, BROWN);
+        const auto front = uv_align_check(CYAN, RED, YELLOW, BROWN, GREEN);
+    const auto right = uv_align_check(RED, YELLOW, PURPLE, GREEN, WHITE);
+    const auto back = uv_align_check(GREEN, PURPLE, CYAN, WHITE, BLUE);
+    const auto up = uv_align_check(BROWN, CYAN, PURPLE, RED, YELLOW);
+    const auto down = uv_align_check(PURPLE, BROWN, GREEN, BLUE, WHITE);
+    const auto pattern = cube_map(left, front, right, back, up, down);
+
     EXPECT_EQ(1, 1);
 }
 
