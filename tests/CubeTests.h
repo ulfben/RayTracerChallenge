@@ -236,7 +236,7 @@ TEST(Cube, FindingTheColorsOnAMappedCube) {
     c = RED;
     EXPECT_EQ(pattern_at(pattern, p), c);
 
-    point(1, 0.9f, 0.9f);
+    p = point(1, 0.9f, 0.9f);
     c = YELLOW;
     EXPECT_EQ(pattern_at(pattern, p), c);
     
