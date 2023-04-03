@@ -104,6 +104,36 @@ constexpr CubeFace face_from_point(const Point& point) noexcept {
     if (coord == -point.x) { return CubeFace::left; }
     if (coord == point.y) { return CubeFace::up; }
     if (coord == -point.y) { return CubeFace::down; }
-    if (coord == point.z) { return CubeFace::front; }    
+    if (coord == point.z) { return CubeFace::front; }
     return CubeFace::back;
+}
+
+constexpr UVCoords cube_uv_front(const Point& p) noexcept {
+    return uv((p.x + 1.0f) * 0.5f, (p.y + 1.0f) * 0.5f);
+
+    /*const auto u = ((p.x + 1) % 2) / 2.0f;
+    const auto v = ((p.y + 1) % 2) / 2.0f;
+    return uv(u, v);*/
+}
+constexpr UVCoords cube_uv_back(const Point& p) noexcept {
+    return uv((1.0f - p.x) * 0.5f, (p.y + 1.0f) * 0.5f);
+    /*const auto u = ((1.0f - p.x) % 2) / 2.0f;
+    const auto v = ((p.y + 1) % 2) / 2.0f;
+    return uv(u, v);*/
+}
+
+constexpr UVCoords cube_uv_left(const Point& p) noexcept {
+    return uv((p.z + 1.0f) * 0.5f, (p.y + 1.0f) * 0.5f);    
+}
+
+constexpr UVCoords cube_uv_right(const Point& p) noexcept {
+    return uv((1.0f - p.z) * 0.5f, (p.y + 1.0f) * 0.5f);
+}
+
+constexpr UVCoords cube_uv_up(const Point& p) noexcept {
+    return uv((p.x + 1.0f) * 0.5f, (1.0f - p.z) * 0.5f);
+}
+
+constexpr UVCoords cube_uv_down(const Point& p) noexcept {
+    return uv((p.x + 1.0f) * 0.5f, (p.z + 1.0f) * 0.5f);
 }

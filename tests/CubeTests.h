@@ -107,4 +107,78 @@ TEST(Cube, IdentifyingTheFaceOfACubeFromAPoint) {
     EXPECT_EQ(face_from_point(p), CubeFace::down);    
 }
 
+TEST(Cube, UVMappingTheFrontFaceOfACube) {    
+    auto p = point(-0.5f, 0.5f, 1.0f);
+    auto uv = cube_uv_front(p);
+    EXPECT_EQ(uv.u, 0.25f);
+    EXPECT_EQ(uv.v, 0.75f);
+
+    p = point(0.5f, -0.5f, 1.0f);
+    uv = cube_uv_front(p);
+    EXPECT_EQ(uv.u, 0.75f);
+    EXPECT_EQ(uv.v, 0.25f);
+}
+
+TEST(Cube, UVMappingTheBackFaceOfACube) {    
+    auto p = point(0.5f, 0.5f, -1.0f);
+    auto uv = cube_uv_back(p);
+    EXPECT_EQ(uv.u, 0.25f);
+    EXPECT_EQ(uv.v, 0.75f);
+
+    p = point(-0.5f, -0.5f, -1.0f);
+    uv = cube_uv_back(p);
+    EXPECT_EQ(uv.u, 0.75f);
+    EXPECT_EQ(uv.v, 0.25f);
+}
+
+TEST(Cube, UVMappingTheLeftFaceOfACube) {    
+    auto p = point(-1, 0.5f, -0.5f);
+    auto uv = cube_uv_left(p);
+    EXPECT_EQ(uv.u, 0.25f);
+    EXPECT_EQ(uv.v, 0.75f);
+
+    p = point(-1, -0.5f, 0.5f);
+    uv = cube_uv_left(p);
+    EXPECT_EQ(uv.u, 0.75f);
+    EXPECT_EQ(uv.v, 0.25f);
+}
+
+TEST(Cube, UVMappingTheRightFaceOfACube) {    
+    auto p = point(1, 0.5f, 0.5f);
+    auto uv = cube_uv_right(p);
+    EXPECT_EQ(uv.u, 0.25f);
+    EXPECT_EQ(uv.v, 0.75f);
+
+    p = point(1, -0.5f, -0.5f);
+    uv = cube_uv_right(p);
+    EXPECT_EQ(uv.u, 0.75f);
+    EXPECT_EQ(uv.v, 0.25f);
+}
+
+TEST(Cube, UVMappingTheUpperFaceOfACube) {    
+    auto p = point(-0.5f, 1, -0.5f);
+    auto uv = cube_uv_up(p);
+    EXPECT_EQ(uv.u, 0.25f);
+    EXPECT_EQ(uv.v, 0.75f);
+
+    p = point(0.5f, 1, 0.5f);
+    uv = cube_uv_up(p);
+    EXPECT_EQ(uv.u, 0.75f);
+    EXPECT_EQ(uv.v, 0.25f);
+}
+
+TEST(Cube, UVMappingTheLowerFaceOfACube) {    
+    auto p = point(-0.5f, -1, 0.5f);
+    auto uv = cube_uv_down(p);
+    EXPECT_EQ(uv.u, 0.25f);
+    EXPECT_EQ(uv.v, 0.75f);
+
+    p = point(0.5f, -1, -0.5f);
+    uv = cube_uv_down(p);
+    EXPECT_EQ(uv.u, 0.75f);
+    EXPECT_EQ(uv.v, 0.25f);
+}
+
+
+
 RESTORE_WARNINGS

@@ -27,8 +27,6 @@ static constexpr Point ORIGO = Point{ 0, 0, 0 };
 constexpr Vector normalize(const Vector& t) noexcept; //pre-declare
 
 constexpr UVCoords uv(Real u, Real v) noexcept {
-   /* assert(math::is_between(u, 0.0f, 1.0f));
-    assert(math::is_between(v, 0.0f, 1.0f));*/
     return { u, v };
 }
 
