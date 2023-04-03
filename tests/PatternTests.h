@@ -138,7 +138,7 @@ TEST(Pattern, checkersPatternIn2D) {
     EXPECT_EQ(uv_pattern.at(uv(1, 1)), BLACK);
 }
 
-TEST(Pattern, TestSphericalMapping) {
+TEST(Pattern, UsingASphericalMappingOnA3DPoint) {
     constexpr auto tolerance = math::BRAZZY_EPSILON;
 
     const auto [u1, v1] = spherical_map(point(0, 0, -1));
@@ -225,6 +225,58 @@ TEST(Pattern, UsingAPlanarMappingOnA3DPoint) {
 
     uvCoords = planar_map(point(0, 0, 0));
     EXPECT_EQ(uvCoords, uv(0, 0));
+}
+
+TEST(Pattern, UsingACylindricalMappingOnA3DPoint) {           
+    auto uvCoords = cylindrical_map(point(0, 0,-1));
+    EXPECT_EQ(uvCoords, uv(0, 0));
+
+    uvCoords = cylindrical_map(point(0, 0.5f, -1));
+    EXPECT_EQ(uvCoords, uv(0, 0.5f));
+        
+    uvCoords = cylindrical_map(point(0, 1, -1));
+    EXPECT_EQ(uvCoords, uv(0, 0));
+
+    uvCoords = cylindrical_map(point(0.70711f, 0.5f, -0.70711f));
+    EXPECT_EQ(uvCoords, uv(0.125f, 0.5f));
+
+    uvCoords = cylindrical_map(point(1, 0.5f, 0));
+    EXPECT_EQ(uvCoords, uv(0.25f, 0.5f));
+        
+    uvCoords = cylindrical_map(point(0.70711f, 0.5, 0.70711f));
+    EXPECT_EQ(uvCoords, uv(0.375f, 0.5f));
+
+    uvCoords = cylindrical_map(point(0, -0.25f, 1));
+    EXPECT_EQ(uvCoords, uv(0.5f, 0.75f));
+
+    uvCoords = cylindrical_map(point(-0.70711f, 0.5, 0.70711f));
+    EXPECT_EQ(uvCoords, uv(0.625f, 0.5f));
+    
+    uvCoords = cylindrical_map(point(-1, 1.25f, 0));
+    EXPECT_EQ(uvCoords, uv(0.75f, 0.25f));
+    
+    uvCoords = cylindrical_map(point(-0.70711f, 0.5, -0.70711f));
+    EXPECT_EQ(uvCoords, uv(0.875f, 0.5f));
+}
+
+TEST(Pattern, LayoutOfTheAlignCheckPattern) {           
+    constexpr auto main = color(1, 0, 0);
+    constexpr auto ul = color(1, 0, 0);
+    constexpr auto ur = color(1, 1, 0);
+    constexpr auto bl = color(0, 1, 0);
+    constexpr auto br = color(0, 1, 1);
+    constexpr auto pattern = uv_align_check(main, ul, ur, bl, br);
+
+    auto c = uv_pattern_at(pattern, uv(0.5f, 0.5f));
+    EXPECT_EQ(c, main);
+    c = uv_pattern_at(pattern, uv(0.1f, 0.9f));
+    EXPECT_EQ(c, ul);
+    c = uv_pattern_at(pattern, uv(0.9f, 0.9f));
+    EXPECT_EQ(c, ur);
+    c = uv_pattern_at(pattern, uv(0.1f, 0.1f));
+    EXPECT_EQ(c, bl);
+    c = uv_pattern_at(pattern, uv(0.9f, 0.1f));
+    EXPECT_EQ(c, br);    
 }
 
 RESTORE_WARNINGS

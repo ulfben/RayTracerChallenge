@@ -165,15 +165,15 @@ private:
 };
 struct UVCheckers final {
     constexpr UVCheckers(unsigned width_, unsigned height_, Color a_, Color b_) noexcept
-        : width{ width_ }, height{ height_ }, a{ a_ }, b{ b_ } {        
-    }    
-    constexpr Color at(const UVCoords& uv) const noexcept {        
+        : width{ width_ }, height{ height_ }, a{ a_ }, b{ b_ } {
+    }
+    constexpr Color at(const UVCoords& uv) const noexcept {
         const auto u2 = math::int_floor(uv.u * width);
         const auto v2 = math::int_floor(uv.v * height);
         const auto sum = u2 + v2;
         return (sum % 2 == 0) ? a : b;
-    }    
-private:    
+    }
+private:
     Color a{};
     Color b{};
     unsigned width = 0;
@@ -184,13 +184,13 @@ struct TextureMap final {
     using Texture = UVCheckers;
     using Callable = std::function<UVCoords(const Point&)>;
     /*constexpr*/ TextureMap(Texture uv_pattern, Callable uv_map) noexcept
-        : uv_pattern{ std::move(uv_pattern) }, uv_map{std::move(uv_map)}
-    {           
-    }    
+        : uv_pattern{ std::move(uv_pattern) }, uv_map{ std::move(uv_map) }
+    {
+    }
     /*constexpr*/ Color at(const Point& p) const noexcept {
         const auto texCoords = uv_map(p);
         return uv_pattern.at(texCoords);
-    }        
+    }
     constexpr void set_transform(Matrix4 mat) noexcept {
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
@@ -202,19 +202,19 @@ struct TextureMap final {
         return _invTransform;
     }
     explicit constexpr operator bool() const noexcept { return true; }
-    constexpr bool operator==([[maybe_unused]]const TextureMap& that) const noexcept { 
+    constexpr bool operator==([[maybe_unused]] const TextureMap& that) const noexcept {
         return true; /* TODO: the implementation is necessary for the build to succeed,
-            as = default won't do. std::function isn't (easily) comparable anyway so some 
-            thought is needed to decide on how this comparison should operate. 
+            as = default won't do. std::function isn't (easily) comparable anyway so some
+            thought is needed to decide on how this comparison should operate.
             Right now all TextureMaps are functionally identical so returning true is mostly correct?
-            The proper solution might be to move texture and uv mapping functionality away from the 
+            The proper solution might be to move texture and uv mapping functionality away from the
             "Pattern"-structure */
     }
 private:
     Matrix4 _transform{ Matrix4Identity };
     Matrix4 _invTransform{ Matrix4Identity };
     Texture uv_pattern;
-    Callable uv_map;    
+    Callable uv_map;
 };
 
 /*constexpr*/ auto texture_map(TextureMap::Texture uv_pattern, TextureMap::Callable uv_map) noexcept {
@@ -330,4 +330,47 @@ Color pattern_at(const Patterns& pattern, const /*must be is_shapes but I can't 
     const auto u = p.x - std::floor(p.x); // treat the fractional portion of the x coordinate as u
     const auto v = p.z - std::floor(p.z); //and the fractional portion of z as v.
     return uv(u, v);
+}
+
+/*planar mapping tiles every unit square on the plane, and ignores the y coordinate.*/
+/*constexpr*/ UVCoords cylindrical_map(const Point& p) noexcept {
+    //compute the azimuthal angle, same as with spherical_map()
+    const auto theta = std::atan2(p.x, p.z);
+    const auto raw_u = theta / math::TWO_PI;
+    const auto u = 1 - (raw_u + 0.5f);
+    // let v go from 0 to 1 between whole units of y
+    const auto v = p.y - std::floor(p.y);
+    return uv(u, v);
+}
+
+struct AlignCheck final {
+    Color main;
+    Color upper_left;
+    Color upper_right;
+    Color bottom_left;
+    Color bottom_right;
+};
+constexpr AlignCheck uv_align_check(Color main, Color upper_left, Color upper_right,
+                                                Color bottom_left, Color bottom_right) noexcept {
+    return AlignCheck{ main, upper_left, upper_right, bottom_left, bottom_right };
+}
+
+constexpr Color uv_pattern_at(const AlignCheck& pattern, const UVCoords& uv) noexcept {
+    if (uv.v > 0.8f) {
+        if (uv.u < 0.2f) {
+            return pattern.upper_left; 
+        }
+        if (uv.u > 0.8f) {
+            return pattern.upper_right;
+        }
+    }
+    else if (uv.v < 0.2f) {
+        if (uv.u < 0.2f) {
+            return pattern.bottom_left;
+        }
+        if (uv.u > 0.8f) {
+            return pattern.bottom_right;
+        }
+    }
+    return pattern.main;
 }

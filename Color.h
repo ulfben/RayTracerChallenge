@@ -9,7 +9,7 @@ struct Color final {
     value_type b{};
 };
 
-constexpr Color color(Real r, Real g, Real b) noexcept {    
+constexpr Color color(Real r, Real g, Real b) noexcept {
     return Color{ r, g, b };
 }
 constexpr Color color(Real rgb) noexcept {
@@ -58,7 +58,7 @@ constexpr ByteColor to_byte_color(const Color& col) noexcept {
     return std::pow((s + a) / (1.0f + a), 2.4f);
 }
 
-Color sRGB_to_linear(Real r, Real g, Real b) noexcept {    
+Color sRGB_to_linear(Real r, Real g, Real b) noexcept {
     return color(sRGB_to_linear(r), sRGB_to_linear(g), sRGB_to_linear(b));
 }
 
@@ -84,7 +84,7 @@ Color color_from_srgb(const Color& c) noexcept {
 }
 
 /*constexpr*/ Color linear_to_sRGB(const Color& c) noexcept {
-    return {linear_to_sRGB(c.r), linear_to_sRGB(c.g), linear_to_sRGB(c.b),};
+    return { linear_to_sRGB(c.r), linear_to_sRGB(c.g), linear_to_sRGB(c.b), };
 }
 
 /*constexpr*/ Real gamma_to_linear(Real s) noexcept {
@@ -101,11 +101,11 @@ struct ByteColor_sRGB final {
     value_type g{};
     value_type b{};
     constexpr ByteColor_sRGB() noexcept = default;
-    /*constexpr*/ explicit ByteColor_sRGB(const Color& c) noexcept {        
+    /*constexpr*/ explicit ByteColor_sRGB(const Color& c) noexcept {
         const auto srgb = ByteColor(linear_to_sRGB(clamp(c, 0.0f, 1.0f)));
         r = srgb.r;
         g = srgb.g;
-        b = srgb.b;        
+        b = srgb.b;
     };
 };
 
@@ -114,12 +114,16 @@ struct ByteColor_sRGB final {
 }
 
 
-static constexpr auto BLACK = Color{ 0, 0, 0 };
-static constexpr auto WHITE = Color{1, 1, 1};
-static constexpr auto RED = Color{1, 0, 0};
-static constexpr auto GREEN = Color{0, 1, 0};
-static constexpr auto BLUE = Color{0, 0, 1};
-static constexpr auto MAGENTA = Color{ 1, 0, 1 };
+static constexpr auto BLACK = color(0, 0, 0);
+static constexpr auto WHITE = color(1, 1, 1);
+static constexpr auto RED = color(1, 0, 0);
+static constexpr auto GREEN = color(0, 1, 0);
+static constexpr auto BLUE = color(0, 0, 1);
+static constexpr auto MAGENTA = color(1, 0, 1);
+static constexpr auto YELLOW = color(1, 1, 0);
+static constexpr auto BROWN = color(1, 0.5, 0);
+static constexpr auto CYAN = color(0, 1, 1);
+static constexpr auto PURPLE = MAGENTA;
 
 //Color interface
 constexpr Color operator*(const Color& lhs, const Color& rhs) noexcept {
@@ -128,7 +132,7 @@ constexpr Color operator*(const Color& lhs, const Color& rhs) noexcept {
 constexpr Color operator*(const Color& lhs, Real scalar) noexcept {
     return Color{ lhs.r * scalar, lhs.g * scalar, lhs.b * scalar };
 }
-constexpr void operator*=(Color& lhs,Real scalar) noexcept {
+constexpr void operator*=(Color& lhs, Real scalar) noexcept {
     lhs.r *= scalar;
     lhs.g *= scalar;
     lhs.b *= scalar;
@@ -148,7 +152,7 @@ constexpr bool operator==(const Color& lhs, const Color& rhs) noexcept {
     return float_cmp(lhs.r, rhs.r, epsilon) && float_cmp(lhs.g, rhs.g, epsilon) &&
         float_cmp(lhs.b, rhs.b, epsilon);
 };
-constexpr Color lerp(Color start, Color end, Real t) {    
+constexpr Color lerp(Color start, Color end, Real t) {
     //return (start*(1.0f - t)) + (end*t);
     return start + (end - start) * t;
 }
@@ -159,7 +163,7 @@ constexpr Color lerp(Color start, Color end, Real t) {
 
 void to_sRGB(std::span<Color> buffer) noexcept {
     std::for_each(std::execution::par, buffer.begin(), buffer.end(),
-        [] (auto& color) constexpr -> void { to_sRGB(color); }
+        [](auto& color) constexpr -> void { to_sRGB(color); }
     );
 }
 
