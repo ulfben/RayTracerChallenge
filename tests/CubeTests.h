@@ -87,4 +87,24 @@ TEST(Cube, normalOnTheSurfaceOfACube) {
     }
 }
 
+TEST(Cube, IdentifyingTheFaceOfACubeFromAPoint) {    
+    auto p = point(-1, 0.5f, -0.25f);
+    EXPECT_EQ(face_from_point(p), CubeFace::left);
+
+    p = point(1.1f, -0.75f, 0.8f);
+    EXPECT_EQ(face_from_point(p), CubeFace::right);
+
+    p = point(0.1f, 0.6f, 0.9f);
+    EXPECT_EQ(face_from_point(p), CubeFace::front);
+
+    p =  point(-0.7f, 0, -2);
+    EXPECT_EQ(face_from_point(p), CubeFace::back);
+
+    p = point(0.5f, 1, 0.9f);
+    EXPECT_EQ(face_from_point(p), CubeFace::up);
+
+    p = point(-0.2f, -1.3f, 1.1f);
+    EXPECT_EQ(face_from_point(p), CubeFace::down);    
+}
+
 RESTORE_WARNINGS

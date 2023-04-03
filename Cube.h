@@ -6,15 +6,15 @@
 #include "Ray.h"
 /*A unit AABB, always positioned at 0, 0, 0 and extending from -1 to +1f*/
 struct Cube {
-    Material surface{ material() };          
-    constexpr Cube() noexcept = default;    
+    Material surface{ material() };
+    constexpr Cube() noexcept = default;
     explicit constexpr Cube(Material m) noexcept : surface(std::move(m)) {}
     explicit constexpr Cube(Matrix4 transf) noexcept {
         set_transform(std::move(transf));
     }
     constexpr Cube(Material m, Matrix4 transf) noexcept : surface(std::move(m)) {
         set_transform(std::move(transf));
-    }   
+    }
     constexpr auto operator==(const Cube& that) const noexcept {
         return surface == that.surface && _transform == that._transform;
     }
@@ -28,7 +28,7 @@ struct Cube {
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }
-private: 
+private:
     Matrix4 _transform{ Matrix4Identity };
     Matrix4 _invTransform{ Matrix4Identity };
 };
@@ -37,19 +37,19 @@ constexpr Cube cube() noexcept {
     return {};
 }
 constexpr Cube cube(Color col) noexcept {
-    return Cube( material(col) );    
+    return Cube(material(col));
 }
 constexpr Cube cube(Material m) noexcept {
-    return Cube( std::move(m) );    
+    return Cube(std::move(m));
 }
 constexpr Cube sphcubeere(Matrix4 transform) noexcept {
-    return Cube(std::move(transform));    
+    return Cube(std::move(transform));
 }
 constexpr Cube cube(Material m, Matrix4 transform) noexcept {
-    return Cube(std::move(m), std::move(transform));    
+    return Cube(std::move(m), std::move(transform));
 }
 
-constexpr Vector local_normal_at([[maybe_unused]]const Cube& c, const Point& p) noexcept {
+constexpr Vector local_normal_at([[maybe_unused]] const Cube& c, const Point& p) noexcept {
     using std::max, math::abs;
     const auto max_component = max({ abs(p.x), abs(p.y), abs(p.z) });
     if (max_component == abs(p.x)) {
@@ -64,7 +64,7 @@ constexpr Vector local_normal_at([[maybe_unused]]const Cube& c, const Point& p) 
 constexpr std::pair<Real, Real> check_axis(Real origin, Real direction, Real min = -1.0f, Real max = 1.0f) noexcept {
     const auto tmin_numerator = (min - origin);
     const auto tmax_numerator = (max - origin);
-    Real tmin, tmax; 
+    Real tmin, tmax;
     if (math::abs(direction) >= math::BOOK_EPSILON) {
         tmin = tmin_numerator / direction;
         tmax = tmax_numerator / direction;
@@ -73,7 +73,7 @@ constexpr std::pair<Real, Real> check_axis(Real origin, Real direction, Real min
         tmin = tmin_numerator * math::MAX; //arbitrary large-ish value. used to be INFINITY, but that breaks when compiled
         tmax = tmax_numerator * math::MAX; //with /fp:fast. I just multiply with *something* to keep the signs correct.
     }
-    return (tmin > tmax) ?  std::pair{ tmax, tmin } : std::pair{ tmin, tmax };
+    return (tmin > tmax) ? std::pair{ tmax, tmin } : std::pair{ tmin, tmax };
 }
 
 constexpr auto local_intersect([[maybe_unused]] const Cube& cube, const Ray& local_ray) noexcept {
@@ -85,3 +85,25 @@ constexpr auto local_intersect([[maybe_unused]] const Cube& cube, const Ray& loc
     if (tmin > tmax) return MISS;
     return  std::vector{ tmin, tmax };
 };
+
+enum class CubeFace {
+    right,
+    left,
+    up,
+    down,
+    front,
+    back
+};
+
+constexpr CubeFace face_from_point(const Point& point) noexcept {
+    float abs_x = math::abs(point.x);
+    float abs_y = math::abs(point.y);
+    float abs_z = math::abs(point.z);
+    float coord = math::max(abs_x, abs_y, abs_z);
+    if (coord == point.x) { return CubeFace::right; }
+    if (coord == -point.x) { return CubeFace::left; }
+    if (coord == point.y) { return CubeFace::up; }
+    if (coord == -point.y) { return CubeFace::down; }
+    if (coord == point.z) { return CubeFace::front; }    
+    return CubeFace::back;
+}
