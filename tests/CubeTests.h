@@ -186,7 +186,7 @@ TEST(Cube, FindingTheColorsOnAMappedCube) {
     const auto back = uv_align_check(GREEN, PURPLE, CYAN, WHITE, BLUE);
     const auto up = uv_align_check(BROWN, CYAN, PURPLE, RED, YELLOW);
     const auto down = uv_align_check(PURPLE, BROWN, GREEN, BLUE, WHITE);
-    const auto faces = std::vector<const AlignCheck*>({ &left, &front, &right, &back, &up, &down });
+    const auto faces = Faces({left, front, right, back, up, down});
     const auto pattern = cube_map(faces);
 
     //left

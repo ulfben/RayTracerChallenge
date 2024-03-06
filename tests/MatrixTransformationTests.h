@@ -12,7 +12,6 @@ TEST(TransformationMatrix, translation) {
     const auto expected = point(2, 1, 7);
     EXPECT_EQ(result, expected);    
 }
-
 TEST(TransformationMatrix, inverseTranslation) {    
     const Matrix4 inv_transform = inverse(translation(5,-3,2));
     const auto p = point(-3, 4, 5);    

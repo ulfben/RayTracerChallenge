@@ -5,8 +5,8 @@
 #include "Matrix.h"
 #include "Shapes.h"
 
-#define RYML_SINGLE_HDR_DEFINE_NOW
-#include "external/rapidyaml.h"
+//#define RYML_SINGLE_HDR_DEFINE_NOW
+//#include "external/rapidyaml.h"
 
 #include "tests/CanvasTests.h"
 #include "tests/FloatCompareTests.h"
@@ -484,14 +484,12 @@ TEST(DISABLED_Bonus01, CanCubeMap) {
         view_transform(point(0.0f, 0.0f, -5.0f), point(0, 0, 0), vector(0, 1, 0)));
     const auto light = point_light(point(-10, 10, -10), color(1, 1, 1));
     
-    const auto green = color_from_srgb(0, 0.5f, 0);
-    const auto texture = texture_map(uv_checkers(20, 10, green, WHITE), spherical_map);    
-    Material mat = material(texture);
+    Material mat = material(CubeMap());
     mat.ambient = 0.1f;
     mat.specular = 0.4f;
     mat.shininess = 10.0f;
     mat.diffuse = 0.6f;
-    const auto s = sphere(mat);
+    const auto s = cube(mat,  scaling(0.4f)*rotation(22*math::TO_RAD, 45*math::TO_RAD, 22*math::TO_RAD));
     const auto world = World({s}, 
                               light);    
     const auto img = render(c, world);

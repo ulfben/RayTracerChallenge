@@ -4,7 +4,7 @@
 #include "Color.h"
 #include "Matrix.h"
 //// uv stuff
-struct AlignCheck final {
+struct AlignCheck final{
     Color main;
     Color upper_left;
     Color upper_right;
@@ -12,241 +12,239 @@ struct AlignCheck final {
     Color bottom_right;
 };
 constexpr AlignCheck uv_align_check(Color main, Color upper_left, Color upper_right,
-                                                Color bottom_left, Color bottom_right) noexcept {
-    return AlignCheck{ main, upper_left, upper_right, bottom_left, bottom_right };
+    Color bottom_left, Color bottom_right) noexcept{
+    return AlignCheck{main, upper_left, upper_right, bottom_left, bottom_right};
 }
 
-constexpr Color uv_pattern_at(const AlignCheck& pattern, const UVCoords& uv) noexcept {
-    if (uv.v > 0.8f) {
-        if (uv.u < 0.2f) { return pattern.upper_left; }
-        if (uv.u > 0.8f) { return pattern.upper_right; }
-    }
-    else if (uv.v < 0.2f) {
-        if (uv.u < 0.2f) { return pattern.bottom_left; }
-        if (uv.u > 0.8f) { return pattern.bottom_right;}
+constexpr Color uv_pattern_at(const AlignCheck& pattern, const UVCoords& uv) noexcept{
+    if(uv.v > 0.8f){
+        if(uv.u < 0.2f){ return pattern.upper_left; }
+        if(uv.u > 0.8f){ return pattern.upper_right; }
+    } else if(uv.v < 0.2f){
+        if(uv.u < 0.2f){ return pattern.bottom_left; }
+        if(uv.u > 0.8f){ return pattern.bottom_right; }
     }
     return pattern.main;
 }
 
-enum class CubeFace {
+enum class CubeFace{
     left = 0,
     front = 1,
-    right = 2,    
+    right = 2,
     back = 3,
     up = 4,
     down = 5,
     count = 6
 };
 
-constexpr CubeFace face_from_point(const Point& point) noexcept {
+constexpr CubeFace face_from_point(const Point& point) noexcept{
     float abs_x = math::abs(point.x);
     float abs_y = math::abs(point.y);
     float abs_z = math::abs(point.z);
     float coord = math::max(abs_x, abs_y, abs_z);
-    if (coord == point.x) { return CubeFace::right; }
-    if (coord == -point.x) { return CubeFace::left; }
-    if (coord == point.y) { return CubeFace::up; }
-    if (coord == -point.y) { return CubeFace::down; }
-    if (coord == point.z) { return CubeFace::front; }
+    if(coord == point.x){ return CubeFace::right; }
+    if(coord == -point.x){ return CubeFace::left; }
+    if(coord == point.y){ return CubeFace::up; }
+    if(coord == -point.y){ return CubeFace::down; }
+    if(coord == point.z){ return CubeFace::front; }
     return CubeFace::back;
 }
 
-constexpr UVCoords cube_uv_front(const Point& p) noexcept {
+constexpr UVCoords cube_uv_front(const Point& p) noexcept{
     return uv((p.x + 1.0f) * 0.5f, (p.y + 1.0f) * 0.5f);
 
     /*const auto u = ((p.x + 1) % 2) / 2.0f;
     const auto v = ((p.y + 1) % 2) / 2.0f;
     return uv(u, v);*/
 }
-constexpr UVCoords cube_uv_back(const Point& p) noexcept {
+constexpr UVCoords cube_uv_back(const Point& p) noexcept{
     return uv((1.0f - p.x) * 0.5f, (p.y + 1.0f) * 0.5f);
     /*const auto u = ((1.0f - p.x) % 2) / 2.0f;
     const auto v = ((p.y + 1) % 2) / 2.0f;
     return uv(u, v);*/
 }
 
-constexpr UVCoords cube_uv_left(const Point& p) noexcept {
-    return uv((p.z + 1.0f) * 0.5f, (p.y + 1.0f) * 0.5f);    
+constexpr UVCoords cube_uv_left(const Point& p) noexcept{
+    return uv((p.z + 1.0f) * 0.5f, (p.y + 1.0f) * 0.5f);
 }
 
-constexpr UVCoords cube_uv_right(const Point& p) noexcept {
+constexpr UVCoords cube_uv_right(const Point& p) noexcept{
     return uv((1.0f - p.z) * 0.5f, (p.y + 1.0f) * 0.5f);
 }
 
-constexpr UVCoords cube_uv_up(const Point& p) noexcept {
+constexpr UVCoords cube_uv_up(const Point& p) noexcept{
     return uv((p.x + 1.0f) * 0.5f, (1.0f - p.z) * 0.5f);
 }
 
-constexpr UVCoords cube_uv_down(const Point& p) noexcept {
+constexpr UVCoords cube_uv_down(const Point& p) noexcept{
     return uv((p.x + 1.0f) * 0.5f, (p.z + 1.0f) * 0.5f);
 }
 //// uv stuff
 
 
-struct NullPattern final {
-    constexpr Color at([[maybe_unused]] const Point& p) const noexcept { return MAGENTA; }
-    explicit constexpr operator bool() const noexcept { return false; }
+struct NullPattern final{
+    constexpr Color at([[maybe_unused]] const Point& p) const noexcept{ return MAGENTA; }
+    explicit constexpr operator bool() const noexcept{ return false; }
     constexpr bool operator==(const NullPattern& that) const noexcept = default;
-    constexpr const Matrix4& get_transform() const noexcept { return _transform; }
-    constexpr const Matrix4& inv_transform() const noexcept { return _invTransform; }
-    constexpr void set_transform([[maybe_unused]] Matrix4 mat) noexcept {}
+    constexpr const Matrix4& get_transform() const noexcept{ return _transform; }
+    constexpr const Matrix4& inv_transform() const noexcept{ return _invTransform; }
+    constexpr void set_transform([[maybe_unused]] Matrix4 mat) noexcept{}
 private:
-    Matrix4 _transform{ Matrix4Identity };
-    Matrix4 _invTransform{ Matrix4Identity };
+    Matrix4 _transform{Matrix4Identity};
+    Matrix4 _invTransform{Matrix4Identity};
 };
 
-struct TestPattern final {
-    constexpr Color at([[maybe_unused]] const Point& p) const noexcept { return color(p.x, p.y, p.z); }
-    explicit constexpr operator bool() const noexcept { return true; }
+struct TestPattern final{
+    constexpr Color at([[maybe_unused]] const Point& p) const noexcept{ return color(p.x, p.y, p.z); }
+    explicit constexpr operator bool() const noexcept{ return true; }
     constexpr bool operator==(const TestPattern& that) const noexcept = default;
-    constexpr const Matrix4& get_transform() const noexcept { return _transform; }
-    constexpr const Matrix4& inv_transform() const noexcept { return _invTransform; }
-    constexpr void set_transform(Matrix4 mat) noexcept {
+    constexpr const Matrix4& get_transform() const noexcept{ return _transform; }
+    constexpr const Matrix4& inv_transform() const noexcept{ return _invTransform; }
+    constexpr void set_transform(Matrix4 mat) noexcept{
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }
 private:
-    Matrix4 _transform{ Matrix4Identity };
-    Matrix4 _invTransform{ Matrix4Identity };
+    Matrix4 _transform{Matrix4Identity};
+    Matrix4 _invTransform{Matrix4Identity};
 };
 
-struct StripePattern final {
-    constexpr StripePattern(Matrix4 mat, Color a_, Color b_) noexcept : a{ a_ }, b{ b_ } {
+struct StripePattern final{
+    constexpr StripePattern(Matrix4 mat, Color a_, Color b_) noexcept : a{a_}, b{b_}{
         set_transform(std::move(mat));
     }
-    constexpr Color at(const Point& p) const noexcept {
+    constexpr Color at(const Point& p) const noexcept{
         return (math::int_floor(p.x) % 2 == 0) ? a : b;
     }
-    constexpr void set_transform(Matrix4 mat) noexcept {
+    constexpr void set_transform(Matrix4 mat) noexcept{
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }
-    constexpr const Matrix4& get_transform() const noexcept {
+    constexpr const Matrix4& get_transform() const noexcept{
         return _transform;
     }
-    constexpr const Matrix4& inv_transform() const noexcept {
+    constexpr const Matrix4& inv_transform() const noexcept{
         return _invTransform;
     }
-    explicit constexpr operator bool() const noexcept { return true; }
+    explicit constexpr operator bool() const noexcept{ return true; }
     constexpr bool operator==(const StripePattern& that) const noexcept = default;
 private:
-    Matrix4 _transform{ Matrix4Identity };
-    Matrix4 _invTransform{ Matrix4Identity };
+    Matrix4 _transform{Matrix4Identity};
+    Matrix4 _invTransform{Matrix4Identity};
     Color a{};
     Color b{};
 };
 
-struct GradientPattern final {
-    constexpr GradientPattern(Matrix4 mat, Color a_, Color b_) noexcept : a{ a_ }, b{ b_ } {
+struct GradientPattern final{
+    constexpr GradientPattern(Matrix4 mat, Color a_, Color b_) noexcept : a{a_}, b{b_}{
         set_transform(std::move(mat));
     }
-    constexpr Color at(const Point& p) const noexcept {
+    constexpr Color at(const Point& p) const noexcept{
         const auto dx = p.x - math::floor(p.x);
         return lerp(a, b, dx);
     }
-    constexpr void set_transform(Matrix4 mat) noexcept {
+    constexpr void set_transform(Matrix4 mat) noexcept{
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }
-    constexpr const Matrix4& get_transform() const noexcept {
+    constexpr const Matrix4& get_transform() const noexcept{
         return _transform;
     }
-    constexpr const Matrix4& inv_transform() const noexcept {
+    constexpr const Matrix4& inv_transform() const noexcept{
         return _invTransform;
     }
-    explicit constexpr operator bool() const noexcept { return true; }
+    explicit constexpr operator bool() const noexcept{ return true; }
     constexpr bool operator==(const GradientPattern& that) const noexcept = default;
 private:
-    Matrix4 _transform{ Matrix4Identity };
-    Matrix4 _invTransform{ Matrix4Identity };
+    Matrix4 _transform{Matrix4Identity};
+    Matrix4 _invTransform{Matrix4Identity};
     Color a{};
     Color b{};
 };
-struct RadialGradientPattern final {
-    constexpr RadialGradientPattern(Matrix4 mat, Color a_, Color b_) noexcept : a{ a_ }, b{ b_ } {
+struct RadialGradientPattern final{
+    constexpr RadialGradientPattern(Matrix4 mat, Color a_, Color b_) noexcept : a{a_}, b{b_}{
         set_transform(std::move(mat));
     }
-    constexpr Color at(const Point& p) const noexcept {
+    constexpr Color at(const Point& p) const noexcept{
         const auto dist_from_center = magnitude(vector(p.x, p.y, p.z));
         const auto fraction = dist_from_center - math::floor(dist_from_center);
         return lerp(a, b, fraction);
     }
-    constexpr void set_transform(Matrix4 mat) noexcept {
+    constexpr void set_transform(Matrix4 mat) noexcept{
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }
-    constexpr const Matrix4& get_transform() const noexcept {
+    constexpr const Matrix4& get_transform() const noexcept{
         return _transform;
     }
-    constexpr const Matrix4& inv_transform() const noexcept {
+    constexpr const Matrix4& inv_transform() const noexcept{
         return _invTransform;
     }
-    explicit constexpr operator bool() const noexcept { return true; }
+    explicit constexpr operator bool() const noexcept{ return true; }
     constexpr bool operator==(const RadialGradientPattern& that) const noexcept = default;
 private:
-    Matrix4 _transform{ Matrix4Identity };
-    Matrix4 _invTransform{ Matrix4Identity };
+    Matrix4 _transform{Matrix4Identity};
+    Matrix4 _invTransform{Matrix4Identity};
     Color a{};
     Color b{};
 };
-struct RingPattern final {
-    constexpr RingPattern(Matrix4 mat, Color a_, Color b_) noexcept : a{ a_ }, b{ b_ } {
+struct RingPattern final{
+    constexpr RingPattern(Matrix4 mat, Color a_, Color b_) noexcept : a{a_}, b{b_}{
         set_transform(std::move(mat));
     }
-    constexpr void set_transform(Matrix4 mat) noexcept {
+    constexpr void set_transform(Matrix4 mat) noexcept{
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }
-    constexpr Color at(const Point& p) const noexcept {
+    constexpr Color at(const Point& p) const noexcept{
         const auto distance_from_center = math::sqrt((p.x * p.x) + (p.z * p.z));
         const auto mod = math::int_floor(distance_from_center) % 2;
         return mod == 0 ? a : b;
     }
-    constexpr const Matrix4& get_transform() const noexcept {
+    constexpr const Matrix4& get_transform() const noexcept{
         return _transform;
     }
-    constexpr const Matrix4& inv_transform() const noexcept {
+    constexpr const Matrix4& inv_transform() const noexcept{
         return _invTransform;
     }
-    explicit constexpr operator bool() const noexcept { return true; }
+    explicit constexpr operator bool() const noexcept{ return true; }
     constexpr bool operator==(const RingPattern& that) const noexcept = default;
 private:
-    Matrix4 _transform{ Matrix4Identity };
-    Matrix4 _invTransform{ Matrix4Identity };
+    Matrix4 _transform{Matrix4Identity};
+    Matrix4 _invTransform{Matrix4Identity};
     Color a{};
     Color b{};
 };
-struct CheckersPattern final {
-    constexpr CheckersPattern(Matrix4 mat, Color a_, Color b_) noexcept : a{ a_ }, b{ b_ } {
+struct CheckersPattern final{
+    constexpr CheckersPattern(Matrix4 mat, Color a_, Color b_) noexcept : a{a_}, b{b_}{
         set_transform(std::move(mat));
     }
-    constexpr Color at(const Point& p) const noexcept {
+    constexpr Color at(const Point& p) const noexcept{
         const auto val = static_cast<int>(math::floor(p.x) + math::floor(p.y) + math::floor(p.z));
         return (val % 2 == 0) ? a : b;
     }
-    constexpr void set_transform(Matrix4 mat) noexcept {
+    constexpr void set_transform(Matrix4 mat) noexcept{
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }
-    constexpr const Matrix4& get_transform() const noexcept {
+    constexpr const Matrix4& get_transform() const noexcept{
         return _transform;
     }
-    constexpr const Matrix4& inv_transform() const noexcept {
+    constexpr const Matrix4& inv_transform() const noexcept{
         return _invTransform;
     }
-    explicit constexpr operator bool() const noexcept { return true; }
+    explicit constexpr operator bool() const noexcept{ return true; }
     constexpr bool operator==(const CheckersPattern& that) const noexcept = default;
 private:
-    Matrix4 _transform{ Matrix4Identity };
-    Matrix4 _invTransform{ Matrix4Identity };
+    Matrix4 _transform{Matrix4Identity};
+    Matrix4 _invTransform{Matrix4Identity};
     Color a{};
     Color b{};
 };
-struct UVCheckers final {
+struct UVCheckers final{
     constexpr UVCheckers(unsigned width_, unsigned height_, Color a_, Color b_) noexcept
-        : width{ width_ }, height{ height_ }, a{ a_ }, b{ b_ } {
-    }
-    constexpr Color at(const UVCoords& uv) const noexcept {
+        : width{width_}, height{height_}, a{a_}, b{b_}{}
+    constexpr Color at(const UVCoords& uv) const noexcept{
         const auto u2 = math::int_floor(uv.u * width);
         const auto v2 = math::int_floor(uv.v * height);
         const auto sum = u2 + v2;
@@ -259,29 +257,27 @@ private:
     unsigned height = 0;
 };
 
-struct TextureMap final {
+struct TextureMap final{
     using Texture = UVCheckers;
     using Callable = std::function<UVCoords(const Point&)>;
     /*constexpr*/ TextureMap(Texture uv_pattern, Callable uv_map) noexcept
-        : uv_pattern{ std::move(uv_pattern) }, uv_map{ std::move(uv_map) }
-    {
-    }
-    /*constexpr*/ Color at(const Point& p) const noexcept {
+        : uv_pattern{std::move(uv_pattern)}, uv_map{std::move(uv_map)}{}
+    /*constexpr*/ Color at(const Point& p) const noexcept{
         const auto texCoords = uv_map(p);
         return uv_pattern.at(texCoords);
     }
-    constexpr void set_transform(Matrix4 mat) noexcept {
+    constexpr void set_transform(Matrix4 mat) noexcept{
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }
-    constexpr const Matrix4& get_transform() const noexcept {
+    constexpr const Matrix4& get_transform() const noexcept{
         return _transform;
     }
-    constexpr const Matrix4& inv_transform() const noexcept {
+    constexpr const Matrix4& inv_transform() const noexcept{
         return _invTransform;
     }
-    explicit constexpr operator bool() const noexcept { return true; }
-    constexpr bool operator==([[maybe_unused]] const TextureMap& that) const noexcept {
+    explicit constexpr operator bool() const noexcept{ return true; }
+    constexpr bool operator==([[maybe_unused]] const TextureMap& that) const noexcept{
         return true; /* TODO: the implementation is necessary for the build to succeed,
             as = default won't do. std::function isn't (easily) comparable anyway so some
             thought is needed to decide on how this comparison should operate.
@@ -290,96 +286,102 @@ struct TextureMap final {
             "Pattern"-structure */
     }
 private:
-    Matrix4 _transform{ Matrix4Identity };
-    Matrix4 _invTransform{ Matrix4Identity };
+    Matrix4 _transform{Matrix4Identity};
+    Matrix4 _invTransform{Matrix4Identity};
     Texture uv_pattern;
     Callable uv_map;
 };
 
-using Faces = std::vector<const AlignCheck*>; //std::span<const AlignCheck*>
-struct CubeMap final {    
-    /*constexpr*/ CubeMap(Faces patterns) noexcept
-        : faces{ std::move(patterns) } 
-    {
-        assert(faces.size() == static_cast<int>(CubeFace::count) && "A CubeMap must have 6 patterns, one for each face.");
+using Faces = std::array<AlignCheck, std::to_underlying(CubeFace::count)>; //std::span<const AlignCheck*>
+struct CubeMap final{
+    constexpr explicit CubeMap(Faces patterns) noexcept
+        : faces{std::move(patterns)}{
+        assert(faces.size() == static_cast<size_t>(CubeFace::count) && "A CubeMap must have 6 patterns, one for each face.");
     }
-    /*constexpr*/ Color at(const Point& p) const noexcept {
+
+    constexpr CubeMap() noexcept{
+        //default constructor = test cube pattern from Bonus chapter 1, test: "Finding the colors on a mapped cube"
+        const auto left = uv_align_check(YELLOW, CYAN, RED, BLUE, BROWN);
+        const auto front = uv_align_check(CYAN, RED, YELLOW, BROWN, GREEN);
+        const auto right = uv_align_check(RED, YELLOW, PURPLE, GREEN, WHITE);
+        const auto back = uv_align_check(GREEN, PURPLE, CYAN, WHITE, BLUE);
+        const auto up = uv_align_check(BROWN, CYAN, PURPLE, RED, YELLOW);
+        const auto down = uv_align_check(PURPLE, BROWN, GREEN, BLUE, WHITE);
+        faces = Faces({left, front, right, back, up, down});
+    }
+
+    constexpr Color at(const Point& p) const noexcept{
         const auto face = face_from_point(p);
         auto uvCoords = uv(0, 0);
-        if (face == CubeFace::left) {
+        if(face == CubeFace::left){
             uvCoords = cube_uv_left(p);
-        }
-        else if (face == CubeFace::right) {
+        } else if(face == CubeFace::right){
             uvCoords = cube_uv_right(p);
-        }
-        else if (face == CubeFace::front) {
+        } else if(face == CubeFace::front){
             uvCoords = cube_uv_front(p);
-        }
-        else if (face == CubeFace::back) {
+        } else if(face == CubeFace::back){
             uvCoords = cube_uv_back(p);
-        }
-        else if (face == CubeFace::up) {
+        } else if(face == CubeFace::up){
             uvCoords = cube_uv_up(p);
-        }
-        else { //CubeFace::down
+        } else{ //CubeFace::down
             uvCoords = cube_uv_down(p);
         }
         const auto i = std::to_underlying(face);
         assert(i >= 0 && i < static_cast<int>(CubeFace::count));
-        return uv_pattern_at(*faces[i], uvCoords);        
+        return uv_pattern_at(faces[i], uvCoords);
     }
-    constexpr void set_transform(Matrix4 mat) noexcept {
+    constexpr void set_transform(Matrix4 mat) noexcept{
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }
-    constexpr const Matrix4& get_transform() const noexcept {
+    constexpr const Matrix4& get_transform() const noexcept{
         return _transform;
     }
-    constexpr const Matrix4& inv_transform() const noexcept {
+    constexpr const Matrix4& inv_transform() const noexcept{
         return _invTransform;
     }
-    explicit constexpr operator bool() const noexcept { return true; }
-    constexpr bool operator==([[maybe_unused]] const CubeMap& that) const noexcept {
-        return true; 
+    explicit constexpr operator bool() const noexcept{ return true; }
+    constexpr bool operator==([[maybe_unused]] const CubeMap& that) const noexcept{
+        return true;
     }
 private:
-    Matrix4 _transform{ Matrix4Identity };
-    Matrix4 _invTransform{ Matrix4Identity };
-    Faces faces;    
+    Matrix4 _transform{Matrix4Identity};
+    Matrix4 _invTransform{Matrix4Identity};
+    Faces faces;
 };
 
-/*constexpr*/ auto cube_map(Faces patterns) noexcept {
-    assert(patterns.size() == static_cast<int>(CubeFace::count) && "A CubeMap must have 6 patterns, one for each face.");
+/*constexpr*/ auto cube_map(Faces patterns) noexcept{
+    assert(patterns.size() == static_cast<size_t>(CubeFace::count) && "A CubeMap must have 6 patterns, one for each face.");
     return CubeMap(std::move(patterns));
 }
 
-/*constexpr*/ auto texture_map(TextureMap::Texture uv_pattern, TextureMap::Callable uv_map) noexcept {
+/*constexpr*/ auto texture_map(TextureMap::Texture uv_pattern, TextureMap::Callable uv_map) noexcept{
     return TextureMap(std::move(uv_pattern), std::move(uv_map));
 }
 
-constexpr auto null_pattern() noexcept {
+constexpr auto null_pattern() noexcept{
     return NullPattern{};
 };
-constexpr auto test_pattern() noexcept {
+constexpr auto test_pattern() noexcept{
     return TestPattern();
 };
 
-constexpr auto stripe_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexcept {
+constexpr auto stripe_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexcept{
     return StripePattern(std::move(m), a, b);
 };
-constexpr auto gradient_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexcept {
+constexpr auto gradient_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexcept{
     return GradientPattern(std::move(m), a, b);
 };
-constexpr auto radial_gradient_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexcept {
+constexpr auto radial_gradient_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexcept{
     return RadialGradientPattern(std::move(m), a, b);
 };
-constexpr auto ring_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexcept {
+constexpr auto ring_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexcept{
     return RingPattern(std::move(m), a, b);
 };
-constexpr auto checkers_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexcept {
+constexpr auto checkers_pattern(Color a, Color b, Matrix4 m = Matrix4Identity) noexcept{
     return CheckersPattern(std::move(m), a, b);
 };
-constexpr auto uv_checkers(unsigned width, unsigned height, Color a, Color b) noexcept {
+constexpr auto uv_checkers(unsigned width, unsigned height, Color a, Color b) noexcept{
     return UVCheckers(width, height, a, b);
 };
 using Patterns = std::variant<NullPattern, TestPattern, StripePattern, GradientPattern, RingPattern, CheckersPattern, RadialGradientPattern, TextureMap, CubeMap>;
@@ -388,52 +390,52 @@ template<typename T>
 concept is_pattern = std::is_same_v<NullPattern, T> || std::is_same_v<TestPattern, T> ||
 std::is_same_v<StripePattern, T> || std::is_same_v<GradientPattern, T> ||
 std::is_same_v<RingPattern, T> || std::is_same_v<CheckersPattern, T> ||
-std::is_same_v<RadialGradientPattern, T> || std::is_same_v<TextureMap, T> || 
+std::is_same_v<RadialGradientPattern, T> || std::is_same_v<TextureMap, T> ||
 std::is_same_v<CubeMap, T>;
 
 template<typename T>
     requires is_pattern<T>
-inline bool operator==(const T& t, const Patterns& v) {
+inline bool operator==(const T& t, const Patterns& v){
     const T* c = std::get_if<T>(&v);
     return c && *c == t; // true if v contains a pattern that compares equal to v
 }
 
-inline bool operator==(const Patterns& v, const is_pattern auto& t) {
+inline bool operator==(const Patterns& v, const is_pattern auto& t){
     return t == v;
 };
 
-constexpr void set_transform(Patterns& variant, const Matrix4& newTransform) noexcept {
-    return std::visit([&newTransform](auto& pattern) noexcept -> void {
+constexpr void set_transform(Patterns& variant, const Matrix4& newTransform) noexcept{
+    return std::visit([&newTransform](auto& pattern) noexcept -> void{
         return pattern.set_transform(newTransform);
         }, variant);
 };
-constexpr const Matrix4& get_transform(const Patterns& variant) noexcept {
-    return std::visit([](const auto& pattern) noexcept -> const Matrix4& {
+constexpr const Matrix4& get_transform(const Patterns& variant) noexcept{
+    return std::visit([](const auto& pattern) noexcept -> const Matrix4&{
         return pattern.get_transform();
         }, variant);
 };
-constexpr const Matrix4& get_inverse_transform(const Patterns& variant) noexcept {
-    return std::visit([](const auto& pattern) noexcept -> const Matrix4& {
+constexpr const Matrix4& get_inverse_transform(const Patterns& variant) noexcept{
+    return std::visit([](const auto& pattern) noexcept -> const Matrix4&{
         return pattern.inv_transform();
         }, variant);
 };
 
-Color pattern_at(const Patterns& variant, const Point& p) noexcept {
+Color pattern_at(const Patterns& variant, const Point& p) noexcept{
     assert(!std::holds_alternative<NullPattern>(variant) && "pattern_at: called on NullPattern.");
-    return std::visit([&p](const auto& pattern) noexcept -> Color { return pattern.at(p); }, variant);
+    return std::visit([&p](const auto& pattern) noexcept -> Color{ return pattern.at(p); }, variant);
 };
 
 //#include "Shapes.h"
 //template<typename T>
 //requires is_shape<T>
-Color pattern_at(const Patterns& pattern, const /*must be is_shapes but I can't name that here. got some circular dependency going on.*/ auto& obj, const Point& world_point) noexcept {
+Color pattern_at(const Patterns& pattern, const /*must be is_shapes but I can't name that here. got some circular dependency going on.*/ auto& obj, const Point& world_point) noexcept{
     assert(!std::holds_alternative<NullPattern>(pattern) && "pattern_at: called on NullPattern.");
     const auto object_point = get_inverse_transform(obj) * world_point;
     const auto pattern_point = get_inverse_transform(pattern) * object_point;
     return pattern_at(pattern, pattern_point);
 };
 
-/*constexpr*/ UVCoords spherical_map(const Point& p) noexcept {
+/*constexpr*/ UVCoords spherical_map(const Point& p) noexcept{
     // Compute the azimuthal angle
     // -π < theta <= π
     // Angle increases clockwise as viewed from above,
@@ -459,18 +461,18 @@ Color pattern_at(const Patterns& pattern, const /*must be is_shapes but I can't 
     // by subtracting it from 1.
     const auto v = 1 - phi / math::PI;
 
-    return { u, v };
+    return {u, v};
 }
 
 /*planar mapping tiles every unit square on the plane, and ignores the y coordinate.*/
-/*constexpr*/ UVCoords planar_map(const Point& p) noexcept {
+/*constexpr*/ UVCoords planar_map(const Point& p) noexcept{
     const auto u = p.x - std::floor(p.x); // treat the fractional portion of the x coordinate as u
     const auto v = p.z - std::floor(p.z); //and the fractional portion of z as v.
     return uv(u, v);
 }
 
 /*planar mapping tiles every unit square on the plane, and ignores the y coordinate.*/
-/*constexpr*/ UVCoords cylindrical_map(const Point& p) noexcept {
+/*constexpr*/ UVCoords cylindrical_map(const Point& p) noexcept{
     //compute the azimuthal angle, same as with spherical_map()
     const auto theta = std::atan2(p.x, p.z);
     const auto raw_u = theta / math::TWO_PI;

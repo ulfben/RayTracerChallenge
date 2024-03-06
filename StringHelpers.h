@@ -54,3 +54,15 @@ std::string join(std::input_iterator auto begin, std::input_iterator auto end,
                            return a + delim + to_string(b);
                          });
 }
+
+#include <charconv>
+#include <optional>
+template<typename Number>
+[[nodiscard]] std::optional<Number> from_chars(std::string_view s) noexcept {
+    Number value{};
+    auto res = std::from_chars(s.data(), s.data() + s.size(), value);    
+    if (res.ec == std::errc::invalid_argument || res.ec == std::errc::result_out_of_range) {
+        return std::nullopt;
+    }    
+    return value;
+}

@@ -42,7 +42,7 @@ constexpr Cube cube(Color col) noexcept {
 constexpr Cube cube(Material m) noexcept {
     return Cube(std::move(m));
 }
-constexpr Cube sphcubeere(Matrix4 transform) noexcept {
+constexpr Cube cube(Matrix4 transform) noexcept {
     return Cube(std::move(transform));
 }
 constexpr Cube cube(Material m, Matrix4 transform) noexcept {
@@ -85,4 +85,3 @@ constexpr auto local_intersect([[maybe_unused]] const Cube& cube, const Ray& loc
     if (tmin > tmax) return MISS;
     return  std::vector{ tmin, tmax };
 };
-

@@ -159,3 +159,21 @@ void save_to_file(const Canvas& img, std::string_view path) {
     std::ofstream ofs(path.data(), std::ofstream::out);    
     ofs << img.to_ppm();
 }
+
+std::optional<Canvas> canvas_from_ppm(std::string_view ppm) {
+    auto lines = split(ppm, NEWLINE);
+    auto PPMversion = lines[0];
+    if (PPMversion != PPM_VERSION) {
+        return std::nullopt;
+    }
+    auto widthAndHeight = split(lines[1], " "sv);
+    assert(widthAndHeight.size() == 2);
+    auto width = from_chars<unsigned>(widthAndHeight[0]).value_or(0);
+    auto height = from_chars<unsigned>(widthAndHeight[1]).value_or(0);
+    auto maxByteValue = from_chars<unsigned>(lines[2]).value_or(PPM_MAX_BYTE_VALUE);
+    
+
+    Canvas img(width, height);
+    //std::copy(bitmap.begin(), bitmap.end(), img.begin());
+    return img;
+}

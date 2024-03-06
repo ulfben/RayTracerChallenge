@@ -104,4 +104,16 @@ TEST(Canvas, PPMIsTerminatedByNewline) {
   EXPECT_EQ('\n', output.back());
 }
 
+
+TEST(Canvas, FromPPMFailsOnReadingBadMagicNumber) {
+  auto ppm = 
+R"(P32
+1 1
+255
+0 0 0)";
+  
+  const auto c = canvas_from_ppm(ppm);
+  EXPECT_EQ(c, std::nullopt);
+}
+
 RESTORE_WARNINGS

@@ -135,15 +135,13 @@ namespace math {
         return x * x;
     }
 
-    template<class T>
-        requires std::is_arithmetic_v<T>
+    template<std::floating_point T>
     [[nodiscard]] constexpr int int_ceil(T f) noexcept {
         if (std::is_constant_evaluated()) {
             const int i = static_cast<int>(f);
             return f > i ? i + 1 : i;
         }
         return static_cast<int>(std::ceil(f));
-
     }
 
     template<class T>
