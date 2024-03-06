@@ -170,9 +170,7 @@ std::optional<Canvas> canvas_from_ppm(std::string_view ppm) {
     assert(widthAndHeight.size() == 2);
     auto width = from_chars<unsigned>(widthAndHeight[0]).value_or(0);
     auto height = from_chars<unsigned>(widthAndHeight[1]).value_or(0);
-    auto maxByteValue = from_chars<unsigned>(lines[2]).value_or(PPM_MAX_BYTE_VALUE);
-    
-
+    [[maybe_unused]] auto maxByteValue = from_chars<unsigned>(lines[2]).value_or(PPM_MAX_BYTE_VALUE);
     Canvas img(width, height);
     //std::copy(bitmap.begin(), bitmap.end(), img.begin());
     return img;

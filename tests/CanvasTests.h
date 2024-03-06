@@ -105,7 +105,7 @@ TEST(Canvas, PPMIsTerminatedByNewline) {
 }
 
 
-TEST(Canvas, FromPPMFailsOnReadingBadMagicNumber) {
+TEST(Canvas, FromPPMReturnsNulloptForBadMagicNumber) {
   auto ppm = 
 R"(P32
 1 1
@@ -114,6 +114,23 @@ R"(P32
   
   const auto c = canvas_from_ppm(ppm);
   EXPECT_EQ(c, std::nullopt);
+}
+
+TEST(Canvas, FromPPMReturnsCanvasOfCorrectDimension) {
+  auto ppm = 
+R"(P3
+10 2
+255
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)";
+  
+  const auto c = canvas_from_ppm(ppm);
+  const auto expected = Canvas(10, 2);
+  const auto& result = c.value();
+  EXPECT_EQ(result.width(), expected.width());
+  EXPECT_EQ(result.height(), expected.height());
 }
 
 RESTORE_WARNINGS
