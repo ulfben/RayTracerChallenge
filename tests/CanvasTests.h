@@ -126,11 +126,37 @@ R"(P3
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)";
   
-  const auto c = canvas_from_ppm(ppm);
-  const auto expected = Canvas(10, 2);
+  const auto c = canvas_from_ppm(ppm);  
   const auto& result = c.value();
-  EXPECT_EQ(result.width(), expected.width());
-  EXPECT_EQ(result.height(), expected.height());
+  EXPECT_EQ(result.width(), 10);
+  EXPECT_EQ(result.height(), 2);
+}
+
+TEST(Canvas, FromPPMReadsPixelData) {
+  auto ppm = 
+R"(P3
+4 3
+255
+255 127 0 0 127 255 127 255 0 255 255 255
+0 0 0 255 0 0 0 255 0 0 0 255
+255 255 0 0 255 255 255 0 255 127 127 127)";
+  
+  const auto c = canvas_from_ppm(ppm); 
+  const auto& result = c.value();
+  EXPECT_EQ(result.width(), 4);
+  EXPECT_EQ(result.height(), 3);
+  EXPECT_EQ(result.get(0, 0), color(1.0f, 0.498f, 0.0f));
+  EXPECT_EQ(result.get(1, 0), color(0, 0.498f, 1.0f));
+  EXPECT_EQ(result.get(2, 0), color(0.498f, 1.0f, 0.0f));
+  EXPECT_EQ(result.get(3, 0), color(1.0f, 1.0f, 1.0f));
+  EXPECT_EQ(result.get(0, 1), color(0, 0, 0));
+  EXPECT_EQ(result.get(1, 1), color(1.0f, 0.0f, 0.0f));
+  EXPECT_EQ(result.get(2, 1), color(0.0f, 1.0f, 0.0f));
+  EXPECT_EQ(result.get(3, 1), color(0.0f, 0.0f, 1.0f));
+  EXPECT_EQ(result.get(0, 2), color(0.0f, 1.0f, 0.0f));
+  EXPECT_EQ(result.get(1, 2), color(0.0f, 1.0f, 1.0f));
+  EXPECT_EQ(result.get(2, 2), color(1.0f, 0.0f, 1.0f));
+  EXPECT_EQ(result.get(3, 2), color(0.498f, 0.498f, 0.498f));
 }
 
 RESTORE_WARNINGS
