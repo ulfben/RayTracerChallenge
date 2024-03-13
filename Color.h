@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Math.h"
+#include "StringHelpers.h"
 
 struct Color final {
     using value_type = Real;
@@ -16,6 +17,20 @@ constexpr Color color(Real rgb) noexcept {
     return color(rgb, rgb, rgb);
 }
 
+//TODO: we have triplets of "0"-"255", ultimately we need 0.0f - 1.0f.
+Color color(std::string_view rgb) noexcept{    
+    const float MAX = PPM_MAX_BYTE_VALUE; //TODO: don't hardcode the scaling value, get it from parsing the file like an adult. 
+    auto bytes = split(rgb, " "sv);
+    if(bytes.size() != 3){
+        return {};
+    }
+    auto r = from_chars<uint8_t>(bytes[0]).value_or(0);
+    auto g = from_chars<uint8_t>(bytes[1]).value_or(0);
+    auto b = from_chars<uint8_t>(bytes[2]).value_or(0);
+    return Color{r / MAX, g / MAX, b / MAX};    
+}
+
+
 constexpr Color clamp(const Color& c, Color::value_type min = 0, Color::value_type max = 1) noexcept {
     return {
         std::clamp(c.r, min, max),
@@ -28,7 +43,7 @@ constexpr Color clamp(const Color& c, Color::value_type min = 0, Color::value_ty
 //the idea is to bulk-convert the image-buffer into a smaller integer buffer, 
 //which we can then split across threads to make strings out of.
 struct ByteColor final {
-    using value_type = uint8_t;
+    using value_type = std::uint8_t;
     static constexpr float MAX = PPM_MAX_BYTE_VALUE;
     value_type r{};
     value_type g{};
@@ -47,6 +62,8 @@ struct ByteColor final {
 constexpr ByteColor to_byte_color(const Color& col) noexcept {
     return ByteColor(col);
 }
+
+
 
 //sRGB conversion routines courtesy of http://www.ericbrasseur.org/gamma.html
 //for explanation of the constants, see; https://en.wikipedia.org/wiki/SRGB

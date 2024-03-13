@@ -160,24 +160,42 @@ void save_to_file(const Canvas& img, std::string_view path) {
     ofs << img.to_ppm();
 }
 
+std::pair<size_t, size_t> parseWidthAndHeight(std::string_view line) {
+    using size_type = Canvas::size_type; 
+    auto widthAndHeight = split(line, " "sv);
+    assert(widthAndHeight.size() == 2);
+    auto w = from_chars<size_type>(widthAndHeight[0]).value_or(0);
+    auto h = from_chars<size_type>(widthAndHeight[1]).value_or(0);    
+    return {w, h};
+}
+
 std::optional<Canvas> canvas_from_ppm(std::string_view ppm) {
     using size_type = Canvas::size_type;    
     auto lines = split(trim(ppm), NEWLINE);    
     std::erase_if(lines, [](const auto& line) {
         return line.starts_with('#'); //remove comments
     });
-    if (lines.size() < 4) {
-        return std::nullopt;
-    }    
-    if( lines[0] != PPM_VERSION) {
+    if(lines.size() < 4  || lines[0] != PPM_VERSION) {
         return std::nullopt;
     }
-    auto widthAndHeight = split(lines[1], " "sv);
-    assert(widthAndHeight.size() == 2);
-    auto width = from_chars<size_type>(widthAndHeight[0]).value_or(0);
-    auto height = from_chars<size_type>(widthAndHeight[1]).value_or(0);
-    [[maybe_unused]] auto maxByteValue = from_chars<size_type>(lines[2]).value_or(0);
+    auto [width, height] = parseWidthAndHeight(lines[1]);
+    auto maxByteValue = from_chars<size_type>(lines[2]);
+    if(!maxByteValue) {
+        return std::nullopt;
+    }
+    Real scale = static_cast<Real>(*maxByteValue);
     Canvas img(width, height);
-    //std::copy(bitmap.begin(), bitmap.end(), img.begin());
+    for(size_t i = 0; i < height; ++i) { 
+        std::string_view line = lines[i+3]; //i + 3 to skip the header        
+        StringViews pixels = split(line, " "sv);        
+        assert(pixels.size() % 3 == 0); //ensure lines are even pixels, three values per.
+        
+        for(size_t j = 0; j < width; ++j) {
+            auto r = from_chars<Real>(pixels[3 * j]).value_or(-1.0f);
+            auto g = from_chars<Real>(pixels[3 * j+1]).value_or(-1.0f);
+            auto b = from_chars<Real>(pixels[3 * j+2]).value_or(-1.0f);            
+            img.set(j, i, Color{r/scale, g/scale, b/scale});            
+        }
+    }
     return img;
 }
