@@ -208,20 +208,14 @@ std::pair<Canvas, size_t> parse_ppm_properties(std::span<std::string_view> lines
     return {Canvas(widthHeight[0], widthHeight[1]), *maxByteValue};
 }
 
-void parse_and_set_pixels(Canvas& img, std::span<std::string_view> lines, size_t maxByteValue) {
-    const auto values = parse_integers(join(lines.begin() + 3, lines.end(), "\n"s));
-    assert(values.size() % 3 == 0); // Ensure lines are even pixels, three values per.
-    assert(maxByteValue != 0);
-    const auto scale = static_cast<Real>(maxByteValue);
-    for(size_t i = 0; i < values.size(); i += 3){
-        img.set(i / 3, Color{values[i] / scale, values[i + 1] / scale, values[i + 2] / scale});
-    }
-}
-
 Canvas canvas_from_ppm(std::string_view ppm) noexcept(false) {   
     auto lines = split(trim(ppm), NEWLINE);
     std::erase_if(lines, [](const auto& line){ return line.starts_with(PPM_COMMENT); });
     auto [canvas, maxByteValue] = parse_ppm_properties(lines);  
-    parse_and_set_pixels(canvas, lines, maxByteValue);
+    const auto values = parse_integers(join(lines.begin() + 3, lines.end(), "\n"s));
+    assert(values.size() % 3 == 0); // Ensure lines are even pixels, three values per.
+    for(size_t i = 0; i < values.size(); i += 3){
+        canvas.set(i / 3, from_byte_color(values[i], values[i + 1], values[i + 2], maxByteValue));
+    }
     return canvas;
 }
