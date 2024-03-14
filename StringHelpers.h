@@ -55,6 +55,32 @@ std::string join(std::input_iterator auto begin, std::input_iterator auto end,
                          });
 }
 
+
+std::size_t length_of_all_elements(auto begin, auto end) noexcept{
+    std::size_t totalLength{};
+    for(auto i = begin; i != end; ++i){
+        totalLength += i->length();
+    }
+    return totalLength;
+}
+
+//a join for std::string_view
+template<std::input_iterator InputIterator>
+    requires std::same_as<std::string_view, typename std::iterator_traits<InputIterator>::value_type>
+std::string join(InputIterator begin, InputIterator end, const std::string& delimiter = ", "s) {
+    if (begin == end) return {}; // Early return for empty range    
+    const auto count = std::distance(begin, end);    
+    const std::size_t totalLength = length_of_all_elements(begin, end) + 
+                                    (count > 1 ? (delimiter.length() * (count - 1)) : 0);    
+    std::string result;
+    result.reserve(totalLength);
+    result += std::string(*begin++); // Add the first element without a leading delimiter
+    while (begin != end) {
+        result += delimiter + std::string(*begin++);
+    }
+    return result;
+}
+
 #include <charconv>
 #include <optional>
 template<typename Number>

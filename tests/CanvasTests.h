@@ -105,18 +105,17 @@ TEST(Canvas, PPMIsTerminatedByNewline) {
 }
 
 
-TEST(Canvas, FromPPMReturnsNulloptForBadMagicNumber) {
+TEST(Canvas, FromPPMThrowsForBadMagicNumber) {
   auto ppm = 
 R"(P32
 1 1
 255
 0 0 0)";
   
-  const auto c = canvas_from_ppm(ppm);
-  EXPECT_EQ(c, std::nullopt);
+  EXPECT_ANY_THROW(canvas_from_ppm(ppm));  
 }
 
-TEST(DISABLED_Canvas, FromPPMReturnsCanvasOfCorrectDimension) {
+TEST(Canvas, FromPPMReturnsCanvasOfCorrectDimension) {
   auto ppm = 
 R"(P3
 10 2
@@ -125,9 +124,8 @@ R"(P3
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)";
-  
-  const auto c = canvas_from_ppm(ppm);  
-  const auto& result = c.value();
+    
+  const auto result = canvas_from_ppm(ppm);    
   EXPECT_EQ(result.width(), 10);
   EXPECT_EQ(result.height(), 2);
 }
@@ -141,8 +139,7 @@ R"(P3
 0 0 0 255 0 0 0 255 0 0 0 255
 255 255 0 0 255 255 255 0 255 127 127 127)";
   
-  const auto c = canvas_from_ppm(ppm); 
-  const auto& result = c.value();
+  const auto result = canvas_from_ppm(ppm);   
   EXPECT_EQ(result.width(), 4);
   EXPECT_EQ(result.height(), 3);
   EXPECT_EQ(result.get(0, 0), color(1.0f, 0.498f, 0.0f));
@@ -157,6 +154,41 @@ R"(P3
   EXPECT_EQ(result.get(1, 2), color(0.0f, 1.0f, 1.0f));
   EXPECT_EQ(result.get(2, 2), color(1.0f, 0.0f, 1.0f));
   EXPECT_EQ(result.get(3, 2), color(0.498f, 0.498f, 0.498f));
+}
+
+TEST(Canvas, FromPPMIgnoresComments) {
+  auto ppm = 
+R"(P3
+# this is a comment
+2 1
+# this, too
+255
+# another comment
+255 255 255
+# oh, no, comments in the pixel data!
+255 0 255)";
+  
+  const auto result = canvas_from_ppm(ppm);   
+  EXPECT_EQ(result.width(), 2);
+  EXPECT_EQ(result.height(), 1);
+  EXPECT_EQ(result.get(0, 0), color(1.0f, 1.0f, 1.0f));
+  EXPECT_EQ(result.get(1, 0), color(1.0f, 0.0f, 1.0f));  
+}
+
+TEST(Canvas, FromPPMHandlesSplitTriplets) {
+  auto ppm = 
+R"(P3
+1 1
+255
+51
+153
+
+204)";
+  
+  const auto result = canvas_from_ppm(ppm);   
+  EXPECT_EQ(result.width(), 1);
+  EXPECT_EQ(result.height(), 1);
+  EXPECT_EQ(result.get(0, 0), color(0.2f, 0.6f, 0.8f));  
 }
 
 RESTORE_WARNINGS
