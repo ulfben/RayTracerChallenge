@@ -164,15 +164,6 @@ public:
     explicit ppm_parse_error(std::string_view what) noexcept : std::runtime_error(what.data()){}
 };
 
-std::pair<size_t, size_t> parse_width_and_height(std::string_view line){
-    using size_type = Canvas::size_type;
-    auto widthAndHeight = split(line, " "sv);
-    assert(widthAndHeight.size() == 2);
-    auto w = from_chars<size_type>(widthAndHeight[0]).value_or(0);
-    auto h = from_chars<size_type>(widthAndHeight[1]).value_or(0);
-    return {w, h};
-}
-
 constexpr std::pair<size_t, size_t> next_number_bounds(std::string_view str, size_t offset, std::string_view delims = " \n") noexcept{
     size_t number_start = str.find_first_not_of(delims, offset);
     if(number_start == std::string_view::npos){ 
@@ -193,11 +184,8 @@ std::vector<size_t> parse_integers(std::string_view str, size_t offset = 0){
     size_t start = 0;
     while(start < str.size()){
         auto [begin, end] = next_number_bounds(str, start, delimiters);
-        if(begin == std::string_view::npos){
-            break;
-        }
-        auto val = from_chars<size_t>(str.substr(begin, end-begin));
-        if(val){
+        if(begin == std::string_view::npos){ break; }
+        if(auto val = from_chars<size_t>(str.substr(begin, end-begin)); val){
             integers.push_back(*val);
         }
         start = end;
@@ -205,25 +193,35 @@ std::vector<size_t> parse_integers(std::string_view str, size_t offset = 0){
     return integers;
 }
 
-Canvas canvas_from_ppm(std::string_view ppm) noexcept(false) {
-    using size_type = Canvas::size_type;    
-    auto lines = split(trim(ppm), NEWLINE);
-    std::erase_if(lines, [](const auto& line){ return line.starts_with('#'); });
-    if(lines.size() < 4 || lines[0] != PPM_VERSION){
-        throw ppm_parse_error(std::format("No header, or invalid ppm_version. Must be version '{}'"sv, PPM_VERSION));
+std::pair<Canvas, size_t> parse_ppm_properties(std::span<std::string_view> lines) {
+    if (lines[0] != PPM_VERSION) {
+        throw ppm_parse_error("Invalid PPM version.");
     }
-    auto [width, height] = parse_width_and_height(lines[1]);
-    auto maxByteValue = from_chars<size_type>(lines[2]);
-    if(!maxByteValue){
-        throw ppm_parse_error("malformed header - no byte value specified.");
+    auto widthHeight = parse_integers(lines[1], 0);
+    if(widthHeight.size() != 2 || widthHeight[0] == 0 || widthHeight[1] == 0){
+        throw ppm_parse_error("Malformed header - no width and height specified.");
     }
-    Real scale = static_cast<Real>(*maxByteValue);  
-    assert(scale != 0.0f);
-    auto values = parse_integers(join(lines.begin() + 3, lines.end(), "\n"s));
-    assert(values.size() % 3 == 0); //ensure lines are even pixels, three values per.
-    Canvas img(width, height);
+    auto maxByteValue = from_chars<size_t>(lines[2]);
+    if(!maxByteValue || *maxByteValue == 0){
+        throw ppm_parse_error("Malformed header - no max byte value specified, or max byte is zero.");
+    }
+    return {Canvas(widthHeight[0], widthHeight[1]), *maxByteValue};
+}
+
+void parse_and_set_pixels(Canvas& img, std::span<std::string_view> lines, size_t maxByteValue) {
+    const auto values = parse_integers(join(lines.begin() + 3, lines.end(), "\n"s));
+    assert(values.size() % 3 == 0); // Ensure lines are even pixels, three values per.
+    assert(maxByteValue != 0);
+    const auto scale = static_cast<Real>(maxByteValue);
     for(size_t i = 0; i < values.size(); i += 3){
         img.set(i / 3, Color{values[i] / scale, values[i + 1] / scale, values[i + 2] / scale});
     }
-    return img;
+}
+
+Canvas canvas_from_ppm(std::string_view ppm) noexcept(false) {   
+    auto lines = split(trim(ppm), NEWLINE);
+    std::erase_if(lines, [](const auto& line){ return line.starts_with(PPM_COMMENT); });
+    auto [canvas, maxByteValue] = parse_ppm_properties(lines);  
+    parse_and_set_pixels(canvas, lines, maxByteValue);
+    return canvas;
 }

@@ -31,6 +31,7 @@ using Real = float;
 //static constexpr auto T_MISS = std::numeric_limits<Real>::max(); //magic value to denote an invalid t for intersections
 static const std::vector<Real> MISS = {};// std::pair<Real, Real>(T_MISS, T_MISS);
 static constexpr auto PPM_VERSION = "P3"sv;
+static constexpr auto PPM_COMMENT = "#"sv;
 static constexpr uint16_t PPM_MAX_LINE_LENGTH = 70;
 static constexpr uint16_t PPM_MAX_BYTE_VALUE = 255; //max value of color components in PPM file. 
 static constexpr bool RUN_SEQUENTIAL = false;
