@@ -93,30 +93,51 @@ template<typename Number>
     return value;
 }
 
-std::string_view get_line(std::string_view sv, size_t n, std::string_view line_ending = "\n"sv) {
+constexpr std::string_view get_line(std::string_view sv, size_t n, std::string_view line_ending = "\n"sv) noexcept {
     size_t line_start = 0;
     size_t line_end = 0;
-    for (size_t i = 0; i <= n; ++i) {
-        // If we are looking for the first line or have found the start of the nth line
-        if (i == n) {
-            line_end = sv.find(line_ending, line_start);            
-            if (line_end == std::string_view::npos) {// If line_end is npos, we're at the last line or beyond  
-                if (i != 0 && line_start >= sv.size()) {
-                    return {}; // If this isn't the first line and we are at the end of the string, return empty
-                }                
-                line_end = sv.size();
+    size_t found_lines = 0;
+
+    while (line_start < sv.size() && found_lines <= n) {
+        line_end = sv.find(line_ending, line_start);
+        if (line_end == std::string_view::npos) { 
+            line_end = sv.size();
+        }        
+        if (line_start != line_end) { //ignore empty lines
+            if (found_lines == n) {               
+                return sv.substr(line_start, line_end - line_start);
             }
-            // Return the substring representing the line
-            return sv.substr(line_start, line_end - line_start);
+            ++found_lines;
+        }        
+        line_start = (line_end == sv.size()) ? sv.size() : line_end + line_ending.length();
+    }
+    return {};
+}
+
+std::string_view get_non_comment_line(std::string_view sv, size_t n, std::string_view line_ending = "\n"sv, std::string_view comment = "#"sv) {
+    size_t found_lines = 0;
+    size_t current_line = 0;
+
+    while (true) {
+        auto line = get_line(sv, current_line++, line_ending);
+        if (line.empty()) {
+            return line; //end of the string view, so return empty line
         }
 
-        // Find the next newline character to advance line_start for the next iteration
-        size_t next_newline = sv.find('\n', line_start);
-        // If there are no more newlines, break early
-        if (next_newline == std::string_view::npos) {
-            return {};
+        //check if the line is a comment or empty (after potentially trimming a comment)
+        size_t comment_pos = line.find(comment);
+        if (comment_pos == 0 || (comment_pos == std::string_view::npos && line.find_first_not_of(line_ending) == std::string_view::npos)) {
+            continue; //skip comments and empty lines
         }
-        line_start = next_newline + 1;
-    }
+
+        //trim the line if a comment starts mid-line
+        if (comment_pos != std::string_view::npos) {
+            line = line.substr(0, comment_pos);
+        }
+        
+        if (found_lines++ == n) {
+            return line; //Return the nth non-comment, non-empty line we've found
+        }
+    }    
     return {};
 }

@@ -111,8 +111,11 @@ R"(P32
 1 1
 255
 0 0 0)";
-  
-  EXPECT_ANY_THROW(canvas_from_ppm(ppm));  
+  try{
+      EXPECT_ANY_THROW(canvas_from_ppm(ppm));
+  } catch (...) {
+      //EXPECT_STREQ(e.what(), "Invalid PPM magic number");
+  }
 }
 
 TEST(Canvas, FromPPMReturnsCanvasOfCorrectDimension) {

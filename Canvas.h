@@ -195,7 +195,7 @@ std::vector<size_t> parse_integers(std::string_view str, size_t offset = 0){
 
 std::pair<Canvas, size_t> parse_ppm_properties(std::span<std::string_view> lines) {
     if (lines[0] != PPM_VERSION) {
-        throw ppm_parse_error("Invalid PPM version.");
+        throw ppm_parse_error("Invalid PPM magic number");
     }
     auto widthHeight = parse_integers(lines[1], 0);
     if(widthHeight.size() != 2 || widthHeight[0] == 0 || widthHeight[1] == 0){
