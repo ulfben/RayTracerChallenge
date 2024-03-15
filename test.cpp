@@ -27,6 +27,7 @@
 #include "tests/CubeTests.h"
 #include "tests/CylinderTests.h"
 #include "tests/ConeTests.h"
+#include "tests/StringHelpersTest.h"
 
 TEST(DISABLED_Chapter2, CanOutputPPM) {    
     auto c = Canvas(300, 300);

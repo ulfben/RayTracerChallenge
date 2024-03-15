@@ -213,7 +213,7 @@ Canvas canvas_from_ppm(std::string_view ppm) noexcept(false) {
     std::erase_if(lines, [](const auto& line){ return line.starts_with(PPM_COMMENT); });
     auto [canvas, maxByteValue] = parse_ppm_properties(lines);  
     const auto values = parse_integers(join(lines.begin() + 3, lines.end(), "\n"s));
-    assert(values.size() % 3 == 0); // Ensure lines are even pixels, three values per.
+    assert(values.size() % 3 == 0); //three bytes per pixel, or the file is broken. 
     for(size_t i = 0; i < values.size(); i += 3){
         canvas.set(i / 3, from_byte_color(values[i], values[i + 1], values[i + 2], maxByteValue));
     }

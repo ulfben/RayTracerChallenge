@@ -92,3 +92,31 @@ template<typename Number>
     }    
     return value;
 }
+
+std::string_view get_line(std::string_view sv, size_t n, std::string_view line_ending = "\n"sv) {
+    size_t line_start = 0;
+    size_t line_end = 0;
+    for (size_t i = 0; i <= n; ++i) {
+        // If we are looking for the first line or have found the start of the nth line
+        if (i == n) {
+            line_end = sv.find(line_ending, line_start);            
+            if (line_end == std::string_view::npos) {// If line_end is npos, we're at the last line or beyond  
+                if (i != 0 && line_start >= sv.size()) {
+                    return {}; // If this isn't the first line and we are at the end of the string, return empty
+                }                
+                line_end = sv.size();
+            }
+            // Return the substring representing the line
+            return sv.substr(line_start, line_end - line_start);
+        }
+
+        // Find the next newline character to advance line_start for the next iteration
+        size_t next_newline = sv.find('\n', line_start);
+        // If there are no more newlines, break early
+        if (next_newline == std::string_view::npos) {
+            return {};
+        }
+        line_start = next_newline + 1;
+    }
+    return {};
+}

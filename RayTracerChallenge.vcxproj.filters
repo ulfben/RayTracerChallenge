@@ -99,6 +99,9 @@
     <ClInclude Include="tests\ConeTests.h">
       <Filter>tests</Filter>
     </ClInclude>
+    <ClInclude Include="tests\StringHelpersTest.h">
+      <Filter>tests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="tests">
