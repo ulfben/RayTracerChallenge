@@ -117,7 +117,6 @@ constexpr std::string_view get_line(std::string_view sv, size_t n, std::string_v
 std::string_view get_non_comment_line(std::string_view sv, size_t n, std::string_view line_ending = "\n"sv, std::string_view comment = "#"sv) {
     size_t found_lines = 0;
     size_t current_line = 0;
-
     while (true) {
         auto line = get_line(sv, current_line++, line_ending);
         if (line.empty()) {

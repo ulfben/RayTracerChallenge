@@ -12,6 +12,7 @@
 #include <execution>
 #include <functional>
 #include <concepts>
+#include <cctype> // for std::isspace
 #include <codeanalysis\warnings.h>
 #pragma warning(push)
 #pragma warning(disable:ALL_CODE_ANALYSIS_WARNINGS)
