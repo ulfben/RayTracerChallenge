@@ -163,26 +163,16 @@ void save_to_file(const Canvas& img, std::string_view path){
     ofs << img.to_ppm();
 }
 
-
-
 class ppm_parse_error : public std::runtime_error{   
 public: 
     explicit ppm_parse_error(std::string_view what) noexcept : std::runtime_error(what.data()){}
 };
 
-float next_value_scaled(std::string_view data, size_t& offset, float scale) {
-    assert(scale != 0); 
-    size_t end;
-    float value = static_cast<float>(std::stoi(std::string(data.substr(offset)), &end)) / scale;
-    offset += end;
-    return value;
-}
-
 size_t next_non_comment(std::string_view data, size_t& offset) {
     while (offset < data.size()) {
         if (data[offset] == '#') {
             size_t end_line = data.find(NEWLINE, offset);
-            offset = end_line == std::string_view::npos ? data.size() : end_line + NEWLINE.size();
+            offset = (end_line == std::string_view::npos) ? data.size() : end_line + NEWLINE.size();
         } else if (!std::isspace(data[offset])) {
             return offset;
         } else {
@@ -192,43 +182,45 @@ size_t next_non_comment(std::string_view data, size_t& offset) {
     return std::string_view::npos;
 }
 
+// a helper function to advance the offset past non-comment sections and parse a number
+template <typename T>
+T next_number(std::string_view data, size_t& offset) {
+    offset = next_non_comment(data, offset);
+    T value{};
+    auto [ptr, ec] = std::from_chars(data.data() + offset, data.data() + data.size(), value);
+    if(ec != std::errc{}){
+        throw ppm_parse_error("Failed to parse number!");
+    }
+    offset = ptr - data.data();
+    return value;
+}
+
 struct ppm_header_data{
     size_t width;
     size_t height;
     float maxByteValue;
     size_t data_start;
+
+    constexpr ppm_header_data(size_t w, size_t h, float max, size_t data_start) : width(w), height(h), maxByteValue(max), data_start(data_start){
+        if(width == 0 || height == 0) throw ppm_parse_error("Canvas dimensions must be non-zero."sv);
+        if(maxByteValue > 255 || maxByteValue <= 0) throw ppm_parse_error("Invalid max byte value."sv);
+        if(data_start == std::string_view::npos) throw ppm_parse_error("Incomplete or incorrect PPM header."sv);
+    }
 };
 
 ppm_header_data parse_header(std::string_view data) {
     size_t offset = 0;
-    offset = next_non_comment(data, offset); //skip leading whitespaces and comments        
-    if (data.substr(offset, 2) != "P3" || !std::isspace(data[offset + 2])) {
+    offset = next_non_comment(data, offset); //skip any leading comments. 
+    if (data.substr(offset, 2) != PPM_VERSION || !std::isspace(data[offset + 2])) {
         throw ppm_parse_error("Unsupported or invalid PPM format. Only P3 is supported.");
     }
-    offset += 3; //move past "P3" and the whitespace after it    
-    
-    offset = next_non_comment(data, offset);
-    size_t end = 0;
-    size_t width = std::stoi(std::string(data.substr(offset)), &end);
-    offset += end;
-    
-    offset = next_non_comment(data, offset);
-    size_t height = std::stoi(std::string(data.substr(offset)), &end);
-    offset += end;
-        
-    offset = next_non_comment(data, offset);
-    float maxByteValue = static_cast<float>(std::stoi(std::string(data.substr(offset)), &end));
-    offset += end;
+    offset += PPM_VERSION.size()+1;// Move past "P3" and the whitespace after it
 
-    if (maxByteValue > 255 || maxByteValue <= 0) {
-        throw ppm_parse_error("Invalid max byte value.");
-    }
-        
-    size_t pixel_data_start = data.find_first_not_of("\n", offset);
-    if (pixel_data_start == std::string_view::npos) {    
-        throw ppm_parse_error("Incomplete or incorrect PPM header.");
-    }    
-    return {width, height, maxByteValue, pixel_data_start}; // return starting position of pixel data after header
+    auto width = next_number<size_t>(data, offset);
+    auto height = next_number<size_t>(data, offset);
+    auto maxByteValue = next_number<float>(data, offset);
+    size_t pixel_data_start = data.find_first_not_of("\n", offset);    
+    return {width, height, maxByteValue, pixel_data_start};
 }
 
 Canvas canvas_from_ppm(std::string_view ppm) {
@@ -238,12 +230,11 @@ Canvas canvas_from_ppm(std::string_view ppm) {
     size_t offset = data_start;
     while (offset < ppm.size() && pixels.size() < width * height) {
         next_non_comment(ppm, offset);
-        float r = next_value_scaled(ppm, offset, maxByteValue);
-        float g = next_value_scaled(ppm, offset, maxByteValue);
-        float b = next_value_scaled(ppm, offset, maxByteValue);
+        auto r = next_number<float>(ppm, offset) / maxByteValue;
+        auto g = next_number<float>(ppm, offset) / maxByteValue;
+        auto b = next_number<float>(ppm, offset) / maxByteValue;
         pixels.emplace_back(r, g, b);
     }
-    if (pixels.size() != width * height) throw ppm_parse_error("Pixel data does not match width*height.");
-    
+    if (pixels.size() != width * height) throw ppm_parse_error("Pixel data does not match width*height."); 
     return Canvas(width, height, std::move(pixels));
 }
