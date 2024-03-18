@@ -194,4 +194,18 @@ R"(P3
   EXPECT_EQ(result.get(0, 0), color(0.2f, 0.6f, 0.8f));  
 }
 
+TEST(Canvas, FromPPMHandlesScaling) {
+  auto ppm = 
+R"(P3
+2 2
+100
+100 100 100 50 50 50
+75 50 25 0 0 0)";
+  
+  const auto result = canvas_from_ppm(ppm);   
+  EXPECT_EQ(result.width(), 2);
+  EXPECT_EQ(result.height(), 2);
+  EXPECT_EQ(result.get(0, 1), color(0.75f, 0.5f, 0.25f));  
+}
+
 RESTORE_WARNINGS

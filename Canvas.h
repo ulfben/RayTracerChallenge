@@ -201,11 +201,11 @@ struct ppm_header_data{
 
 ppm_header_data parse_header(std::string_view data) {
     size_t offset = 0;
-    offset = next_non_comment(data, offset); // Skip leading whitespaces and comments        
+    offset = next_non_comment(data, offset); //skip leading whitespaces and comments        
     if (data.substr(offset, 2) != "P3" || !std::isspace(data[offset + 2])) {
         throw ppm_parse_error("Unsupported or invalid PPM format. Only P3 is supported.");
     }
-    offset += 3; // Move past "P3" and the whitespace after it    
+    offset += 3; //move past "P3" and the whitespace after it    
     
     offset = next_non_comment(data, offset);
     size_t end = 0;
