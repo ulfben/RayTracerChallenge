@@ -16,7 +16,10 @@ struct Intersection final {
         return *objPtr;
     }
     constexpr const Material& surface() const noexcept {
-        return std::visit([](const auto& obj) -> const Material& { return obj.surface();  }, object());
+        return ::surface(object());
+        /*return std::visit([](const auto& obj) -> const Material& { 
+            return obj.surface();  
+        }, object());*/
     }
     constexpr bool operator<(const Intersection& that) const noexcept {
         return t < that.t;
@@ -105,8 +108,14 @@ constexpr auto intersections(std::span<Real> ts, const Shapes& variant) noexcept
 
 constexpr auto intersect(const Shapes& variant, const Ray& r) {
     std::vector<Real> ts = std::visit([&r](const auto& obj) {
-        const auto local_ray = transform(r, obj.inv_transform());
-        return local_intersect(obj, local_ray);  }, variant
+        if constexpr (std::is_same_v<std::decay_t<decltype(obj)>, Group*>) {
+            assert(obj != nullptr && "Null Group pointer encountered");
+            const auto local_ray = transform(r, obj->inv_transform());
+            return local_intersect(*obj, local_ray);
+        } else {
+            const auto local_ray = transform(r, obj.inv_transform());
+            return local_intersect(obj, local_ray);
+        }}, variant
     );
     return intersections(ts, variant);
     /*if (t1 != T_MISS) {
