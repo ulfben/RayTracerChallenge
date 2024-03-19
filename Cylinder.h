@@ -6,7 +6,7 @@
 #include "Material.h"
 #include "Ray.h"
 /* unit cylinder, always radius 1, positioned at 0, 0, 0 and extending to infinity on the y axis*/
-struct Cylinder {
+struct Cylinder final {
     Material surface{ material() };    
     Real minimum = math::MIN; //cylinder extents on the Y-axis. Up-to but not including this value.
     Real maximum = math::MAX; //avoiding INFINITY to avoid fp:fast bugs.

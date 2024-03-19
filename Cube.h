@@ -5,7 +5,7 @@
 #include "Material.h"
 #include "Ray.h"
 /*A unit AABB, always positioned at 0, 0, 0 and extending from -1 to +1f*/
-struct Cube {
+struct Cube final {
     Material surface{ material() };
     constexpr Cube() noexcept = default;
     explicit constexpr Cube(Material m) noexcept : surface(std::move(m)) {}

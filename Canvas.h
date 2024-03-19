@@ -77,7 +77,7 @@ public:
     }
 
     constexpr Canvas(size_type width, size_type height, std::vector<Color> pixels) : bitmap(std::move(pixels)), _width(width), _height(height){
-        if(bitmap.size() != this->width() * this->height()){
+        if(this->size() != this->width() * this->height()){
             throw std::runtime_error("Pixel data does not match width*height.");
         }
     }
@@ -215,7 +215,6 @@ ppm_header_data parse_header(std::string_view data) {
         throw ppm_parse_error("Unsupported or invalid PPM format. Only P3 is supported.");
     }
     offset += PPM_VERSION.size()+1;// Move past "P3" and the whitespace after it
-
     auto width = next_number<size_t>(data, offset);
     auto height = next_number<size_t>(data, offset);
     auto maxByteValue = next_number<float>(data, offset);

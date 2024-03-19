@@ -102,6 +102,12 @@
     <ClInclude Include="tests\StringHelpersTest.h">
       <Filter>tests</Filter>
     </ClInclude>
+    <ClInclude Include="Group.h">
+      <Filter>geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\GroupTests.h">
+      <Filter>tests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="tests">

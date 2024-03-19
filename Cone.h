@@ -6,7 +6,7 @@
 #include "Material.h"
 #include "Ray.h"
 
-struct Cone {
+struct Cone final {
     Material surface{ material() };    
     Real minimum = math::MIN; //cone extents on the Y-axis. Up-to but not including this value.
     Real maximum = math::MAX; //avoiding INFINITY to avoid fp:fast bugs.

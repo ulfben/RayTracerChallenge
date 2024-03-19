@@ -73,6 +73,7 @@
     <ClInclude Include="Cone.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="Cylinder.h" />
+    <ClInclude Include="Group.h" />
     <ClInclude Include="HitState.h" />
     <ClInclude Include="Intersection.h" />
     <ClInclude Include="Lighting.h" />
@@ -95,6 +96,7 @@
     <ClInclude Include="tests\CubeTests.h" />
     <ClInclude Include="tests\CylinderTests.h" />
     <ClInclude Include="tests\FloatCompareTests.h" />
+    <ClInclude Include="tests\GroupTests.h" />
     <ClInclude Include="tests\MaterialTests.h" />
     <ClInclude Include="tests\MatrixTests.h" />
     <ClInclude Include="tests\MatrixTransformationTests.h" />
