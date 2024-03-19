@@ -90,12 +90,12 @@ TEST(Transparency, shadeHitWithTransparentMaterial) {
     constexpr auto halfSqrt = sqrt / 2.0f;
     auto w = World();
     auto floor = plane(translation(0, -1, 0));
-    floor.surface.transparency = 0.5f;
-    floor.surface.refractive_index = 1.5f;
+    floor.surface().transparency = 0.5f;
+    floor.surface().refractive_index = 1.5f;
 
     auto ball = sphere(translation(0, -3.5f, -0.5f));
-    ball.surface.color = color(1, 0, 0);
-    ball.surface.ambient = 0.5f;
+    ball.surface().color = color(1, 0, 0);
+    ball.surface().ambient = 0.5f;
 
     w.push_back(floor);
     w.push_back(ball);
@@ -145,13 +145,13 @@ TEST(Transparency, shadeHitWithAReflectiveTransparentMaterial) {
     constexpr auto halfSqrt = sqrt / 2.0f;
     auto w = World();
     auto floor = plane(translation(0, -1, 0));
-    floor.surface.transparency = 0.5f;
-    floor.surface.reflective = 0.5f;
-    floor.surface.refractive_index = 1.5f;
+    floor.surface().transparency = 0.5f;
+    floor.surface().reflective = 0.5f;
+    floor.surface().refractive_index = 1.5f;
 
     auto ball = sphere(translation(0, -3.5f, -0.5f));
-    ball.surface.color = color(1, 0, 0);
-    ball.surface.ambient = 0.5f;
+    ball.surface().color = color(1, 0, 0);
+    ball.surface().ambient = 0.5f;
 
     w.push_back(floor);
     w.push_back(ball);

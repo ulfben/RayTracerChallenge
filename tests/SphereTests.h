@@ -67,15 +67,15 @@ TEST(Sphere, normalOnTransformedSphere) {
 
 TEST(Sphere, hasADefaultMaterial) {    
     constexpr auto s = sphere();    
-    EXPECT_EQ(s.surface, material());
+    EXPECT_EQ(s.surface(), material());
 }
 
 TEST(Sphere, canBeAssignedMaterial) {    
     auto s = sphere();    
     auto surface = material();
     surface.ambient = 1.0f;
-    s.surface = surface;
-    EXPECT_EQ(s.surface, surface);
+    s.surface() = surface;
+    EXPECT_EQ(s.surface(), surface);
 }
 
 RESTORE_WARNINGS

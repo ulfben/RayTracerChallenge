@@ -50,8 +50,8 @@ TEST(Cube, rayMissesACube) {
         {point(0, 2, 2), vector(0,-1,0)},
         {point(2, 2, 0), vector(-1, 0, 0)}
     };
-    for (size_t i = 0; i < rays.size(); i++) {
-        const auto xs = local_intersect(c, rays[i]);
+    for (const auto& ray : rays) {
+        const auto xs = local_intersect(c, ray);
         EXPECT_EQ(xs, MISS);
     }
 }

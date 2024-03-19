@@ -9,7 +9,7 @@ DISABLE_WARNINGS_FROM_GTEST
 
 
 TEST(Group, ANewGroupIsEmpty) {           
-    Group<Shapes> g;
+    Group g;
     EXPECT_TRUE(g.empty());
     EXPECT_EQ(g.size(), 0);
     EXPECT_EQ(g.get_transform(), Matrix4Identity);

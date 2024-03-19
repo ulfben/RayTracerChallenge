@@ -104,7 +104,7 @@ namespace math {
     }
 
     template<class T>
-    [[nodiscard]] constexpr T is_zero(T v, T epsilon = BOOK_EPSILON) noexcept {
+    [[nodiscard]] constexpr bool is_zero(T v, T epsilon = BOOK_EPSILON) noexcept {
         return v == T(0) || math::abs(v) < epsilon;
     }
 
@@ -138,7 +138,7 @@ namespace math {
     template<std::floating_point T>
     [[nodiscard]] constexpr int int_ceil(T f) noexcept {
         if (std::is_constant_evaluated()) {
-            const int i = static_cast<int>(f);
+            const auto i = static_cast<int>(f);
             return f > i ? i + 1 : i;
         }
         return static_cast<int>(std::ceil(f));

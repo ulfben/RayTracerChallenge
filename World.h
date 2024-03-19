@@ -74,17 +74,17 @@ struct World final {
 };
 
 constexpr Material& get_material(World& w, size_t i) noexcept{    
-    return std::visit([](auto& obj) noexcept -> Material& {return obj.surface;  }, w[i]);
+    return std::visit([](auto& obj) noexcept -> Material& {return obj.surface();  }, w[i]);
 }
 constexpr const Material& get_material(const World& w, size_t i) noexcept{   
-    return std::visit([](const auto& obj) noexcept -> const Material& {return obj.surface;  }, w[i]);
+    return std::visit([](const auto& obj) noexcept -> const Material& {return obj.surface();  }, w[i]);
 }
 
 constexpr Material& get_material(World::iterator iter) noexcept{    
-    return std::visit([](auto& obj) noexcept -> Material& {return obj.surface;  }, *iter);
+    return std::visit([](auto& obj) noexcept -> Material& {return obj.surface();  }, *iter);
 }
 constexpr const Material& get_material(World::const_iterator iter) noexcept{   
-    return std::visit([](const auto& obj) noexcept -> const Material& {return obj.surface;  }, *iter);
+    return std::visit([](const auto& obj) noexcept -> const Material& {return obj.surface();  }, *iter);
 }
 
 constexpr const Matrix4& get_transform(World::const_iterator iter) noexcept{   

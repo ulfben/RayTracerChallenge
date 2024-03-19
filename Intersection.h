@@ -16,7 +16,7 @@ struct Intersection final {
         return *objPtr;
     }
     constexpr const Material& surface() const noexcept {
-        return std::visit([](const auto& obj) -> const Material& { return obj.surface;  }, object());
+        return std::visit([](const auto& obj) -> const Material& { return obj.surface();  }, object());
     }
     constexpr bool operator<(const Intersection& that) const noexcept {
         return t < that.t;

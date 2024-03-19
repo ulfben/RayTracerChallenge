@@ -6,28 +6,27 @@
 #include "Material.h"
 #include "Ray.h"
 
-struct Cone final {
-    Material surface{ material() };    
+struct Cone final {     
     Real minimum = math::MIN; //cone extents on the Y-axis. Up-to but not including this value.
     Real maximum = math::MAX; //avoiding INFINITY to avoid fp:fast bugs.
     bool closed = false; 
     constexpr Cone() noexcept = default;    
     constexpr Cone(Real min, Real max, bool closed_ = false) noexcept : minimum(min), maximum(max), closed(closed_) {}
-    explicit constexpr Cone(Material m) noexcept : surface(std::move(m)) {}
+    explicit constexpr Cone(Material m) noexcept : _surface(std::move(m)) {}
     explicit constexpr Cone(Matrix4 transf) noexcept {
         set_transform(std::move(transf));
     }
-    constexpr Cone(Material m, Matrix4 transf) noexcept : surface(std::move(m)) {
+    constexpr Cone(Material m, Matrix4 transf) noexcept : _surface(std::move(m)) {
         set_transform(std::move(transf));
     }   
-    constexpr Cone(Real min, Real max, Material m, Matrix4 transform) noexcept : minimum(min), maximum(max), surface(std::move(m)) {
+    constexpr Cone(Real min, Real max, Material m, Matrix4 transform) noexcept : minimum(min), maximum(max), _surface(std::move(m)) {
         set_transform(std::move(transform));
     }
-    constexpr Cone(Real min, Real max, bool closed_, Material m, Matrix4 transform) noexcept : minimum(min), maximum(max), closed(closed_), surface(std::move(m)) {
+    constexpr Cone(Real min, Real max, bool closed_, Material m, Matrix4 transform) noexcept : minimum(min), maximum(max), closed(closed_), _surface(std::move(m)) {
         set_transform(std::move(transform));
     }
     constexpr auto operator==(const Cone& that) const noexcept {
-        return surface == that.surface && _transform == that._transform;
+        return surface() == that.surface() && _transform == that._transform;
     }
     constexpr const Matrix4& get_transform() const noexcept {
         return _transform;
@@ -39,7 +38,20 @@ struct Cone final {
         _transform = std::move(mat);
         _invTransform = inverse(_transform);
     }
+    constexpr const Material& surface() const noexcept {
+        return _surface;
+    }
+    constexpr const Color& color() const noexcept{
+        return surface().color;
+    }
+    constexpr Material& surface() noexcept {
+        return _surface;
+    }
+    constexpr Color& color() noexcept{
+        return surface().color;
+    }
 private: 
+    Material _surface{ material() };   
     Matrix4 _transform{ Matrix4Identity };
     Matrix4 _invTransform{ Matrix4Identity };
 };

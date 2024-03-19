@@ -10,8 +10,6 @@
 #include "Color.h"
 #include "Material.h"
 
-
-
 using Shapes = std::variant<Sphere, Plane, Cube, Cylinder, Cone>;
 template<typename T> 
 concept is_shape = std::is_same_v<Sphere, T> || std::is_same_v<Plane, T> || std::is_same_v<Cube, T> || std::is_same_v<Cylinder, T> || std::is_same_v<Cone, T>;
@@ -35,6 +33,7 @@ constexpr bool operator==(const Patterns& v, const is_shape auto& t) {
     return t == v;
 };
 
+//functions handling the Shapes variant
 constexpr const Matrix4& get_transform(const Shapes& variant) noexcept { 
     return std::visit([](const auto& obj) -> const Matrix4& { 
         return obj.get_transform();
@@ -47,17 +46,18 @@ constexpr const Matrix4& get_inverse_transform(const Shapes& variant) noexcept {
 }
 constexpr const Material& surface(const Shapes& variant) noexcept { 
     return std::visit([](const auto& obj) -> const Material& { 
-        return obj.surface;
+        return obj.surface();
     }, variant);    
 }
 constexpr const Color& color(const Shapes& variant) noexcept { 
     return std::visit([](const auto& obj) -> const Color& { 
-        return obj.surface.color;
+        return obj.color();
     }, variant);    
 }
 
+//functions handling the individual geometry types
 constexpr const Material& color(const is_shape auto& obj) noexcept {
-    return obj.surface;
+    return obj.surface();
 }
 
 constexpr const Matrix4& get_transform(const is_shape auto& obj) noexcept {
@@ -69,7 +69,7 @@ constexpr const Matrix4& get_inverse_transform(const is_shape auto& obj) noexcep
 }
 
 constexpr const Color& color(const is_shape auto& obj) noexcept {
-    return obj.surface.color;
+    return obj.color();
 }
 
 std::ostream& operator<<(std::ostream& os, const Shapes& variant){   

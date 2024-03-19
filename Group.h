@@ -3,9 +3,7 @@
 #include "Matrix.h"
 #include "Shapes.h"
 
-template <typename Shapes>
-struct Group final{
-    
+struct Group final{    
     constexpr bool empty() const noexcept { return _shapes.empty(); }
     constexpr size_t size() const noexcept { return _shapes.size(); }
 
@@ -27,3 +25,7 @@ private:
     Matrix4 _transform{ Matrix4Identity };
     Matrix4 _invTransform{ Matrix4Identity };
 };
+
+constexpr Vector local_normal_at([[maybe_unused]]const Group& g, const Point& object_space_point) noexcept { 
+    return normalize(vector(object_space_point)); /*imagine object_space_point - s.position, but s position is always 0*/    
+}
