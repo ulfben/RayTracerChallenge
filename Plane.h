@@ -4,6 +4,7 @@
 #include "Matrix.h"
 #include "Material.h"
 #include "Ray.h"
+struct Group;
 /*A plane is perfectly flat and extends infinitely on the x and z dimensions. It is infinitely thin on the y axis.
 It's normal is the same at every point. */
 struct Plane final{
@@ -41,10 +42,17 @@ struct Plane final{
     constexpr Color& color() noexcept{
         return surface().color;
     }
+    constexpr void set_parent(Group* g) noexcept{
+        _parent = g;
+    }
+    constexpr Group* get_parent() const noexcept{
+        return _parent;
+    }
 private:
     Material _surface{};
     Matrix4 _transform{Matrix4Identity};
     Matrix4 _invTransform{Matrix4Identity};
+    Group* _parent = nullptr;
 };
 
 constexpr Plane plane() noexcept{

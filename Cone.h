@@ -51,6 +51,12 @@ struct Cone final {
     constexpr Color& color() noexcept{
         return surface().color;
     }
+    constexpr void set_parent(Group* g) noexcept{
+        _parent = g;
+    }
+    constexpr Group* get_parent() const noexcept{
+        return _parent;
+    }
 private: 
     Material _surface{ material() };   
     Matrix4 _transform{ Matrix4Identity };

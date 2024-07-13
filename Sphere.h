@@ -4,6 +4,7 @@
 #include "Matrix.h"
 #include "Material.h"
 #include "Ray.h"
+struct Group;
 
 /*A unit Sphere, always positioned at 0, 0, 0 and with a radius of 1.0f*/
 struct Sphere final{
@@ -40,10 +41,17 @@ struct Sphere final{
     constexpr Color& color() noexcept{
         return surface().color;
     }
+    constexpr void set_parent(Group* g) noexcept{
+        _parent = g;
+    }
+    constexpr Group* get_parent() const noexcept{
+        return _parent;
+    }
 private:
     Material _surface{material()};
     Matrix4 _transform{Matrix4Identity};
     Matrix4 _invTransform{Matrix4Identity};
+    Group* _parent = nullptr;
 };
 
 constexpr Sphere sphere() noexcept{

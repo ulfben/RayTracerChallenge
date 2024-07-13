@@ -16,7 +16,7 @@ using Shapes = std::variant<Sphere, Plane, Cube, Cylinder, Cone, Group*>;
 template<typename T>
 concept is_shape = std::is_same_v<Sphere, T> || std::is_same_v<Plane, T> || std::is_same_v<Cube, T> || std::is_same_v<Cylinder, T> || std::is_same_v<Cone, T>;
 
-#include "Group.h"
+//#include "Group.h"
 
 constexpr Vector normal_at(const Shapes& variant, const Point& p){
     return std::visit([&p](const auto& obj) noexcept {
@@ -100,6 +100,27 @@ constexpr const Color& color(const Shapes& variant) noexcept {
     }, variant);
 }
 
+constexpr void set_parent(Shapes& variant, Group* g) noexcept {
+    return std::visit([g](auto& obj) noexcept -> void {
+        if constexpr (std::is_same_v<std::decay_t<decltype(obj)>, Group*>) {
+            assert(obj != nullptr && "Null Group pointer encountered");
+            obj->set_parent(g);
+        } else {
+            obj.set_parent(g);
+        }
+    }, variant);
+}
+
+constexpr Group* get_parent(Shapes& variant) noexcept {
+    return std::visit([](const auto& obj) noexcept -> Group* {
+        if constexpr (std::is_same_v<std::decay_t<decltype(obj)>, Group*>) {
+            assert(obj != nullptr && "Null Group pointer encountered");
+            return obj->get_parent();
+        } else {
+            return obj.get_parent();
+        }
+    }, variant);
+}
 
 //functions handling the individual geometry types
 constexpr const Material& color(const is_shape auto& obj) noexcept{

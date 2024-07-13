@@ -36,10 +36,10 @@ struct Group final{
         return _parent != nullptr;
     }
     constexpr auto& front() noexcept{
-        return _shapes.front();
+        return *_shapes.front();
     }
     constexpr auto& back() noexcept{
-        return _shapes.back();
+        return *_shapes.back();
     }
     constexpr auto begin() noexcept{
         return _shapes.begin();
@@ -47,15 +47,26 @@ struct Group final{
     constexpr auto end() noexcept{
         return _shapes.end();
     }
+    constexpr void push_back(Shapes* s){
+        _shapes.push_back(s);
+        ::set_parent(*s, this);
+    }
+    constexpr void set_parent(Group* g) noexcept{
+        _parent = g;
+    }
+    constexpr Group* get_parent() const noexcept{
+        return _parent;
+    }
 private:
     Material _surface{material()};
     Matrix4 _transform{Matrix4Identity};
     Matrix4 _invTransform{Matrix4Identity};
-    std::vector<Shapes> _shapes;
-    Shapes* _parent = nullptr;
+    std::vector<Shapes*> _shapes;
+    Group* _parent = nullptr;
 };
 
 constexpr Vector local_normal_at([[maybe_unused]] const Group& g, const Point& object_space_point) noexcept{
+    assert(false && "groups don't have normals. only shapes do!");
     return normalize(vector(object_space_point)); /*imagine object_space_point - s.position, but s position is always 0*/
 }
 

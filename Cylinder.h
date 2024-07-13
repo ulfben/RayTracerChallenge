@@ -5,6 +5,7 @@
 #include "Matrix.h"
 #include "Material.h"
 #include "Ray.h"
+struct Group;
 /* unit cylinder, always radius 1, positioned at 0, 0, 0 and extending to infinity on the y axis*/
 struct Cylinder final{
     Real minimum = math::MIN; //cylinder extents on the Y-axis. Up-to but not including this value.
@@ -50,10 +51,17 @@ struct Cylinder final{
     constexpr Color& color() noexcept{
         return surface().color;
     }
+    constexpr void set_parent(Group* g) noexcept{
+        _parent = g;
+    }
+    constexpr Group* get_parent() const noexcept{
+        return _parent;
+    }
 private:
     Material _surface{material()};
     Matrix4 _transform{Matrix4Identity};
     Matrix4 _invTransform{Matrix4Identity};
+    Group* _parent = nullptr;
 };
 
 constexpr Cylinder cylinder() noexcept{

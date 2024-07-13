@@ -24,9 +24,9 @@ TEST(Group, ANewGroupHasNoParent) {
 TEST(Group, CanParentShape) {           
     Group g;
     Shapes s = Sphere();
-  //  add_child(g, s);
-  //  get_parent(s) == &g;
-    g.front() == s;
+    g.push_back(&s);
+    EXPECT_TRUE(g.front() == s);
+    EXPECT_TRUE(get_parent(g.front()) == &g);
 }
 
 RESTORE_WARNINGS
