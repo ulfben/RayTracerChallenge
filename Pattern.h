@@ -88,7 +88,7 @@ struct NullPattern final{
     constexpr bool operator==(const NullPattern& that) const noexcept = default;
     constexpr const Matrix4& get_transform() const noexcept{ return _transform; }
     constexpr const Matrix4& inv_transform() const noexcept{ return _invTransform; }
-    constexpr void set_transform([[maybe_unused]] Matrix4 mat) noexcept{}
+    constexpr void set_transform(Matrix4 mat) noexcept{ _transform = mat; }
 private:
     Matrix4 _transform{Matrix4Identity};
     Matrix4 _invTransform{Matrix4Identity};

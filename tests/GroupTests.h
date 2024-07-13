@@ -16,4 +16,17 @@ TEST(Group, ANewGroupIsEmpty) {
     EXPECT_EQ(g.inv_transform(), inverse(g.get_transform()));
 }
 
+TEST(Group, ANewGroupHasNoParent) {           
+    Group g;
+    EXPECT_FALSE(g.has_parent());
+}
+
+TEST(Group, CanParentShape) {           
+    Group g;
+    Shapes s = Sphere();
+  //  add_child(g, s);
+  //  get_parent(s) == &g;
+    g.front() == s;
+}
+
 RESTORE_WARNINGS

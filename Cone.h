@@ -5,6 +5,7 @@
 #include "Matrix.h"
 #include "Material.h"
 #include "Ray.h"
+struct Group;
 
 struct Cone final {     
     Real minimum = math::MIN; //cone extents on the Y-axis. Up-to but not including this value.
@@ -54,6 +55,7 @@ private:
     Material _surface{ material() };   
     Matrix4 _transform{ Matrix4Identity };
     Matrix4 _invTransform{ Matrix4Identity };
+    Group* _parent = nullptr;
 };
 
 constexpr Cone cone() noexcept {

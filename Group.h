@@ -32,11 +32,27 @@ struct Group final{
     constexpr Color& color() noexcept{
         return surface().color;
     }
+    constexpr bool has_parent() const noexcept{
+        return _parent != nullptr;
+    }
+    constexpr auto& front() noexcept{
+        return _shapes.front();
+    }
+    constexpr auto& back() noexcept{
+        return _shapes.back();
+    }
+    constexpr auto begin() noexcept{
+        return _shapes.begin();
+    }
+    constexpr auto end() noexcept{
+        return _shapes.end();
+    }
 private:
     Material _surface{material()};
     Matrix4 _transform{Matrix4Identity};
     Matrix4 _invTransform{Matrix4Identity};
     std::vector<Shapes> _shapes;
+    Shapes* _parent = nullptr;
 };
 
 constexpr Vector local_normal_at([[maybe_unused]] const Group& g, const Point& object_space_point) noexcept{
