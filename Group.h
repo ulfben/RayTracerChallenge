@@ -47,6 +47,12 @@ struct Group final{
     constexpr auto end() noexcept{
         return _shapes.end();
     }
+     constexpr auto begin() const noexcept{
+        return _shapes.cbegin();
+    }
+    constexpr auto end() const noexcept{
+        return _shapes.cend();
+    }
     constexpr void push_back(Shapes* s){
         _shapes.push_back(s);
         ::set_parent(*s, this);
@@ -70,6 +76,10 @@ constexpr Vector local_normal_at([[maybe_unused]] const Group& g, const Point& o
     return normalize(vector(object_space_point)); /*imagine object_space_point - s.position, but s position is always 0*/
 }
 
-constexpr auto local_intersect([[maybe_unused]] const Group& g, [[maybe_unused]] const Ray& local_ray) noexcept{
+constexpr auto local_intersect(const Group& group, const Ray& local_ray) noexcept{
+    for(auto shape : group){
+        auto xs = local_intersect(shape, ray);
+
+    }    
     return std::vector<Real>();
 }

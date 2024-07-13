@@ -100,6 +100,17 @@ constexpr const Color& color(const Shapes& variant) noexcept {
     }, variant);
 }
 
+constexpr void set_transform(Shapes& variant, const Matrix4& t) noexcept {
+    return std::visit([t](auto& obj) noexcept -> void {
+        if constexpr (std::is_same_v<std::decay_t<decltype(obj)>, Group*>) {
+            assert(obj != nullptr && "Null Group pointer encountered");
+            obj->set_transform(t);
+        } else {
+            obj.set_transform(t);
+        }
+    }, variant);
+}
+
 constexpr void set_parent(Shapes& variant, Group* g) noexcept {
     return std::visit([g](auto& obj) noexcept -> void {
         if constexpr (std::is_same_v<std::decay_t<decltype(obj)>, Group*>) {
@@ -118,6 +129,17 @@ constexpr Group* get_parent(Shapes& variant) noexcept {
             return obj->get_parent();
         } else {
             return obj.get_parent();
+        }
+    }, variant);
+}
+
+constexpr auto local_intersect(const Shapes& variant, const Ray& r) noexcept {
+    return std::visit([r](const auto& obj) noexcept -> auto {
+        if constexpr (std::is_same_v<std::decay_t<decltype(obj)>, Group*>) {
+            assert(obj != nullptr && "Null Group pointer encountered");
+            return ::local_intersect(*obj, r);
+        } else {
+            return ::local_intersect(obj, r);
         }
     }, variant);
 }
