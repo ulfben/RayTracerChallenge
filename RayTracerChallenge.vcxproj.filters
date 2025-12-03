@@ -108,6 +108,7 @@
     <ClInclude Include="tests\GroupTests.h">
       <Filter>tests</Filter>
     </ClInclude>
+    <ClInclude Include="Shapes_fwd.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="tests">

@@ -1,27 +1,16 @@
 #pragma once
 #include "pch.h"
-#include <variant>
-#include "Sphere.h"
-#include "Plane.h"
-#include "Cube.h"
-#include "Cylinder.h"
-#include "Cone.h"
+#include "Shapes_fwd.h" //gets Shapes and is_shape
+#include "Group.h"
+#include "Ray.h"
 #include "Matrix.h"
 #include "Color.h"
 #include "Material.h"
 
-struct Group;
-
-using Shapes = std::variant<Sphere, Plane, Cube, Cylinder, Cone, Group*>;
-template<typename T>
-concept is_shape = std::is_same_v<Sphere, T> || std::is_same_v<Plane, T> || std::is_same_v<Cube, T> || std::is_same_v<Cylinder, T> || std::is_same_v<Cone, T>;
-
-//#include "Group.h"
-
 constexpr Vector normal_at(const Shapes& variant, const Point& p){
     return std::visit([&p](const auto& obj) noexcept {
       if constexpr (std::is_same_v<std::decay_t<decltype(obj)>, Group*>) {
-            assert(obj == nullptr && "Null Group pointer encountered");
+            assert(obj != nullptr && "Null Group pointer encountered");
             // Assuming Group has the necessary methods (this part may need adjustments)
             const auto object_space_point = obj->inv_transform() * p; 
             const auto object_space_normal = local_normal_at(*obj, object_space_point);
@@ -111,7 +100,7 @@ constexpr void set_transform(Shapes& variant, const Matrix4& t) noexcept {
     }, variant);
 }
 
-constexpr void set_parent(Shapes& variant, Group* g) noexcept {
+inline constexpr void set_parent(Shapes& variant, Group* g) noexcept {
     return std::visit([g](auto& obj) noexcept -> void {
         if constexpr (std::is_same_v<std::decay_t<decltype(obj)>, Group*>) {
             assert(obj != nullptr && "Null Group pointer encountered");
@@ -145,7 +134,7 @@ constexpr auto local_intersect(const Shapes& variant, const Ray& r) noexcept {
 }
 
 //functions handling the individual geometry types
-constexpr const Material& color(const is_shape auto& obj) noexcept{
+constexpr const Material& surface(const is_shape auto& obj) noexcept{
     return obj.surface();
 }
 
@@ -166,4 +155,14 @@ std::ostream& operator<<(std::ostream& os, const Shapes& variant){
         os << val;
         return os;
         }, variant);
+}
+
+inline constexpr std::vector<Real> local_intersect(const Group& group, const Ray& local_ray) noexcept{
+    for(const auto shape : group){
+        const Shapes temp = *shape;
+        auto xs = local_intersect(temp, local_ray);
+
+    }
+    //TODO: implement
+    return std::vector<Real>();
 }

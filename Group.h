@@ -1,7 +1,11 @@
 #pragma once
 #include "pch.h"
 #include "Matrix.h"
-#include "Shapes.h"
+#include "Color.h"
+#include "Material.h"
+#include "Shapes_fwd.h"
+
+struct Ray;
 
 struct Group final{
     constexpr bool empty() const noexcept{ return _shapes.empty(); }
@@ -76,10 +80,16 @@ constexpr Vector local_normal_at([[maybe_unused]] const Group& g, const Point& o
     return normalize(vector(object_space_point)); /*imagine object_space_point - s.position, but s position is always 0*/
 }
 
-constexpr auto local_intersect(const Group& group, const Ray& local_ray) noexcept{
-    for(auto shape : group){
-        auto xs = local_intersect(shape, ray);
-
-    }    
-    return std::vector<Real>();
-}
+// Declaration only; the definition appears in shapes.h.
+//
+// Reason:
+// Group is itself a “shape” and contains other Shapes. At the same time,
+// individual Shapes need to know their parent Group. This creates a recursive
+// relationship between Group and Shapes that cannot be resolved in a single
+// header.
+//
+// By declaring local_intersect(Group, Ray) here, Group can expose the function
+// without needing the full variant-based dispatch logic. The actual definition
+// is provided in shapes.h, once both Group and the Shapes variant are fully
+// known.
+constexpr std::vector<Real> local_intersect(const Group& group, const Ray& local_ray) noexcept;

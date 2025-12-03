@@ -86,6 +86,7 @@ constexpr Real magnitudeSq(const Vector& t) noexcept {
     return ((t.x * t.x) + (t.y * t.y) + (t.z * t.z));
 }
 constexpr Real magnitude(const Vector& t) noexcept {
+    //std::hypot(t.x, t.y, t.z); 
     return math::sqrt((t.x * t.x) + (t.y * t.y) + (t.z * t.z));
 }
 constexpr Vector normalize(const Vector& t) noexcept {
